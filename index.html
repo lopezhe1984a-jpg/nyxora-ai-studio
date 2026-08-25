@@ -486,16 +486,12 @@
               Ahora mismo el botón "Generar" funciona en <b>modo demo</b>: simula el proceso y muestra imágenes de ejemplo, para que puedas probar todo el flujo (créditos, modelos, formatos) sin necesidad de una clave todavía.
             </p>
             <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;">
-              NYXORA ya trae integrada la llamada a <b>Google AI Studio (API de Gemini)</b> para generación de imágenes. Solo pega tu clave abajo — se guarda únicamente en la memoria de esta pestaña del navegador, nunca se escribe en el archivo ni se envía a ningún servidor propio de NYXORA. Al cerrar o recargar la página, se borra.
+              Para generación <b>real</b>, conecta tu propia clave de un proveedor legítimo de generación de imágenes/video (por ejemplo, la API de OpenAI, Stability AI, Google, o la Anthropic API para prompts/JSON). Pega tu endpoint y clave aquí — se guardan solo en tu sesión, nunca se envían a ningún otro lado:
             </p>
-            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza distinto según el tipo de clave)"></div>
-            <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-2.5-flash-image" placeholder="gemini-2.5-flash-image"></div>
-            <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Conectar</button>
-            <span id="apiStatusTag" style="margin-left:10px; font-size:12px; color:var(--text-faint);">No conectado</span>
-            <div class="empty-note">
-              Google cambia de vez en cuando el nombre exacto del modelo de imagen disponible en AI Studio. Si ves un error de "modelo no encontrado", entra a <a href="https://aistudio.google.com" target="_blank" style="color:var(--cyan);">aistudio.google.com</a>, revisa qué modelo de generación de imágenes tienes habilitado y escríbelo en el campo de arriba.<br><br>
-              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas. Como esta clave fue escrita en un chat, te recomendamos regenerarla desde AI Studio por seguridad.
-            </div>
+            <div class="field" style="margin-top:14px;"><label>Endpoint de la API de imágenes</label><input type="text" id="apiEndpoint" placeholder="https://api.tuproveedor.com/v1/images/generate"></div>
+            <div class="field"><label>Clave de API (se queda en tu navegador)</label><input type="password" id="apiKey" placeholder="sk-..."></div>
+            <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Guardar conexión</button>
+            <div class="empty-note">Nunca compartas tu clave de API con nadie ni la pegues en apps de terceros no verificadas. NYXORA no incluye ni simula claves ajenas — cada usuario conecta su propia cuenta de proveedor.</div>
           </div>
         </div>
 
@@ -632,3 +628,162 @@ function renderModels(){
   const vidGrid = document.getElementById('videoModelGrid');
   imgGrid.innerHTML = IMAGE_MODELS.map(m => `
     <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('image','${m.id}')">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+  vidGrid.innerHTML = VIDEO_MODELS.map(m => `
+    <div class="model-card ${m.id===state.selectedVideoModel?'selected':''}" onclick="selectModel('video','${m.id}')">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+}
+function selectModel(kind, id){
+  if(kind==='image') state.selectedImageModel = id; else state.selectedVideoModel = id;
+  const label = (kind==='image'?IMAGE_MODELS:VIDEO_MODELS).find(m=>m.id===id).name;
+  document.getElementById('activeModelLabel').textContent = label;
+  renderModels();
+}
+
+/* ================= NAVEGACIÓN ================= */
+function switchView(view){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+}
+
+/* ================= GENERACIÓN (DEMO) ================= */
+const SAMPLE_IMAGES = [
+  'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80',
+  'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=600&q=80',
+];
+function runGeneration(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
+  const cost = 10;
+  if(!state.isOwner && state.coins < cost){ showToast('No tienes créditos suficientes. Ve a "Créditos".'); return; }
+  if(!state.isOwner) state.coins -= cost;
+  state.gensToday++;
+  document.getElementById('gensToday').textContent = state.gensToday + ' / 20';
+  updateCurrencyUI();
+
+  const count = parseInt(document.getElementById('optCount').value) || 1;
+  const grid = document.getElementById('resultGrid');
+  grid.innerHTML = '';
+  for(let i=0;i<count;i++){
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = '<div class="spinner"></div>';
+    grid.appendChild(card);
+    setTimeout(()=>{
+      const img = SAMPLE_IMAGES[Math.floor(Math.random()*SAMPLE_IMAGES.length)];
+      card.innerHTML = `<img src="${img}" alt="resultado">`;
+      state.gallery.unshift(img);
+      renderGallery();
+    }, 900 + i*350);
+  }
+  updateJsonPreview(prompt);
+}
+function magicPrompt(){
+  const el = document.getElementById('promptInput');
+  if(!el.value.trim()){ showToast('Escribe algo primero para mejorarlo.'); return; }
+  el.value = el.value.trim() + ', composición cinematográfica, iluminación dramática, ultra detallado, 8k, fotorrealista';
+  showToast('Prompt mejorado.');
+  updateJsonPreview(el.value);
+}
+function promptToJSON(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
+  updateJsonPreview(prompt);
+  showToast('JSON actualizado en el panel lateral.');
+}
+function updateJsonPreview(prompt){
+  const json = {
+    subject: prompt.slice(0,60) || '—',
+    style: 'cinematic',
+    lighting: 'soft golden hour',
+    camera: '85mm portrait lens',
+    quality: 'ultra-detailed, 8k'
+  };
+  document.getElementById('jsonPreview').textContent = JSON.stringify(json, null, 2);
+}
+function renderGallery(){
+  const grid = document.getElementById('galleryGrid');
+  if(state.gallery.length === 0){
+    grid.innerHTML = '<div class="result-card"><div class="result-empty">Aún no has generado nada.<br>Ve a "Generar" para empezar.</div></div>';
+    return;
+  }
+  grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="creación"></div>`).join('');
+}
+
+/* ================= CREDITOS ================= */
+function claimDaily(type){
+  if(state.claimed[type]){ showToast('Ya reclamaste esto por ahora.'); return; }
+  state.claimed[type] = true;
+  if(type==='coin') state.coins += 150;
+  if(type==='gem') state.gems += 20;
+  if(type==='diamond') state.diamonds += 1;
+  updateCurrencyUI();
+  showToast('¡Reclamado con éxito!');
+}
+function mockPurchase(item){
+  showToast(`Simulación: "${item}" — conecta un proveedor de pagos real para procesar compras.`);
+}
+function updateCurrencyUI(){
+  document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
+  document.getElementById('gemCount').textContent = state.isOwner ? '∞' : state.gems;
+  document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
+}
+
+/* ================= API CONFIG ================= */
+function saveApiConfig(){
+  const ep = document.getElementById('apiEndpoint').value.trim();
+  const key = document.getElementById('apiKey').value.trim();
+  if(!ep || !key){ showToast('Completa endpoint y clave.'); return; }
+  state.apiConfigured = true;
+  showToast('Conexión guardada para esta sesión. (Modo demo sigue activo hasta integrar la llamada real).');
+}
+
+/* ================= OWNER PANEL ================= */
+function renderUserTable(){
+  const tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = state.users.map((u,i) => `
+    <tr>
+      <td>${u.name}</td>
+      <td>${u.plan}</td>
+      <td>${u.credits}</td>
+      <td><span class="status-tag ${u.status}">${u.status}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn gift" onclick="giftUser(${i})">🎁 Regalar</button>
+          <button class="icon-btn" onclick="muteUser(${i})">🔇 Silenciar</button>
+          <button class="icon-btn danger" onclick="banUser(${i})">⛔ Banear</button>
+          <button class="icon-btn danger" onclick="removeUser(${i})">🗑 Eliminar</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('statUsers').textContent = state.users.length;
+}
+function giftUser(i){ state.users[i].credits += 500; renderUserTable(); showToast(`500 créditos regalados a ${state.users[i].name}.`); }
+function muteUser(i){ state.users[i].status = 'muted'; renderUserTable(); showToast(`${state.users[i].name} silenciado.`); }
+function banUser(i){ state.users[i].status = 'banned'; renderUserTable(); showToast(`${state.users[i].name} baneado.`); }
+function removeUser(i){ const n = state.users[i].name; state.users.splice(i,1); renderUserTable(); showToast(`${n} eliminado.`); }
+
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ================= INIT ================= */
+renderModels();
+updateJsonPreview('');
+showForm('login');
+</script>
+</body>
+</html>
