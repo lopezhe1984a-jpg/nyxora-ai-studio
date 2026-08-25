@@ -6,12 +6,6 @@
 <title>NYXORA — AI Creative Studio</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<!-- ===== FIREBASE SDKs ===== -->
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
 <style>
   :root{
     --bg-0:#07070C;
@@ -150,7 +144,6 @@
   .auth-note{ text-align:center; font-size:11px; color:var(--text-faint); margin-top:18px; line-height:1.5; }
   .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); }
   .owner-link:hover{ color:var(--gold); }
-  .reset-ok{ background:#33E5FF18; border:1px solid #33E5FF44; color:var(--cyan); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
 
   /* ---------- Dashboard / generate view ---------- */
   .view-head{ margin-bottom:22px; }
@@ -265,12 +258,6 @@
   .empty-note{ background:#33E5FF12; border:1px solid #33E5FF33; border-radius:12px; padding:14px 16px; font-size:12.5px; color:#9dd7e6; line-height:1.6; margin-top:16px; }
   .empty-note b{ color:var(--cyan); }
   code{ background:var(--bg-1); padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono'; font-size:11.5px; color:var(--cyan); }
-
-  .security-note{
-    background:#F5B94210; border:1px solid #F5B94244; border-radius:12px;
-    padding:14px 16px; font-size:12.5px; color:#e8c97a; line-height:1.6; margin-top:16px;
-  }
-  .security-note b{ color:var(--gold); }
 </style>
 </head>
 <body>
@@ -285,11 +272,10 @@
     </div>
 
     <div class="auth-error" id="authError"></div>
-    <div class="reset-ok" id="resetOk"></div>
 
     <!-- LOGIN -->
     <form id="formLogin" onsubmit="return false;">
-      <div class="field"><label>Correo</label><input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" value="lopezhe1984a@gmail.com" required></div>
+      <div class="field"><label>Correo</label><input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" required></div>
       <div class="field"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" required></div>
       <button class="btn btn-primary" onclick="handleLogin()">Iniciar sesión</button>
       <div class="auth-switch">¿No tienes cuenta? <button onclick="showForm('register')">Regístrate</button></div>
@@ -305,17 +291,14 @@
       <div class="auth-switch">¿Ya tienes cuenta? <button onclick="showForm('login')">Inicia sesión</button></div>
     </form>
 
-    <!-- RESET (SIMPLIFICADO — FIREBASE ENVÍA ENLACE POR CORREO) -->
+    <!-- RESET -->
     <form id="formReset" style="display:none;" onsubmit="return false;">
       <div class="field"><label>Correo de tu cuenta</label><input type="email" id="resetEmail" placeholder="tucorreo@ejemplo.com" required></div>
-      <p style="font-size:11.5px; color:var(--text-faint); margin-bottom:14px; line-height:1.5;">
-        Firebase enviará un enlace a este correo para que restablezcas tu contraseña desde tu bandeja de entrada.
-      </p>
-      <button class="btn btn-primary" onclick="handleReset()">Enviar enlace de recuperación</button>
+      <button class="btn btn-primary" onclick="handleReset()">Enviar enlace de restablecimiento</button>
       <div class="auth-switch">¿La recordaste? <button onclick="showForm('login')">Volver a iniciar sesión</button></div>
     </form>
 
-    <div class="auth-note">Al continuar aceptas que esta es una demo funcional de interfaz. La generación real de imágenes requiere conectar tu propia clave de API — ver panel <b>Conexión API</b> dentro de la app.</div>
+    <div class="auth-note">Cuentas reales con Firebase Authentication. Tus datos, créditos y galería se guardan de forma persistente y segura.</div>
   </div>
 </div>
 
@@ -429,9 +412,9 @@
 
         <!-- ===== GALLERY VIEW ===== -->
         <div class="view" id="view-gallery">
-          <div class="view-head"><h2>Mi galería</h2><p>Todo lo que has creado, guardado en la nube.</p></div>
+          <div class="view-head"><h2>Mi galería</h2><p>Todo lo que has creado, en un solo lugar.</p></div>
           <div class="result-grid" id="galleryGrid">
-            <div class="result-card"><div class="result-empty">Cargando galería...</div></div>
+            <div class="result-card"><div class="result-empty">Aún no has generado nada.<br>Ve a "Generar" para empezar.</div></div>
           </div>
         </div>
 
@@ -504,13 +487,13 @@
             <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;">
               NYXORA ya trae integrada la llamada a <b>Google AI Studio (API de Gemini)</b> para generación de imágenes. Solo pega tu clave abajo — se guarda únicamente en la memoria de esta pestaña del navegador, nunca se escribe en el archivo ni se envía a ningún servidor propio de NYXORA. Al cerrar o recargar la página, se borra.
             </p>
-            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave"></div>
+            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza distinto según el tipo de clave)"></div>
             <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-2.5-flash-image" placeholder="gemini-2.5-flash-image"></div>
             <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Conectar</button>
             <span id="apiStatusTag" style="margin-left:10px; font-size:12px; color:var(--text-faint);">No conectado</span>
             <div class="empty-note">
               Google cambia de vez en cuando el nombre exacto del modelo de imagen disponible en AI Studio. Si ves un error de "modelo no encontrado", entra a <a href="https://aistudio.google.com" target="_blank" style="color:var(--cyan);">aistudio.google.com</a>, revisa qué modelo de generación de imágenes tienes habilitado y escríbelo en el campo de arriba.<br><br>
-              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas.
+              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas. Como esta clave fue escrita en un chat, te recomendamos regenerarla desde AI Studio por seguridad.
             </div>
           </div>
         </div>
@@ -518,25 +501,21 @@
         <!-- ===== OWNER PANEL ===== -->
         <div class="view" id="view-owner">
           <div class="view-head"><h2>Panel del dueño</h2><p>Acceso exclusivo — gestiona usuarios, economía y moderación.</p></div>
-          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario activa — privilegios verificados desde Firestore.</span></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario verificada por Firebase — privilegios reales sobre la base de datos.</span></div>
 
-          <div class="security-note">
-            <b>🔒 Seguridad real:</b> Este panel solo se muestra si tu cuenta tiene el <b>Custom Claim</b> <code>owner: true</code> asignado desde el backend de Firebase (Admin SDK). No hay ninguna contraseña de dueño escrita en este archivo HTML, por lo que nadie puede falsificar este rol desde el navegador.
-          </div>
-
-          <div class="panel" style="margin-top:18px;">
-            <h4>Usuarios registrados (datos reales de Firestore)</h4>
+          <div class="panel">
+            <h4>Usuarios registrados</h4>
             <table class="user-table">
-              <thead><tr><th>Usuario</th><th>Correo</th><th>Plan</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
-              <tbody id="userTableBody"><tr><td colspan="6" style="text-align:center; color:var(--text-faint); padding:20px;">Cargando usuarios...</td></tr></tbody>
+              <thead><tr><th>Usuario</th><th>Plan</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
+              <tbody id="userTableBody"></tbody>
             </table>
           </div>
 
           <div class="panel" style="margin-top:18px;">
             <h4>Métricas rápidas</h4>
             <div class="stat-row"><span>Usuarios totales</span><span class="v" id="statUsers">—</span></div>
-            <div class="stat-row"><span>Créditos en circulación</span><span class="v" id="statCredits">—</span></div>
           </div>
+          <div class="empty-note">"Eliminar" borra el perfil y sus datos de Firestore, pero no la cuenta de inicio de sesión en Firebase Authentication — eso requiere el script de administrador que se ejecuta fuera del navegador (ver instrucciones que te compartí aparte).</div>
         </div>
 
       </div>
@@ -546,45 +525,58 @@
 
 <div class="toast" id="toast"></div>
 
-<script>
-/* ============================================================
-   CONFIGURACIÓN DE FIREBASE — TUS CLAVES REALES ✅
-   ============================================================ */
+<script type="module">
+/* =====================================================================
+   NYXORA — conectado a Firebase (Auth + Firestore)
+   MODO GRATUITO: la galería se guarda como texto (base64) dentro de
+   Firestore, sin usar Firebase Storage — así no requiere plan Blaze.
+   Si más adelante activas Storage, dime y te lo vuelvo a cambiar.
+   ===================================================================== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import {
+  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+  signInWithEmailAndPassword, signOut, sendPasswordResetEmail
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import {
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
+  collection, getDocs, increment
+} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+/* ---------------------------------------------------------------------
+   1) PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE
+   La encuentras en: Firebase Console → ⚙️ Configuración del proyecto →
+   pestaña "General" → sección "Tus apps" → ícono </> (app web) →
+   "Configuración del SDK de Firebase".
+   Este objeto NO es secreto: está diseñado para vivir en código de
+   navegador. La seguridad real la dan las Reglas de Firestore/Storage.
+--------------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
   authDomain: "nyxora-ai-creative-studio.firebaseapp.com",
-  databaseURL: "https://nyxora-ai-creative-studio-default-rtdb.firebaseio.com",
   projectId: "nyxora-ai-creative-studio",
   storageBucket: "nyxora-ai-creative-studio.firebasestorage.app",
   messagingSenderId: "329683111824",
-  appId: "1:329683111824:web:6848a0f168b2327f72ed15",
-  measurementId: "G-5DHBWKEFE0"
+  appId: "1:329683111824:web:6848a0f168b2327f72ed15"
 };
 
-// Inicializar Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
 
-/* ============================================================
-   ESTADO GLOBAL
-   ============================================================ */
-const OWNER_EMAIL = "lopezhe1984a@gmail.com"; // ✅ Tu correo de dueño
+/* ================= ESTADO EN MEMORIA ================= */
 const state = {
-  currentUser: null,
   uid: null,
+  currentUser: null,
   isOwner: false,
-  coins: 150,
+  coins: 0,
   gems: 0,
   diamonds: 0,
-  claimed: { coin:false, gem:false, diamond:false },
   gensToday: 0,
   selectedImageModel: 'aurora-vision',
   selectedVideoModel: 'aurora-motion',
   gallery: [],
   apiConfigured: false,
   apiKey: null,
-  allUsers: []
 };
 
 const IMAGE_MODELS = [
@@ -601,18 +593,45 @@ const VIDEO_MODELS = [
   { id:'flowframe', name:'FlowFrame', tag:'Movimiento fluido', badge:'' },
 ];
 
-/* ============================================================
-   AUTENTICACIÓN — FIREBASE AUTH REAL
-   ============================================================ */
+/* ================= AUTH — UI ================= */
 function showForm(which){
   document.getElementById('formLogin').style.display = which==='login' ? 'block':'none';
   document.getElementById('formRegister').style.display = which==='register' ? 'block':'none';
   document.getElementById('formReset').style.display = which==='reset' ? 'block':'none';
-  const subs = { login:'Inicia sesión para entrar a tu estudio creativo', register:'Crea tu cuenta y prueba Pro gratis 3 días', reset:'Restablece el acceso a tu cuenta' };
+  const subs = { login:'Inicia sesión para entrar a tu estudio creativo', register:'Crea tu cuenta y prueba Pro gratis 3 días', reset:'Te enviaremos un enlace para restablecer tu contraseña' };
   document.getElementById('authSubtitle').textContent = subs[which];
   hideAuthError();
-  document.getElementById('resetOk').style.display = 'none';
 }
 function showAuthError(msg){
   const el = document.getElementById('authError');
-  el.textContent = msg; el.style.display = 'block
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideAuthError(){ document.getElementById('authError').style.display = 'none'; }
+
+function friendlyAuthError(err){
+  const code = err?.code || '';
+  const map = {
+    'auth/invalid-email': 'Ese correo no es válido.',
+    'auth/user-not-found': 'No existe una cuenta con ese correo.',
+    'auth/wrong-password': 'Contraseña incorrecta.',
+    'auth/invalid-credential': 'Correo o contraseña incorrectos.',
+    'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
+    'auth/weak-password': 'La contraseña necesita al menos 6 caracteres.',
+    'auth/network-request-failed': 'Sin conexión a internet.',
+    'auth/invalid-api-key': 'La configuración de Firebase no está completa todavía (revisa firebaseConfig en el código).',
+  };
+  return map[code] || (err?.message || 'Ocurrió un error, intenta de nuevo.');
+}
+
+/* ================= AUTH — ACCIONES REALES ================= */
+async function handleLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if(!email || !pass){ showAuthError('Completa correo y contraseña.'); return; }
+  try{
+    await signInWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged se encarga de entrar a la app
+  }catch(err){
+    showAuthError(friendlyAuthError(err));
+  }
+}
