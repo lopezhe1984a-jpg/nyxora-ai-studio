@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NYXORA — AI Creative Studio</title>
+<meta name="theme-color" content="#8B5CF6">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -262,6 +263,31 @@
 </head>
 <body>
 
+<!-- ==============================================
+   FIREBASE SDK — CONEXIÓN COMPLETA
+============================================== -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, getDocs } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-analytics.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
+    authDomain: "nyxora-ai-creative-studio.firebaseapp.com",
+    projectId: "nyxora-ai-creative-studio",
+    storageBucket: "nyxora-ai-creative-studio.firebasestorage.app",
+    messagingSenderId: "329683111824",
+    appId: "1:329683111824:web:6848a0f168b2327f72ed15",
+    measurementId: "G-5DHBWKEFE0"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app);
+  window.db = getFirestore(app);
+  const analytics = getAnalytics(app);
+</script>
+
 <!-- ================= AUTH SCREEN ================= -->
 <div id="authScreen">
   <div class="auth-card">
@@ -294,12 +320,11 @@
     <!-- RESET -->
     <form id="formReset" style="display:none;" onsubmit="return false;">
       <div class="field"><label>Correo de tu cuenta</label><input type="email" id="resetEmail" placeholder="tucorreo@ejemplo.com" required></div>
-      <div class="field"><label>Nueva contraseña</label><input type="password" id="resetPass" placeholder="Nueva contraseña" required></div>
-      <button class="btn btn-primary" onclick="handleReset()">Restablecer contraseña</button>
+      <button class="btn btn-primary" onclick="handleReset()">Enviar enlace de restablecimiento</button>
       <div class="auth-switch">¿La recordaste? <button onclick="showForm('login')">Volver a iniciar sesión</button></div>
     </form>
 
-    <div class="auth-note">Al continuar aceptas que esta es una demo funcional de interfaz. La generación real de imágenes requiere conectar tu propia clave de API — ver panel <b>Conexión API</b> dentro de la app.</div>
+    <div class="auth-note">Al continuar aceptas los términos. La generación real de imágenes requiere conectar tu propia clave de API — ver panel <b>Conexión API</b> dentro de la app.</div>
   </div>
 </div>
 
@@ -477,34 +502,30 @@
               <button class="btn btn-ghost" onclick="mockPurchase('Plan VIP anual')">Suscribirse</button>
             </div>
           </div>
-          <div class="empty-note">Esta es una interfaz de precios de demostración — no procesa pagos reales. Para cobros reales necesitas integrar un proveedor como Stripe o el sistema de compras in-app de iOS/Android.</div>
+          <div class="empty-note">Esta es una interfaz de demostración. Para pagos reales integra Stripe o compras in-app.</div>
         </div>
 
         <!-- ===== API CONNECTION VIEW ===== -->
         <div class="view" id="view-api">
-          <div class="view-head"><h2>Conexión API</h2><p>Así es como conectas NYXORA a un motor de generación real.</p></div>
+          <div class="view-head"><h2>Conexión API</h2><p>Conecta NYXORA a un motor de generación real.</p></div>
           <div class="panel">
             <h4>Estado actual</h4>
             <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7;">
-              Ahora mismo el botón "Generar" funciona en <b>modo demo</b>: simula el proceso y muestra imágenes de ejemplo, para que puedas probar todo el flujo (créditos, modelos, formatos) sin necesidad de una clave todavía.
-            </p>
-            <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;">
-              Para generación <b>real</b>, conecta tu propia clave de un proveedor legítimo de generación de imágenes/video (por ejemplo, la API de OpenAI, Stability AI, Google, o la Anthropic API para prompts/JSON). Pega tu endpoint y clave aquí — se guardan solo en tu sesión, nunca se envían a ningún otro lado:
+              El botón "Generar" funciona en <b>modo demo</b> para que pruebes todo el flujo. Para generación <b>real</b>, pega tu clave de API de tu proveedor.
             </p>
             <div class="field" style="margin-top:14px;"><label>Endpoint de la API de imágenes</label><input type="text" id="apiEndpoint" placeholder="https://api.tuproveedor.com/v1/images/generate"></div>
-            <div class="field"><label>Clave de API (se queda en tu navegador)</label><input type="password" id="apiKey" placeholder="sk-..."></div>
+            <div class="field"><label>Clave de API</label><input type="password" id="apiKey" placeholder="sk-..."></div>
             <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Guardar conexión</button>
-            <div class="empty-note">Nunca compartas tu clave de API con nadie ni la pegues en apps de terceros no verificadas. NYXORA no incluye ni simula claves ajenas — cada usuario conecta su propia cuenta de proveedor.</div>
           </div>
         </div>
 
         <!-- ===== OWNER PANEL ===== -->
         <div class="view" id="view-owner">
           <div class="view-head"><h2>Panel del dueño</h2><p>Acceso exclusivo — gestiona usuarios, economía y moderación.</p></div>
-          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario activa — privilegios ilimitados dentro de esta app.</span></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario activa — privilegios ilimitados.</span></div>
 
           <div class="panel">
-            <h4>Usuarios registrados (demo)</h4>
+            <h4>Usuarios registrados</h4>
             <table class="user-table">
               <thead><tr><th>Usuario</th><th>Plan</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody id="userTableBody"></tbody>
@@ -514,8 +535,7 @@
           <div class="panel" style="margin-top:18px;">
             <h4>Métricas rápidas</h4>
             <div class="stat-row"><span>Usuarios totales</span><span class="v" id="statUsers">3</span></div>
-            <div class="stat-row"><span>Generaciones hoy (todas las cuentas)</span><span class="v" id="statGens">0</span></div>
-            <div class="stat-row"><span>Créditos en circulación</span><span class="v" id="statCredits">—</span></div>
+            <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="statGens">0</span></div>
           </div>
         </div>
 
@@ -527,9 +547,14 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================= ESTADO EN MEMORIA ================= */
+/* ================= CONFIGURACIÓN DE DUEÑO ================= */
+const OWNER_EMAIL = 'lopezhe1984a@gmail.com';
+const OWNER_NAME = 'Dueño';
+
+/* ================= ESTADO ================= */
 const state = {
   currentUser: null,
+  uid: null,
   isOwner: false,
   coins: 150,
   gems: 0,
@@ -547,12 +572,6 @@ const state = {
   ]
 };
 
-// ==== CREDENCIALES DE DUEÑO ====
-// ⚠️ CAMBIA ESTOS DATOS POR LOS TUYOS
-const OWNER_EMAIL = 'lopezhe1984a@gmail.com'; // Tu correo real
-const OWNER_PASSWORD = 'Nyxora2026!'; // Tu contraseña personalizada
-const OWNER_NAME = 'Dueño';
-
 const IMAGE_MODELS = [
   { id:'aurora-vision', name:'Aurora Vision', tag:'Fotorrealismo general', badge:'Popular' },
   { id:'nyx-portrait', name:'Nyx Portrait', tag:'Retratos y personas', badge:'HD' },
@@ -567,14 +586,11 @@ const VIDEO_MODELS = [
   { id:'flowframe', name:'FlowFrame', tag:'Movimiento fluido', badge:'' },
 ];
 
-/* ================= AUTH ================= */
-function showForm(which){
-  document.getElementById('formLogin').style.display = which==='login' ? 'block':'none';
-  document.getElementById('formRegister').style.display = which==='register' ? 'block':'none';
-  document.getElementById('formReset').style.display = which==='reset' ? 'block':'none';
-  const subs = { login:'Inicia sesión para entrar a tu estudio creativo', register:'Crea tu cuenta y prueba Pro gratis 3 días', reset:'Restablece el acceso a tu cuenta' };
-  document.getElementById('authSubtitle').textContent = subs[which];
-  hideAuthError();
+/* ================= UTILIDADES ================= */
+function showToast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3000);
 }
 function showAuthError(msg){
   const el = document.getElementById('authError');
@@ -582,62 +598,69 @@ function showAuthError(msg){
 }
 function hideAuthError(){ document.getElementById('authError').style.display = 'none'; }
 
-function handleLogin(){
+/* ================= AUTENTICACIÓN FIREBASE ================= */
+function showForm(which){
+  document.getElementById('formLogin').style.display = which==='login' ? 'block':'none';
+  document.getElementById('formRegister').style.display = which==='register' ? 'block':'none';
+  document.getElementById('formReset').style.display = which==='reset' ? 'block':'none';
+  const subs = { login:'Inicia sesión', register:'Crea tu cuenta', reset:'Restablece contraseña' };
+  document.getElementById('authSubtitle').textContent = subs[which];
+  hideAuthError();
+}
+
+async function handleLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
   if(!email || !pass){ showAuthError('Completa correo y contraseña.'); return; }
 
-  // 🔑 ACCESO DE DUEÑO — TU CORREO Y CONTRASEÑA
-  if(email.toLowerCase() === OWNER_EMAIL.toLowerCase() && pass === OWNER_PASSWORD){
-    enterApp(OWNER_NAME, true);
-    return;
+  try {
+    const userCred = await signInWithEmailAndPassword(auth, email, pass);
+    const user = userCred.user;
+    const isOwner = email.toLowerCase() === OWNER_EMAIL.toLowerCase();
+    await loadUserData(user.uid, email.split('@')[0], isOwner);
+    enterApp(email.split('@')[0], user.uid, isOwner);
+  } catch (err) {
+    console.error(err);
+    if(err.code === 'auth/invalid-credential') showAuthError('Correo o contraseña incorrectos.');
+    else if(err.code === 'auth/user-not-found') showAuthError('No existe una cuenta con este correo.');
+    else showAuthError('Error: ' + err.message);
   }
-  enterApp(email.split('@')[0] || 'Usuario', false);
 }
-function handleRegister(){
+
+async function handleRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pass = document.getElementById('regPass').value;
-  if(!name || !email || pass.length < 6){ showAuthError('Revisa los campos: la contraseña necesita 6+ caracteres.'); return; }
-  enterApp(name, false);
-}
-function handleReset(){
-  const email = document.getElementById('resetEmail').value.trim();
-  const pass = document.getElementById('resetPass').value;
-  if(!email || pass.length < 6){ showAuthError('Ingresa un correo válido y una contraseña de 6+ caracteres.'); return; }
-  showToast('Contraseña restablecida. Ahora inicia sesión.');
-  showForm('login');
-}
-function enterApp(name, isOwner){
-  state.currentUser = name;
-  state.isOwner = isOwner;
-  document.getElementById('authScreen').classList.add('hidden');
-  document.getElementById('app').classList.add('active');
-  document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('ownerNavBtn').style.display = isOwner ? 'flex' : 'none';
-  if(isOwner){
-    state.coins = 999999; state.gems = 999999; state.diamonds = 999999;
-    document.getElementById('planStatus').textContent = 'Propietario — acceso total';
-    renderUserTable();
+  if(!name || !email || pass.length < 6){ showAuthError('La contraseña necesita mínimo 6 caracteres.'); return; }
+
+  try {
+    const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+    const user = userCred.user;
+    await setDoc(doc(db, 'users', user.uid), {
+      name, email, coins:150, gems:0, diamonds:0, plan:'Free',
+      createdAt: new Date().toISOString(), gensToday:0
+    });
+    enterApp(name, user.uid, false);
+  } catch (err) {
+    console.error(err);
+    showAuthError('Error al registrar: ' + err.message);
   }
-  updateCurrencyUI();
-  showToast(isOwner ? 'Bienvenido, propietario. Acceso total activado.' : `Bienvenido, ${name}`);
-}
-function logout(){
-  document.getElementById('app').classList.remove('active');
-  document.getElementById('authScreen').classList.remove('hidden');
-  showForm('login');
 }
 
-/* ================= MEJORAR PROMPT CON IA ================= */
-async function magicPrompt(){
-  const el = document.getElementById('promptInput');
-  const prompt = el.value.trim();
-  if(!prompt){ showToast('Escribe algo primero para mejorarlo.'); return; }
+async function handleReset(){
+  const email = document.getElementById('resetEmail').value.trim();
+  if(!email){ showAuthError('Escribe tu correo.'); return; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    showToast('Correo enviado. Revisa tu bandeja de entrada.');
+    showForm('login');
+  } catch (err) {
+    showAuthError('Error: ' + err.message);
+  }
+}
 
-  const ep = document.getElementById('apiEndpoint').value.trim();
-  const key = document.getElementById('apiKey').value.trim();
-
-  if(!ep || !key){
-    el.value = prompt + ', composición cinematográfica, iluminación dramática, ultra detallado, 8k, fotorrealista, colores vibrantes, alta definición, profesional';
-    showToast('✨ Prompt mejorado (modo local). Conecta tu API para mejoras reales
+async function loadUserData(uid, name, isOwner){
+  if(isOwner) return;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid));
+    if(snap.exists()){
