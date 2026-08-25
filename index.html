@@ -488,13 +488,13 @@
             <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;">
               NYXORA ya trae integrada la llamada a <b>Google AI Studio (API de Gemini)</b> para generación de imágenes. Solo pega tu clave abajo — se guarda únicamente en la memoria de esta pestaña del navegador, nunca se escribe en el archivo ni se envía a ningún servidor propio de NYXORA. Al cerrar o recargar la página, se borra.
             </p>
-            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza distinto según el tipo de clave)"></div>
+            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave"></div>
             <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-2.5-flash-image" placeholder="gemini-2.5-flash-image"></div>
             <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Conectar</button>
             <span id="apiStatusTag" style="margin-left:10px; font-size:12px; color:var(--text-faint);">No conectado</span>
             <div class="empty-note">
               Google cambia de vez en cuando el nombre exacto del modelo de imagen disponible en AI Studio. Si ves un error de "modelo no encontrado", entra a <a href="https://aistudio.google.com" target="_blank" style="color:var(--cyan);">aistudio.google.com</a>, revisa qué modelo de generación de imágenes tienes habilitado y escríbelo en el campo de arriba.<br><br>
-              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas. Como esta clave fue escrita en un chat, te recomendamos regenerarla desde AI Studio por seguridad.
+              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas.
             </div>
           </div>
         </div>
@@ -528,7 +528,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-/* ================= ESTADO EN MEMORIA (sin localStorage) ================= */
+/* ================= ESTADO EN MEMORIA ================= */
 const state = {
   currentUser: null,
   isOwner: false,
@@ -548,7 +548,8 @@ const state = {
   ]
 };
 
-const OWNER_CREDENTIALS = { user: 'owner', pass: 'nyxora-admin' };
+// === CREDENCIALES DEL DUEÑO — TAL COMO ME PEDISTE ===
+const OWNER_CREDENTIALS = { email: 'lopezhe1984a@gmail.com', pass: 'nyxora-admin' };
 
 const IMAGE_MODELS = [
   { id:'aurora-vision', name:'Aurora Vision', tag:'Fotorrealismo general', badge:'Popular' },
@@ -584,9 +585,9 @@ function handleLogin(){
   const pass = document.getElementById('loginPass').value;
   if(!email || !pass){ showAuthError('Completa correo y contraseña.'); return; }
 
-  // Acceso especial de propietario: usuario "owner" con la clave configurada arriba
-  if(email.toLowerCase() === OWNER_CREDENTIALS.user && pass === OWNER_CREDENTIALS.pass){
-    enterApp('Owner', true);
+  // === ACCESO DE DUEÑO — CORREO Y CONTRASEÑA QUE ME DISTE ===
+  if(email.toLowerCase() === OWNER_CREDENTIALS.email && pass === OWNER_CREDENTIALS.pass){
+    enterApp('Dueño', true);
     return;
   }
   enterApp(email.split('@')[0] || 'Usuario', false);
@@ -626,12 +627,10 @@ function logout(){
   showForm('login');
 }
 
-/* ================= MODELOS ================= */
+/* ================= RESTO DE FUNCIONES ================= */
 function renderModels(){
   const imgGrid = document.getElementById('imageModelGrid');
   const vidGrid = document.getElementById('videoModelGrid');
   imgGrid.innerHTML = IMAGE_MODELS.map(m => `
     <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('image','${m.id}')">
-      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
-      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
-    </div>`
+      <div class="m-name">${m.name}</div><div class
