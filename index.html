@@ -635,3 +635,371 @@ async function handleLogin(){
     showAuthError(friendlyAuthError(err));
   }
 }
+async function handleRegister(){
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  if(!name || !email || pass.length < 6){ showAuthError('Revisa los campos: la contraseña necesita 6+ caracteres.'); return; }
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email,
+      coins: 150, gems: 0, diamonds: 0,
+      plan: 'Free (prueba Pro 3 días)',
+      status: 'active',
+      isOwner: false,
+      trialEndsAt: new Date(Date.now() + 3*24*60*60*1000).toISOString(),
+      lastClaimCoin: null, lastClaimGem: null, lastClaimDiamond: null,
+      createdAt: new Date().toISOString(),
+    });
+    // onAuthStateChanged se encarga de entrar a la app
+  }catch(err){
+    showAuthError(friendlyAuthError(err));
+  }
+}
+async function handleReset(){
+  const email = document.getElementById('resetEmail').value.trim();
+  if(!email){ showAuthError('Escribe tu correo.'); return; }
+  try{
+    await sendPasswordResetEmail(auth, email);
+    showToast('Enlace enviado. Revisa tu correo (y spam).');
+    showForm('login');
+  }catch(err){
+    showAuthError(friendlyAuthError(err));
+  }
+}
+async function logout(){
+  await signOut(auth);
+}
+
+/* ================= SESIÓN: entrar/salir de la app ================= */
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    state.uid = user.uid;
+    let snap = await getDoc(doc(db, 'users', user.uid));
+    if(!snap.exists()){
+      // por si el doc no se creó (ej. cuenta antigua); creamos uno por defecto
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.email.split('@')[0], email: user.email,
+        coins: 150, gems: 0, diamonds: 0, plan: 'Free', status:'active', isOwner:false,
+        lastClaimCoin:null, lastClaimGem:null, lastClaimDiamond:null,
+        createdAt: new Date().toISOString(),
+      });
+      snap = await getDoc(doc(db, 'users', user.uid));
+    }
+    const data = snap.data();
+    state.currentUser = data.name || user.email;
+    state.coins = data.coins ?? 0;
+    state.gems = data.gems ?? 0;
+    state.diamonds = data.diamonds ?? 0;
+
+    // El rol de dueño se verifica por Custom Claim firmado por Firebase (no por un campo editable)
+    const tokenResult = await user.getIdTokenResult(true);
+    state.isOwner = tokenResult.claims.isOwner === true;
+
+    enterApp();
+  } else {
+    state.uid = null;
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('authScreen').classList.remove('hidden');
+    showForm('login');
+  }
+});
+
+function enterApp(){
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('app').classList.add('active');
+  document.getElementById('userAvatar').textContent = (state.currentUser||'U').charAt(0).toUpperCase();
+  document.getElementById('ownerNavBtn').style.display = state.isOwner ? 'flex' : 'none';
+  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — acceso total' : 'Prueba Pro — 3 días';
+  updateCurrencyUI();
+  loadGallery();
+  if(state.isOwner) renderUserTable();
+  showToast(state.isOwner ? 'Bienvenido, propietario.' : `Bienvenido, ${state.currentUser}`);
+}
+
+/* ================= MODELOS ================= */
+function renderModels(){
+  const imgGrid = document.getElementById('imageModelGrid');
+  const vidGrid = document.getElementById('videoModelGrid');
+  imgGrid.innerHTML = IMAGE_MODELS.map(m => `
+    <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('image','${m.id}')">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+  vidGrid.innerHTML = VIDEO_MODELS.map(m => `
+    <div class="model-card ${m.id===state.selectedVideoModel?'selected':''}" onclick="selectModel('video','${m.id}')">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+}
+function selectModel(kind, id){
+  if(kind==='image') state.selectedImageModel = id; else state.selectedVideoModel = id;
+  const label = (kind==='image'?IMAGE_MODELS:VIDEO_MODELS).find(m=>m.id===id).name;
+  document.getElementById('activeModelLabel').textContent = label;
+  renderModels();
+}
+
+/* ================= NAVEGACIÓN ================= */
+function switchView(view){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+view).classList.add('active');
+  if(view === 'owner' && state.isOwner) renderUserTable();
+}
+
+/* ================= GENERACIÓN ================= */
+const SAMPLE_IMAGES = [
+  'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80',
+  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80',
+  'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=600&q=80',
+];
+
+// Llamada real a la API de Gemini (Google AI Studio). La clave nunca se escribe
+// en este archivo: vive solo en memoria mientras esta pestaña está abierta.
+async function callGeminiImage(prompt){
+  const key = state.apiKey;
+  const model = (document.getElementById('apiModel').value.trim()) || 'gemini-2.5-flash-image';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
+  };
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
+    body: JSON.stringify(body)
+  });
+  if(!res.ok){
+    const errText = await res.text().catch(()=> '');
+    throw new Error(`La API respondió ${res.status}. ${errText.slice(0,180)}`);
+  }
+  const data = await res.json();
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  const imgPart = parts.find(p => p.inlineData || p.inline_data);
+  if(imgPart){
+    const inline = imgPart.inlineData || imgPart.inline_data;
+    return `data:${inline.mimeType || inline.mime_type};base64,${inline.data}`;
+  }
+  const textPart = parts.find(p => p.text);
+  throw new Error(textPart ? `El modelo respondió solo texto: "${textPart.text.slice(0,100)}..."` : 'No se recibió imagen en la respuesta.');
+}
+
+async function saveGeneratedImage(dataUri, prompt){
+  // MODO GRATUITO: guarda la imagen como texto (base64) directamente en Firestore,
+  // sin usar Firebase Storage. Funciona bien para imágenes; ten en cuenta que cada
+  // documento de Firestore tiene un límite de 1 MB, así que imágenes muy grandes
+  // podrían fallar — si eso pasa, es momento de activar Storage.
+  try{
+    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), {
+      url: dataUri, prompt, createdAt: new Date().toISOString()
+    });
+    state.gallery.unshift(dataUri);
+    renderGallery();
+  }catch(err){
+    // Si algo falla al guardar, igual mostramos la imagen en esta sesión
+    state.gallery.unshift(dataUri);
+    renderGallery();
+    console.warn('No se pudo guardar en Storage/Firestore:', err.message);
+  }
+}
+
+async function runGeneration(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
+  const cost = 10;
+  if(!state.isOwner && state.coins < cost){ showToast('No tienes créditos suficientes. Ve a "Créditos".'); return; }
+
+  if(!state.isOwner){
+    state.coins -= cost;
+    await updateDoc(doc(db, 'users', state.uid), { coins: increment(-cost) });
+  }
+  state.gensToday++;
+  document.getElementById('gensToday').textContent = state.gensToday + ' / 20';
+  updateCurrencyUI();
+
+  const count = parseInt(document.getElementById('optCount').value) || 1;
+  const grid = document.getElementById('resultGrid');
+  grid.innerHTML = '';
+
+  for(let i=0;i<count;i++){
+    const card = document.createElement('div');
+    card.className = 'result-card';
+    card.innerHTML = '<div class="spinner"></div>';
+    grid.appendChild(card);
+
+    if(state.apiConfigured && state.apiKey){
+      try{
+        const img = await callGeminiImage(prompt);
+        card.innerHTML = `<img src="${img}" alt="resultado">`;
+        await saveGeneratedImage(img, prompt);
+      }catch(err){
+        card.innerHTML = `<div class="result-empty">⚠️ ${err.message}</div>`;
+        showToast('Error al generar con la API. Revisa "Conexión API".');
+      }
+    } else {
+      await new Promise(r => setTimeout(r, 700 + i*300));
+      const img = SAMPLE_IMAGES[Math.floor(Math.random()*SAMPLE_IMAGES.length)];
+      card.innerHTML = `<img src="${img}" alt="resultado (modo demo)">`;
+      state.gallery.unshift(img);
+      renderGallery();
+    }
+  }
+  updateJsonPreview(prompt);
+}
+function magicPrompt(){
+  const el = document.getElementById('promptInput');
+  if(!el.value.trim()){ showToast('Escribe algo primero para mejorarlo.'); return; }
+  el.value = el.value.trim() + ', composición cinematográfica, iluminación dramática, ultra detallado, 8k, fotorrealista';
+  showToast('Prompt mejorado.');
+  updateJsonPreview(el.value);
+}
+function promptToJSON(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
+  updateJsonPreview(prompt);
+  showToast('JSON actualizado en el panel lateral.');
+}
+function updateJsonPreview(prompt){
+  const json = {
+    subject: prompt.slice(0,60) || '—',
+    style: 'cinematic',
+    lighting: 'soft golden hour',
+    camera: '85mm portrait lens',
+    quality: 'ultra-detailed, 8k'
+  };
+  document.getElementById('jsonPreview').textContent = JSON.stringify(json, null, 2);
+}
+async function loadGallery(){
+  try{
+    const snap = await getDocs(collection(db, 'users', state.uid, 'gallery'));
+    state.gallery = snap.docs.map(d => d.data().url).reverse();
+    renderGallery();
+  }catch(err){
+    console.warn('No se pudo cargar la galería:', err.message);
+  }
+}
+function renderGallery(){
+  const grid = document.getElementById('galleryGrid');
+  if(state.gallery.length === 0){
+    grid.innerHTML = '<div class="result-card"><div class="result-empty">Aún no has generado nada.<br>Ve a "Generar" para empezar.</div></div>';
+    return;
+  }
+  grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="creación"></div>`).join('');
+}
+
+/* ================= CRÉDITOS (persistentes en Firestore) ================= */
+function hoursSince(iso){ return iso ? (Date.now() - new Date(iso).getTime()) / 3600000 : Infinity; }
+
+async function claimDaily(type){
+  const snap = await getDoc(doc(db, 'users', state.uid));
+  const data = snap.data();
+  const rules = {
+    coin: { field:'lastClaimCoin', hours:24, amount:150, key:'coins' },
+    gem: { field:'lastClaimGem', hours:24*7, amount:20, key:'gems' },
+    diamond: { field:'lastClaimDiamond', hours:Infinity, amount:1, key:'diamonds' }, // solo una vez
+  }[type];
+
+  const last = data[rules.field];
+  if(last !== null && hoursSince(last) < rules.hours){
+    showToast('Todavía no puedes reclamar esto — vuelve más tarde.');
+    return;
+  }
+  await updateDoc(doc(db, 'users', state.uid), {
+    [rules.key]: increment(rules.amount),
+    [rules.field]: new Date().toISOString(),
+  });
+  state[rules.key] += rules.amount;
+  updateCurrencyUI();
+  showToast('¡Reclamado con éxito!');
+}
+function mockPurchase(item){
+  showToast(`Simulación: "${item}" — conecta un proveedor de pagos real (Stripe / compras in-app) para procesar cobros.`);
+}
+function updateCurrencyUI(){
+  document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
+  document.getElementById('gemCount').textContent = state.isOwner ? '∞' : state.gems;
+  document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
+}
+
+/* ================= CONEXIÓN API (Gemini) ================= */
+function saveApiConfig(){
+  const key = document.getElementById('apiKey').value.trim();
+  if(!key){ showToast('Pega tu clave de API primero.'); return; }
+  state.apiKey = key;
+  state.apiConfigured = true;
+  document.getElementById('apiStatusTag').textContent = '● Conectado (esta sesión)';
+  document.getElementById('apiStatusTag').style.color = 'var(--cyan)';
+  showToast('Conectado. Ve a "Generar" — ahora usará Gemini de verdad.');
+}
+
+/* ================= PANEL DEL DUEÑO (Firestore real) ================= */
+let ownerUsersCache = [];
+async function renderUserTable(){
+  const snap = await getDocs(collection(db, 'users'));
+  ownerUsersCache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  const tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = ownerUsersCache.map(u => `
+    <tr>
+      <td>${u.name || u.email || u.id.slice(0,8)}</td>
+      <td>${u.plan || 'Free'}</td>
+      <td>${u.coins ?? 0}</td>
+      <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn gift" onclick="giftUser('${u.id}')">🎁 Regalar</button>
+          <button class="icon-btn" onclick="muteUser('${u.id}')">🔇 Silenciar</button>
+          <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
+          <button class="icon-btn danger" onclick="removeUser('${u.id}')">🗑 Eliminar</button>
+        </div>
+      </td>
+    </tr>`).join('');
+  document.getElementById('statUsers').textContent = ownerUsersCache.length;
+}
+async function giftUser(uid){
+  await updateDoc(doc(db, 'users', uid), { coins: increment(500) });
+  showToast('500 créditos regalados.');
+  renderUserTable();
+}
+async function muteUser(uid){
+  await updateDoc(doc(db, 'users', uid), { status: 'muted' });
+  showToast('Usuario silenciado.');
+  renderUserTable();
+}
+async function banUser(uid){
+  await updateDoc(doc(db, 'users', uid), { status: 'banned' });
+  showToast('Usuario baneado.');
+  renderUserTable();
+}
+async function removeUser(uid){
+  await deleteDoc(doc(db, 'users', uid));
+  showToast('Perfil eliminado de la base de datos.');
+  renderUserTable();
+}
+
+/* ================= TOAST ================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
+
+/* ================= EXPONER FUNCIONES PARA LOS onclick ================= */
+Object.assign(window, {
+  handleLogin, handleRegister, handleReset, showForm, switchView,
+  runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
+  saveApiConfig, giftUser, muteUser, banUser, removeUser, logout, selectModel
+});
+
+/* ================= INIT ================= */
+renderModels();
+updateJsonPreview('');
+showForm('login');
+</script>
+
+</body>
+</html>
