@@ -511,7 +511,7 @@
               NYXORA ya trae integrada la llamada a <b>Google AI Studio (API de Gemini)</b> para generación de imágenes. Solo pega tu clave abajo — se guarda únicamente en la memoria de esta pestaña del navegador, nunca se escribe en el archivo ni se envía a ningún servidor propio de NYXORA. Al cerrar o recargar la página, se borra.
             </p>
             <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza distinto según el tipo de clave)"></div>
-            <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-2.5-flash-image" placeholder="gemini-2.5-flash-image"></div>
+            <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-3.1-flash-image-preview" placeholder="gemini-3.1-flash-image-preview"></div>
             <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Conectar</button>
             <span id="apiStatusTag" style="margin-left:10px; font-size:12px; color:var(--text-faint);">No conectado</span>
             <div class="empty-note">
@@ -793,7 +793,7 @@ const SAMPLE_IMAGES = [
 // en este archivo: vive solo en memoria mientras esta pestaña está abierta.
 async function callGeminiImage(prompt){
   const key = state.apiKey;
-  const model = (document.getElementById('apiModel').value.trim()) || 'gemini-2.5-flash-image';
+  const model = (document.getElementById('apiModel').value.trim()) || 'gemini-3.1-flash-image-preview';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
