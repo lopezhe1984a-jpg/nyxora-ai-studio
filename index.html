@@ -100,6 +100,15 @@
   .view.active{ display:block; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
+  /* ---------- Menú móvil (hamburguesa) ---------- */
+  .hamburger-btn{
+    display:none; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
+    align-items:center; justify-content:center;
+  }
+  .sidebar-overlay{ display:none; position:fixed; inset:0; background:#000000aa; z-index:55; }
+  .sidebar-overlay.show{ display:block; }
+
   /* ---------- Auth screen ---------- */
   .auth-card{
     width:100%; max-width:400px; background:var(--panel);
@@ -166,7 +175,17 @@
   .gen-hero p{ color:var(--text-dim); font-size:13px; max-width:480px; margin:0 auto; }
 
   .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
-  @media (max-width:900px){ .studio-grid{ grid-template-columns:1fr; } .sidebar{ display:none; } .main{ padding:20px; } }
+  @media (max-width:900px){
+    .studio-grid{ grid-template-columns:1fr; }
+    .main{ padding:18px 16px 60px; }
+    .hamburger-btn{ display:flex; }
+    .sidebar{
+      position:fixed; top:0; left:0; height:100vh; width:230px; z-index:60;
+      background:var(--bg-1); transform:translateX(-100%);
+      transition:transform .25s ease; box-shadow:0 0 40px #000000cc;
+    }
+    .sidebar.open{ transform:translateX(0); }
+  }
 
   .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
   .panel h4{ font-size:14px; margin-bottom:14px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
@@ -306,7 +325,10 @@
 <div id="app">
   <div style="flex:1; display:flex; flex-direction:column; width:100%;">
     <div class="topbar">
-      <div class="brand"><span class="orb-mini"></span>NYXORA<small>AI CREATIVE STUDIO</small></div>
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="hamburger-btn" onclick="toggleSidebar()">☰</button>
+        <div class="brand"><span class="orb-mini"></span>NYXORA<small>AI CREATIVE STUDIO</small></div>
+      </div>
       <div class="topbar-right">
         <div class="pill coin">🪙 <span id="coinCount">150</span></div>
         <div class="pill gem">💎 <span id="gemCount">0</span></div>
@@ -314,9 +336,10 @@
         <div class="avatar" id="userAvatar">U</div>
       </div>
     </div>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
     <div class="shell">
-      <div class="sidebar">
+      <div class="sidebar" id="mainSidebar">
         <button class="nav-item active" data-view="generate" onclick="switchView('generate')"><span class="ic">✨</span>Generar</button>
         <button class="nav-item" data-view="gallery" onclick="switchView('gallery')"><span class="ic">🖼️</span>Mi galería</button>
         <button class="nav-item" data-view="credits" onclick="switchView('credits')"><span class="ic">🪙</span>Créditos</button>
@@ -747,6 +770,15 @@ function switchView(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
   if(view === 'owner' && state.isOwner) renderUserTable();
+  if(window.innerWidth <= 900) closeSidebar();
+}
+function toggleSidebar(){
+  document.getElementById('mainSidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('mainSidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
 /* ================= GENERACIÓN ================= */
@@ -992,7 +1024,8 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  saveApiConfig, giftUser, muteUser, banUser, removeUser, logout, selectModel
+  saveApiConfig, giftUser, muteUser, banUser, removeUser, logout, selectModel,
+  toggleSidebar
 });
 
 /* ================= INIT ================= */
