@@ -41,7 +41,7 @@
         </div>
     </header>
 
-    <!-- Contenedor Principal Dinámico -->
+    <!-- Contenedor Principal Dinámico (Vistas) -->
     <main id="app-view" class="flex-grow">
         <!-- Vista Home Inicial -->
         <section class="flex flex-col items-center justify-center text-center px-4 py-24 relative">
@@ -56,21 +56,14 @@
         </section>
     </main>
 
-    <!-- Toast de Notificaciones Flotantes -->
-    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-2 pointer-events-none"></div>
-
     <!-- Footer -->
     <footer class="glass py-6 text-center text-xs text-gray-500">
         <p>&copy; 2026 NYXORA. Todos los derechos reservados. Control creativo total.</p>
     </footer>
 
-    <!-- Lógica del Sistema -->
+    <!-- Script Principal y Lógica del Sistema -->
     <script>
         let currentUser = JSON.parse(localStorage.getItem('nyxora_current_user')) || { name: "Invitado", email: "invitado@nyxora.com", credits: 50 };
-        let communityGallery = JSON.parse(localStorage.getItem('nyxora_gallery')) || [
-            { prompt: "Cyberpunk neon city in the rain, hyperdetailed", url: "https://pollinations.ai/p/Cyberpunk%20neon%20city%20in%20the%20rain?width=800&height=800&nologo=true", author: "Dueña" },
-            { prompt: "Mystical forest with glowing magical flora", url: "https://pollinations.ai/p/Mystical%20forest%20with%20glowing%20magical%20flora?width=800&height=800&nologo=true", author: "NYXORA AI" }
-        ];
 
         function initApp() {
             updateAuthUI();
@@ -93,26 +86,6 @@
             }
         }
 
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = `pointer-events-auto glass px-4 py-3 rounded-xl shadow-2xl text-sm flex items-center space-x-2 border border-white/10 transition transform translate-y-2 opacity-0`;
-            
-            let colorDot = 'bg-cyan-400';
-            if(type === 'success') colorDot = 'bg-emerald-400';
-            if(type === 'error') colorDot = 'bg-rose-400';
-            if(type === 'achievement') colorDot = 'bg-amber-400';
-
-            toast.innerHTML = `<span class="w-2.5 h-2.5 rounded-full ${colorDot}"></span><span class="text-white">${message}</span>`;
-            container.appendChild(toast);
-
-            setTimeout(() => { toast.classList.remove('translate-y-2', 'opacity-0'); }, 50);
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
         function router(view) {
             const mainContainer = document.getElementById('app-view');
             if (view === 'home') {
@@ -130,29 +103,42 @@
             } else if (view === 'studio') {
                 mainContainer.innerHTML = `
                     <div class="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <!-- Panel de Controles -->
                         <div class="glass-card p-6 rounded-2xl flex flex-col space-y-6">
                             <h2 class="text-xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">Studio de Creación</h2>
+                            
+                            <!-- Modos -->
                             <div class="flex bg-gray-900/80 p-1 rounded-xl">
                                 <button onclick="switchMode('image')" id="mode-image" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-cyan-600 text-white transition">Imagen</button>
                                 <button onclick="switchMode('video')" id="mode-video" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Video 🎬</button>
                                 <button onclick="switchMode('3d')" id="mode-3d" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">3D 🧊</button>
                                 <button onclick="switchMode('audio')" id="mode-audio" class="flex-1 py-2 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition">Audio 🎵</button>
                             </div>
+
+                            <!-- Input Prompt -->
                             <div class="space-y-2">
                                 <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Prompt Creativo</label>
                                 <textarea id="studio-prompt" rows="4" placeholder="Describe tu obra maestra en detalle..." class="w-full bg-gray-900/60 border border-gray-800 rounded-xl p-3 text-sm focus:outline-none focus:border-cyan-500 text-white"></textarea>
                             </div>
-                            <div>
-                                <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estilo Artístico</label>
-                                <select id="art-style" class="w-full mt-1 bg-gray-900 border border-gray-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
-                                    <option value="photorealistic">Fotorrealista (Flux)</option>
-                                    <option value="anime">Anime / Manga (Niji-X)</option>
-                                    <option value="cyberpunk">Cyberpunk Neon</option>
-                                    <option value="oil painting">Óleo Clásico</option>
-                                </select>
+
+                            <!-- Opciones Específicas -->
+                            <div id="mode-options" class="space-y-4">
+                                <div>
+                                    <label class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Estilo Artístico</label>
+                                    <select id="art-style" class="w-full mt-1 bg-gray-900 border border-gray-800 rounded-xl p-2.5 text-sm text-white focus:outline-none focus:border-cyan-500">
+                                        <option value="photorealistic">Fotorrealista (Flux)</option>
+                                        <option value="anime">Anime / Manga (Niji-X)</option>
+                                        <option value="cyberpunk">Cyberpunk Neon</option>
+                                        <option value="oil painting">Óleo Clásico</option>
+                                        <option value="3d render">Render 3D Studio</option>
+                                    </select>
+                                </div>
                             </div>
+
                             <button onclick="generateContent()" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-600 font-bold text-white shadow-lg hover:opacity-90 transition">Generar Obra (✦ 2 Créditos)</button>
                         </div>
+
+                        <!-- Visor de Resultados -->
                         <div class="lg:col-span-2 glass-card p-6 rounded-2xl flex flex-col items-center justify-center min-h-[500px] relative">
                             <div id="result-display" class="text-center flex flex-col items-center justify-center space-y-4">
                                 <div class="w-16 h-16 rounded-2xl bg-cyan-950/50 border border-cyan-800/50 flex items-center justify-center text-cyan-400 text-2xl">✨</div>
@@ -160,23 +146,9 @@
                             </div>
                         </div>
                     </div>`;
-            } else if (view === 'gallery') {
-                let galleryHTML = `<div class="max-w-7xl mx-auto px-6 py-12"><h2 class="text-3xl font-bold mb-8 text-cyan-400">🖼️ Galería Pública NYXORA</h2><div class="grid grid-cols-1 md:grid-cols-3 gap-6">`;
-                communityGallery.forEach(item => {
-                    galleryHTML += `
-                        <div class="glass-card rounded-2xl overflow-hidden shadow-xl flex flex-col">
-                            <img src="${item.url}" alt="Obra de comunidad" class="w-full h-64 object-cover">
-                            <div class="p-4 flex flex-col justify-between flex-grow">
-                                <p class="text-sm text-gray-200 mb-2">"${item.prompt}"</p>
-                                <span class="text-xs text-cyan-400 font-medium">Creado por: ${item.author}</span>
-                            </div>
-                        </div>`;
-                });
-                galleryHTML += `</div></div>`;
-                mainContainer.innerHTML = galleryHTML;
             } else if (view === 'owner') {
                 if (!currentUser || currentUser.email !== 'hector@nyxora.admin') {
-                    showToast('Acceso restringido para la dueña de la plataforma, mi amor.', 'error');
+                    alert('Acceso restringido para la dueña de la plataforma, mi amor.');
                     router('home');
                     return;
                 }
@@ -185,20 +157,21 @@
                         <h2 class="text-3xl font-bold mb-8 text-amber-400">👑 Panel de Dueño (NYXORA Admin)</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                             <div class="glass-card p-6 rounded-2xl">
-                                <h3 class="text-gray-400 text-sm">Obras en Galería</h3>
-                                <p class="text-3xl font-bold mt-2 text-cyan-400">${communityGallery.length}</p>
+                                <h3 class="text-gray-400 text-sm">Usuarios Totales</h3>
+                                <p class="text-3xl font-bold mt-2 text-cyan-400">1 (Tú)</p>
                             </div>
                             <div class="glass-card p-6 rounded-2xl">
-                                <h3 class="text-gray-400 text-sm">Créditos Actuales</h3>
+                                <h3 class="text-gray-400 text-sm">Créditos de la Cuenta</h3>
                                 <p class="text-3xl font-bold mt-2 text-purple-400">${currentUser.credits}</p>
                             </div>
                             <div class="glass-card p-6 rounded-2xl">
-                                <h3 class="text-gray-400 text-sm">Estado del Sistema</h3>
-                                <p class="text-3xl font-bold mt-2 text-emerald-400">100% Sincronizado</p>
+                                <h3 class="text-gray-400 text-sm">Estado del Motor IA</h3>
+                                <p class="text-3xl font-bold mt-2 text-emerald-400">Activo (Pollinations)</p>
                             </div>
                         </div>
                         <div class="glass-card p-6 rounded-2xl space-y-4">
-                            <h3 class="text-xl font-semibold">Acciones de Dueña</h3>
+                            <h3 class="text-xl font-semibold">Configuración de Dueña</h3>
+                            <p class="text-gray-400 text-sm">Desde aquí puedes otorgar créditos extra o modificar los parámetros globales.</p>
                             <button onclick="addBonusCredits()" class="px-4 py-2 bg-amber-500 text-gray-950 font-bold rounded-lg text-sm hover:bg-amber-400 transition">Regalarme +100 Créditos</button>
                         </div>
                     </div>`;
@@ -222,12 +195,12 @@
             const promptInput = document.getElementById('studio-prompt');
             const resultDisplay = document.getElementById('result-display');
             if (!promptInput || !promptInput.value.trim()) {
-                showToast('Por favor escribe un prompt, mi amor.', 'error');
+                alert('Por favor escribe un prompt, mi amor.');
                 return;
             }
 
             if (currentUser.credits < 2) {
-                showToast('No tienes suficientes créditos.', 'error');
+                alert('No tienes suficientes créditos.');
                 return;
             }
 
@@ -235,18 +208,12 @@
             localStorage.setItem('nyxora_current_user', JSON.stringify(currentUser));
             updateAuthUI();
 
-            showToast('Generando tu obra maestra con IA...', 'info');
-            resultDisplay.innerHTML = `<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400 mb-4"></div><p class="text-cyan-300 text-sm">Creando universo...</p>`;
+            resultDisplay.innerHTML = `<div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-400 mb-4"></div><p class="text-cyan-300 text-sm">Creando universo con IA...</p>`;
 
             const encodedPrompt = encodeURIComponent(promptInput.value);
             const imageUrl = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&nologo=true`;
 
             setTimeout(() => {
-                // Agregar automáticamente a la galería comunitaria
-                communityGallery.unshift({ prompt: promptInput.value, url: imageUrl, author: currentUser.name });
-                localStorage.setItem('nyxora_gallery', JSON.stringify(communityGallery));
-
-                showToast('¡Obra creada y guardada en la galería con éxito!', 'success');
                 resultDisplay.innerHTML = `
                     <div class="space-y-4 flex flex-col items-center">
                         <img src="${imageUrl}" alt="Resultado IA" class="rounded-xl max-h-[400px] shadow-2xl border border-white/10">
@@ -265,17 +232,16 @@
         }
 
         function openLoginModal() {
-            const secret = prompt("Ingresa tu correo (Ingresa tu correo de dueña para desbloquear el panel):");
+            const secret = prompt("Ingresa el correo de acceso (Ingresa tu correo de dueña para desbloquear el panel):");
             if (secret) {
                 if (secret.includes('admin') || secret.includes('hector')) {
                     currentUser = { name: "Dueña", email: "hector@nyxora.admin", credits: 1000 };
-                    showToast('¡Bienvenida de vuelta, mi amor!', 'achievement');
                 } else {
                     currentUser = { name: secret.split('@')[0], email: secret, credits: 50 };
-                    showToast(`¡Bienvenido, ${currentUser.name}!`, 'success');
                 }
                 localStorage.setItem('nyxora_current_user', JSON.stringify(currentUser));
                 updateAuthUI();
+                alert(`¡Bienvenida de nuevo, ${currentUser.name}! ❤️`);
                 router('studio');
             }
         }
@@ -284,7 +250,7 @@
             currentUser.credits += 100;
             localStorage.setItem('nyxora_current_user', JSON.stringify(currentUser));
             updateAuthUI();
-            showToast('¡100 créditos añadidos a tu cuenta!', 'achievement');
+            alert('¡Créditos añadidos con éxito, mi amor!');
             router('owner');
         }
 
