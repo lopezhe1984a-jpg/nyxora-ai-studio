@@ -554,7 +554,6 @@
    NYXORA — conectado a Firebase (Auth + Firestore)
    MODO GRATUITO: la galería se guarda como texto (base64) dentro de
    Firestore, sin usar Firebase Storage — así no requiere plan Blaze.
-   Si más adelante activas Storage, dime y te lo vuelvo a cambiar.
    ===================================================================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
@@ -566,14 +565,6 @@ import {
   collection, getDocs, increment
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
-/* ---------------------------------------------------------------------
-   1) PEGA AQUÍ TU CONFIGURACIÓN DE FIREBASE
-   La encuentras en: Firebase Console → ⚙️ Configuración del proyecto →
-   pestaña "General" → sección "Tus apps" → ícono </> (app web) →
-   "Configuración del SDK de Firebase".
-   Este objeto NO es secreto: está diseñado para vivir en código de
-   navegador. La seguridad real la dan las Reglas de Firestore/Storage.
---------------------------------------------------------------------- */
 const firebaseConfig = {
   apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
   authDomain: "nyxora-ai-creative-studio.firebaseapp.com",
@@ -587,13 +578,7 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-/* ---------------------------------------------------------------------
-   2) PEGA AQUÍ LA URL DE TU CLOUDFLARE WORKER (nyxora-proxy)
-   La consigues siguiendo las instrucciones de nyxora-proxy-worker.js
-   Ejemplo: "https://nyxora-proxy.tu-usuario.workers.dev"
-   Mientras diga "PEGA_AQUI...", la app funciona en modo demo (imágenes
-   de muestra) para que puedas seguir probando todo lo demás.
---------------------------------------------------------------------- */
+// URL de tu Cloudflare Worker configurada
 const GENERATION_PROXY_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
 
 /* ================= ESTADO EN MEMORIA ================= */
@@ -649,7 +634,6 @@ function friendlyAuthError(err){
     'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
     'auth/weak-password': 'La contraseña necesita al menos 6 caracteres.',
     'auth/network-request-failed': 'Sin conexión a internet.',
-    'auth/invalid-api-key': 'La configuración de Firebase no está completa todavía (revisa firebaseConfig en el código).',
   };
   return map[code] || (err?.message || 'Ocurrió un error, intenta de nuevo.');
 }
@@ -661,7 +645,6 @@ async function handleLogin(){
   if(!email || !pass){ showAuthError('Completa correo y contraseña.'); return; }
   try{
     await signInWithEmailAndPassword(auth, email, pass);
-    // onAuthStateChanged se encarga de entrar a la app
   }catch(err){
     showAuthError(friendlyAuthError(err));
   }
@@ -683,7 +666,6 @@ async function handleRegister(){
       lastClaimCoin: null, lastClaimGem: null, lastClaimDiamond: null,
       createdAt: new Date().toISOString(),
     });
-    // onAuthStateChanged se encarga de entrar a la app
   }catch(err){
     showAuthError(friendlyAuthError(err));
   }
@@ -703,13 +685,12 @@ async function logout(){
   await signOut(auth);
 }
 
-/* ================= SESIÓN: entrar/salir de la app ================= */
+/* ================= SESIÓN ================= */
 onAuthStateChanged(auth, async (user) => {
   if(user){
     state.uid = user.uid;
     let snap = await getDoc(doc(db, 'users', user.uid));
     if(!snap.exists()){
-      // por si el doc no se creó (ej. cuenta antigua); creamos uno por defecto
       await setDoc(doc(db, 'users', user.uid), {
         name: user.email.split('@')[0], email: user.email,
         coins: 150, gems: 0, diamonds: 0, plan: 'Free', status:'active', isOwner:false,
@@ -724,7 +705,6 @@ onAuthStateChanged(auth, async (user) => {
     state.gems = data.gems ?? 0;
     state.diamonds = data.diamonds ?? 0;
 
-    // El rol de dueño se verifica por Custom Claim firmado por Firebase (no por un campo editable)
     const tokenResult = await user.getIdTokenResult(true);
     state.isOwner = tokenResult.claims.isOwner === true;
 
@@ -798,8 +778,6 @@ const SAMPLE_IMAGES = [
   'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=600&q=80',
 ];
 
-// Llamada real a través de TU proxy en Cloudflare Worker — protege tu clave de Gemini,
-// que nunca llega al navegador del usuario. Cada usuario solo necesita estar logueado.
 async function callProxyImage(prompt){
   if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
     throw new Error('MODO_DEMO');
@@ -825,10 +803,6 @@ async function callProxyImage(prompt){
 }
 
 async function saveGeneratedImage(dataUri, prompt){
-  // MODO GRATUITO: guarda la imagen como texto (base64) directamente en Firestore,
-  // sin usar Firebase Storage. Funciona bien para imágenes; ten en cuenta que cada
-  // documento de Firestore tiene un límite de 1 MB, así que imágenes muy grandes
-  // podrían fallar — si eso pasa, es momento de activar Storage.
   try{
     await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), {
       url: dataUri, prompt, createdAt: new Date().toISOString()
@@ -836,10 +810,9 @@ async function saveGeneratedImage(dataUri, prompt){
     state.gallery.unshift(dataUri);
     renderGallery();
   }catch(err){
-    // Si algo falla al guardar, igual mostramos la imagen en esta sesión
     state.gallery.unshift(dataUri);
     renderGallery();
-    console.warn('No se pudo guardar en Storage/Firestore:', err.message);
+    console.warn('No se pudo guardar en Firestore:', err.message);
   }
 }
 
@@ -880,12 +853,13 @@ async function runGeneration(){
         renderGallery();
       } else {
         card.innerHTML = `<div class="result-empty">⚠️ ${err.message}</div>`;
-        showToast('Error al generar. Revisa el proxy en el código.');
+        showToast('Error al generar. Revisa la consola o el proxy.');
       }
     }
   }
   updateJsonPreview(prompt);
 }
+
 function magicPrompt(){
   const el = document.getElementById('promptInput');
   if(!el.value.trim()){ showToast('Escribe algo primero para mejorarlo.'); return; }
@@ -893,12 +867,14 @@ function magicPrompt(){
   showToast('Prompt mejorado.');
   updateJsonPreview(el.value);
 }
+
 function promptToJSON(){
   const prompt = document.getElementById('promptInput').value.trim();
   if(!prompt){ showToast('Escribe un prompt primero.'); return; }
   updateJsonPreview(prompt);
   showToast('JSON actualizado en el panel lateral.');
 }
+
 function updateJsonPreview(prompt){
   const json = {
     subject: prompt.slice(0,60) || '—',
@@ -909,6 +885,7 @@ function updateJsonPreview(prompt){
   };
   document.getElementById('jsonPreview').textContent = JSON.stringify(json, null, 2);
 }
+
 async function loadGallery(){
   try{
     const snap = await getDocs(collection(db, 'users', state.uid, 'gallery'));
@@ -918,6 +895,7 @@ async function loadGallery(){
     console.warn('No se pudo cargar la galería:', err.message);
   }
 }
+
 function renderGallery(){
   const grid = document.getElementById('galleryGrid');
   if(state.gallery.length === 0){
@@ -927,7 +905,7 @@ function renderGallery(){
   grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="creación"></div>`).join('');
 }
 
-/* ================= CRÉDITOS (persistentes en Firestore) ================= */
+/* ================= CRÉDITOS ================= */
 function hoursSince(iso){ return iso ? (Date.now() - new Date(iso).getTime()) / 3600000 : Infinity; }
 
 async function claimDaily(type){
@@ -936,7 +914,7 @@ async function claimDaily(type){
   const rules = {
     coin: { field:'lastClaimCoin', hours:24, amount:150, key:'coins' },
     gem: { field:'lastClaimGem', hours:24*7, amount:20, key:'gems' },
-    diamond: { field:'lastClaimDiamond', hours:Infinity, amount:1, key:'diamonds' }, // solo una vez
+    diamond: { field:'lastClaimDiamond', hours:Infinity, amount:1, key:'diamonds' },
   }[type];
 
   const last = data[rules.field];
@@ -952,27 +930,28 @@ async function claimDaily(type){
   updateCurrencyUI();
   showToast('¡Reclamado con éxito!');
 }
+
 function mockPurchase(item){
-  showToast(`Simulación: "${item}" — conecta un proveedor de pagos real (Stripe / compras in-app) para procesar cobros.`);
+  showToast(`Simulación: "${item}" — conecta un proveedor de pagos real para procesar cobros.`);
 }
+
 function updateCurrencyUI(){
   document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
   document.getElementById('gemCount').textContent = state.isOwner ? '∞' : state.gems;
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-/* ================= ESTADO DEL MOTOR DE GENERACIÓN ================= */
 function updateProxyStatusText(){
   const el = document.getElementById('proxyStatusText');
   if(!el) return;
   if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
-    el.innerHTML = '⚪ Modo demo: el proxy todavía no está configurado en el código, así que "Generar" muestra imágenes de ejemplo.';
+    el.innerHTML = '⚪ Modo demo: el proxy todavía no está configurado en el código.';
   } else {
     el.innerHTML = `🟢 Conectado a: <span class="mono">${GENERATION_PROXY_URL}</span>`;
   }
 }
 
-/* ================= PANEL DEL DUEÑO (Firestore real) ================= */
+/* ================= PANEL DEL DUEÑO ================= */
 const PLAN_CYCLE = ['Free', 'Pro', 'VIP'];
 let ownerUsersCache = [];
 async function renderUserTable(){
@@ -1008,12 +987,12 @@ async function renderUserTable(){
       </tr>`).join('');
   }
 
-  // Métricas rápidas, calculadas sobre TODOS los usuarios (no solo el filtro de búsqueda)
   document.getElementById('statUsers').textContent = ownerUsersCache.length;
   document.getElementById('statActive').textContent = ownerUsersCache.filter(u => (u.status||'active') === 'active').length;
   document.getElementById('statBanned').textContent = ownerUsersCache.filter(u => u.status === 'banned' || u.status === 'muted').length;
   document.getElementById('statCredits').textContent = ownerUsersCache.reduce((sum,u) => sum + (u.coins||0), 0);
 }
+
 async function giftUser(uid){
   const amountStr = prompt('¿Cuántos créditos quieres regalar?', '500');
   const amount = parseInt(amountStr);
@@ -1022,6 +1001,7 @@ async function giftUser(uid){
   showToast(`${amount} créditos regalados.`);
   renderUserTable();
 }
+
 async function cyclePlan(uid, currentPlan){
   const idx = PLAN_CYCLE.indexOf(currentPlan);
   const nextPlan = PLAN_CYCLE[(idx + 1) % PLAN_CYCLE.length];
@@ -1029,29 +1009,32 @@ async function cyclePlan(uid, currentPlan){
   showToast(`Plan cambiado a ${nextPlan}.`);
   renderUserTable();
 }
+
 async function muteUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'muted' });
   showToast('Usuario silenciado.');
   renderUserTable();
 }
+
 async function unbanUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'active' });
   showToast('Usuario reactivado.');
   renderUserTable();
 }
+
 async function banUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'banned' });
   showToast('Usuario baneado.');
   renderUserTable();
 }
+
 async function removeUser(uid){
-  if(!confirm('¿Seguro que quieres eliminar este perfil de la base de datos? No se puede deshacer.')) return;
+  if(!confirm('¿Seguro que quieres eliminar este perfil de la base de datos?')) return;
   await deleteDoc(doc(db, 'users', uid));
   showToast('Perfil eliminado de la base de datos.');
   renderUserTable();
 }
 
-/* ================= TOAST ================= */
 let toastTimer;
 function showToast(msg){
   const t = document.getElementById('toast');
@@ -1060,7 +1043,6 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-/* ================= EXPONER FUNCIONES PARA LOS onclick ================= */
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
@@ -1068,7 +1050,6 @@ Object.assign(window, {
   logout, selectModel, toggleSidebar
 });
 
-/* ================= INIT ================= */
 renderModels();
 updateJsonPreview('');
 showForm('login');
