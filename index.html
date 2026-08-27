@@ -100,7 +100,6 @@
   .view.active{ display:block; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
-  /* Menú móvil */
   .hamburger-btn{
     display:none; background:var(--panel-2); border:1px solid var(--line);
     color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
@@ -210,6 +209,16 @@
   .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
   .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; }
   .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
+  
+  /* Botón de descarga flotante en las tarjetas */
+  .download-btn{
+    position:absolute; bottom:8px; right:8px; background:#000000cc; backdrop-filter:blur(4px);
+    border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700;
+    display:flex; align-items:center; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
+  }
+  .result-card:hover .download-btn{ opacity:1; }
+  .download-btn:hover{ background:var(--violet); border-color:var(--violet); }
+
   .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
   .spinner{ width:26px; height:26px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg);} }
@@ -219,7 +228,7 @@
   .stat-row:last-child{ border-bottom:none; }
   .stat-row .v{ font-weight:700; }
 
-  /* Credits & Plans */
+  /* Plans & Credits */
   .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
   .claim-card .l{ font-weight:700; font-size:14px; }
   .claim-card .s{ font-size:12px; color:var(--text-dim); }
@@ -467,8 +476,39 @@
 
         <!-- OWNER PANEL VIEW -->
         <div class="view" id="view-owner">
-          <div class="view-head"><h2>Panel de Administración y Mejora Dinámica</h2><p>Control total absoluto: agrega nuevos modelos de IA, paquetes, edita funciones o gestiona usuarios.</p></div>
+          <div class="view-head"><h2>Panel de Administración y Mejora Dinámica</h2><p>Control total absoluto: ajusta nitidez, corrige parámetros técnicos, gestiona modelos y usuarios.</p></div>
           <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño activado. Tienes control absoluto, ilimitado y sin costo sobre toda la plataforma.</span></div>
+
+          <!-- NUEVO MÓDULO: AJUSTES TÉCNICOS DE CALIDAD Y NITIDEZ -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
+            <h4 style="color:var(--violet);">🎛️ Control Técnico de Fotorrealismo & Nitidez (Dueño)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Modifica estos parámetros globales para corregir enfoques, eliminar distorsiones faciales y potenciar el realismo en tiempo real.</p>
+            
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+              <div class="field" style="margin-bottom:0;">
+                <label>Filtro de Nitidez Avanzada</label>
+                <select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
+                  <option value="ultra">Ultra Definición 8K (Recomendado)</option>
+                  <option value="max">Máximo Enfoque Facial</option>
+                  <option value="balanced">Balanceado Natural</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Corrección Anti-Distorsión Rostros</label>
+                <select class="chip-select" id="cfgFaceFix" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
+                  <option value="on">Activado (Estricto Realismo)</option>
+                  <option value="off">Desactivado</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Motor de Render Video</label>
+                <select class="chip-select" id="cfgVideoEngine" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
+                  <option value="cinematic">NyxMotion Cinematic Pro</option>
+                  <option value="fluid">Veo Motion Fluido 60FPS</option>
+                </select>
+              </div>
+            </div>
+          </div>
 
           <!-- Administrar Modelos de IA -->
           <div class="panel" style="margin-bottom:20px;">
@@ -541,9 +581,10 @@ const state = {
   gems: 0,
   diamonds: 0,
   gensToday: 0,
-  studioMode: 'image', // 'image' o 'video'
+  studioMode: 'image',
   selectedModel: 'aurora-vision',
   gallery: [],
+  techConfig: { sharpness: 'ultra', faceFix: 'on', videoEngine: 'cinematic' },
   models: [
     { id:'aurora-vision', name:'Aurora Vision', type:'image', tag:'Fotorrealismo general', badge:'Popular' },
     { id:'nyx-portrait', name:'Nyx Portrait', type:'image', tag:'Retratos y personas', badge:'HD' },
@@ -585,7 +626,6 @@ function switchStudioMode(mode){
   document.getElementById('imageOptionsRow').style.display = mode === 'image' ? 'flex' : 'none';
   document.getElementById('videoOptionsRow').style.display = mode === 'video' ? 'flex' : 'none';
   
-  // Seleccionar primer modelo disponible para ese modo
   const first = state.models.find(m => m.type === mode);
   if(first) selectModel(first.id);
   renderModels();
@@ -728,17 +768,26 @@ async function runGeneration(){
     const res = await fetch(GENERATION_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ idToken: freshToken, prompt, model: state.selectedModel, mode: state.studioMode })
+      body: JSON.stringify({ 
+        idToken: freshToken, 
+        prompt, 
+        model: state.selectedModel, 
+        mode: state.studioMode,
+        techConfig: state.techConfig // Enviamos tus ajustes de nitidez y realismo al worker
+      })
     });
     const data = await res.json();
     if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
     
     const mediaUrl = data.mediaUrl;
-    if(state.studioMode === 'video'){
-      grid.innerHTML = `<div class="result-card"><video src="${mediaUrl}" controls autoplay loop></video></div>`;
-    } else {
-      grid.innerHTML = `<div class="result-card"><img src="${mediaUrl}" alt="resultado"></div>`;
-    }
+    const isVid = state.studioMode === 'video' || mediaUrl.includes('.mp4');
+
+    grid.innerHTML = `
+      <div class="result-card">
+        ${isVid ? `<video src="${mediaUrl}" controls autoplay loop></video>` : `<img src="${mediaUrl}" alt="resultado">`}
+        <a class="download-btn" href="${mediaUrl}" target="_blank" download="nyxora-output">📥 Descargar</a>
+      </div>
+    `;
     saveToGallery(mediaUrl);
   }catch(err){
     grid.innerHTML = `<div class="result-card"><div class="result-empty" style="color:var(--danger)">⚠️ Error al generar</div></div>`;
@@ -770,21 +819,26 @@ function renderGallery(){
     return;
   }
   grid.innerHTML = state.gallery.map(url => {
-    const isVid = url.includes('.mp4') || url.includes('video') || state.studioMode === 'video';
-    return `<div class="result-card">${isVid ? `<video src="${url}" controls></video>` : `<img src="${url}" alt="arte">`}</div>`;
+    const isVid = url.includes('.mp4') || url.includes('video');
+    return `
+      <div class="result-card">
+        ${isVid ? `<video src="${url}" controls></video>` : `<img src="${url}" alt="arte">`}
+        <a class="download-btn" href="${url}" target="_blank" download="nyxora-output">📥 Descargar</a>
+      </div>
+    `;
   }).join('');
 }
 
 function magicPrompt(){
   const el = document.getElementById('promptInput');
   if(!el.value.trim()) return;
-  el.value = el.value.trim() + ', fotorrealista hiperdetallado, render 8k, iluminación de estudio profesional, texturas impecables';
-  showToast('Prompt optimizado para máxima calidad.');
+  el.value = el.value.trim() + ', fotorrealismo extremo, textura de piel ultra detallada, 8k resolution, iluminación cinematográfica profesional, sin distorsiones, enfoque perfecto';
+  showToast('Prompt optimizado para máxima nitidez.');
 }
 
 function promptToJSON(){
   const prompt = document.getElementById('promptInput').value.trim();
-  const obj = { prompt: prompt || '—', mode: state.studioMode, model: state.selectedModel, quality: "4K Master" };
+  const obj = { prompt: prompt || '—', mode: state.studioMode, model: state.selectedModel, quality: "8K Cinema Master", techConfig: state.techConfig };
   document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
   showToast('Estructura JSON actualizada.');
 }
@@ -806,17 +860,21 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-// PANEL DE DUEÑO DINÁMICO
+// PANEL DE DUEÑO Y CONFIGURACIÓN TÉCNICA
 async function renderAdminPanel(){
   if(!state.isOwner) return;
-  // Model list
+  
+  // Sincronizar selectores del panel técnico con el estado
+  if(document.getElementById('cfgSharpness')) document.getElementById('cfgSharpness').value = state.techConfig.sharpness;
+  if(document.getElementById('cfgFaceFix')) document.getElementById('cfgFaceFix').value = state.techConfig.faceFix;
+  if(document.getElementById('cfgVideoEngine')) document.getElementById('cfgVideoEngine').value = state.techConfig.videoEngine;
+
   const list = document.getElementById('adminModelList');
   list.innerHTML = state.models.map(m => `
     <div style="background:var(--panel-2); border:1px solid var(--line); padding:8px 12px; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
       <b>${m.name}</b> <span style="color:var(--text-faint);">(${m.type})</span>
     </div>`).join('');
 
-  // Users table
   const snap = await getDocs(collection(db, 'users'));
   const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   const tbody = document.getElementById('userTableBody');
@@ -833,6 +891,13 @@ async function renderAdminPanel(){
         </div>
       </td>
     </tr>`).join('');
+}
+
+function saveOwnerTechConfig(){
+  state.techConfig.sharpness = document.getElementById('cfgSharpness').value;
+  state.techConfig.faceFix = document.getElementById('cfgFaceFix').value;
+  state.techConfig.videoEngine = document.getElementById('cfgVideoEngine').value;
+  showToast('⚙️ Ajustes técnicos y de nitidez guardados.');
 }
 
 function adminAddModel(){
@@ -882,7 +947,7 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, adminAddPack, giftCredits, banUser
+  logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, adminAddPack, giftCredits, banUser, saveOwnerTechConfig
 });
 
 renderModels();
