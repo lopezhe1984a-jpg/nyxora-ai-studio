@@ -6,7 +6,7 @@
 <title>NYXORA — AI Creative Studio & Production Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
+<style id="ownerCustomStyle">
   :root{
     --bg-0:#07070C;
     --bg-1:#0D0E17;
@@ -131,11 +131,11 @@
   .auth-head p{ color:var(--text-dim); font-size:13px; }
   .field{ margin-bottom:14px; }
   .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
-  .field input, .field select{
+  .field input, .field select, .field textarea{
     width:100%; padding:12px 14px; background:var(--bg-1); border:1px solid var(--line);
-    border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s;
+    border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s; font-family:inherit;
   }
-  .field input:focus, .field select:focus{ border-color:var(--violet); }
+  .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--violet); }
   .btn{
     width:100%; padding:13px; border-radius:10px; font-weight:700; font-size:14px; text-align:center;
     transition:transform .12s, opacity .12s;
@@ -145,6 +145,7 @@
   .btn-primary:hover{ opacity:.92; }
   .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
   .btn-ghost:hover{ border-color:var(--violet); }
+  .btn-gold{ background:linear-gradient(135deg, var(--gold), #D97706); color:#000; }
   .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
   .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
   .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
@@ -210,7 +211,6 @@
   .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; }
   .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
   
-  /* Botón de descarga flotante en las tarjetas */
   .download-btn{
     position:absolute; bottom:8px; right:8px; background:#000000cc; backdrop-filter:blur(4px);
     border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700;
@@ -252,7 +252,7 @@
   .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
   .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
 
-  /* Owner Advanced Dynamic Panel */
+  /* Owner Advanced Universal Panel */
   .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
   .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
   .user-table-wrap{ overflow-x:auto; }
@@ -474,17 +474,53 @@
           </div>
         </div>
 
-        <!-- OWNER PANEL VIEW -->
+        <!-- OWNER PANEL VIEW (UNIVERSAL & AVANZADO) -->
         <div class="view" id="view-owner">
-          <div class="view-head"><h2>Panel de Administración y Mejora Dinámica</h2><p>Control total absoluto: ajusta nitidez, corrige parámetros técnicos, gestiona modelos y usuarios.</p></div>
-          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño activado. Tienes control absoluto, ilimitado y sin costo sobre toda la plataforma.</span></div>
+          <div class="view-head"><h2>Panel de Dueño & Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras, monedas, gemas, regalos y modelos de IA sin errores.</p></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
 
-          <!-- NUEVO MÓDULO: AJUSTES TÉCNICOS DE CALIDAD Y NITIDEZ -->
+          <!-- MÓDULO 1: CENTRO DE PROGRAMACIÓN Y EDICIÓN DE CÓDIGO HTML/CSS/JS EN VIVO -->
           <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
-            <h4 style="color:var(--violet);">🎛️ Control Técnico de Fotorrealismo & Nitidez (Dueño)</h4>
-            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Modifica estos parámetros globales para corregir enfoques, eliminar distorsiones faciales y potenciar el realismo en tiempo real.</p>
+            <h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
             
-            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px;">
+            <div class="field">
+              <label>Editor de Código JS / Funciones Customizadas</label>
+              <textarea id="ownerCustomScriptCode" class="mono" style="min-height:100px;" placeholder="// Escribe funciones JavaScript extra aquí, por ejemplo: console.log('Modo Dueño Activo');"></textarea>
+            </div>
+            <div class="field">
+              <label>Editor de Estilos CSS Raíz</label>
+              <textarea id="ownerCustomStyleCode" class="mono" style="min-height:80px;" placeholder="/* Escribe estilos CSS adicionales o sobreescribe clases */"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="executeOwnerCodeInjection()">⚡ Compilar y Aplicar Código al Sistema</button>
+          </div>
+
+          <!-- MÓDULO 2: CONTROL GLOBAL DE BILLETERAS, MONEDAS, GEMAS Y DIAMANTES -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🪙 Administración Global de Billeteras (Monedas, Gemas, Diamantes, Regalos)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Asigna o modifica recursos económicos de cualquier usuario registrado de forma instantánea.</p>
+            
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Correo del Usuario Objetivo</label><input type="text" id="targetUserEmail" placeholder="usuario@ejemplo.com"></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo de Recurso</label>
+                <select class="chip-select" id="targetResourceType" style="width:100%; padding:11px;">
+                  <option value="coins">🪙 Créditos / Monedas</option>
+                  <option value="gems">💎 Gemas</option>
+                  <option value="diamonds">🔷 Diamantes</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;"><label>Cantidad a Sumar/Fijar</label><input type="number" id="targetResourceAmount" placeholder="1000"></div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px;">
+              <button class="btn btn-gold" onclick="ownerModifyWallet(false)">➕ Añadir Recursos</button>
+              <button class="btn btn-ghost" onclick="ownerModifyWallet(true)">🔄 Establecer Valor Exacto</button>
+            </div>
+          </div>
+
+          <!-- MÓDULO 3: CONTROL TÉCNICO DE FOTORREALISMO Y NITIDEZ -->
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>🎛️ Control Técnico de Fotorrealismo & Nitidez</h4>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:12px;">
               <div class="field" style="margin-bottom:0;">
                 <label>Filtro de Nitidez Avanzada</label>
                 <select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
@@ -510,9 +546,9 @@
             </div>
           </div>
 
-          <!-- Administrar Modelos de IA -->
+          <!-- MÓDULO 4: GESTIÓN DE MODELOS DE IA Y PAQUETES -->
           <div class="panel" style="margin-bottom:20px;">
-            <h4>Agregar o Gestionar Modelos de IA (Imagen / Video)</h4>
+            <h4>🤖 Agregar o Gestionar Modelos de IA & Paquetes</h4>
             <div class="admin-form-row">
               <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input type="text" id="newModelName" placeholder="Ej: NyxMotion Ultra"></div>
               <div class="field" style="margin-bottom:0;"><label>Tipo</label>
@@ -523,22 +559,12 @@
             <div id="adminModelList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
           </div>
 
-          <!-- Administrar Paquetes de Precios -->
-          <div class="panel" style="margin-bottom:20px;">
-            <h4>Agregar Paquete de Precios / Recarga</h4>
-            <div class="admin-form-row">
-              <div class="field" style="margin-bottom:0;"><label>Título / Cantidad</label><input type="text" id="newPackTitle" placeholder="Ej: 1000 Créditos Studio"></div>
-              <div class="field" style="margin-bottom:0;"><label>Precio ($)</label><input type="text" id="newPackPrice" placeholder="$24.99"></div>
-              <button class="btn btn-primary" onclick="adminAddPack()">+ Añadir Paquete</button>
-            </div>
-          </div>
-
-          <!-- Lista de Usuarios -->
+          <!-- MÓDULO 5: BASE DE DATOS COMPLETA DE USUARIOS Y MONITOREO -->
           <div class="panel">
-            <h4 style="margin-bottom:14px;">Base de Usuarios Registrados</h4>
+            <h4 style="margin-bottom:14px;">🗄️ Base de Datos Completa de Registros & Monitoreo en Vivo</h4>
             <div class="user-table-wrap">
               <table class="user-table">
-                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody id="userTableBody"></tbody>
               </table>
             </div>
@@ -556,7 +582,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, increment, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
@@ -773,7 +799,7 @@ async function runGeneration(){
         prompt, 
         model: state.selectedModel, 
         mode: state.studioMode,
-        techConfig: state.techConfig // Enviamos tus ajustes de nitidez y realismo al worker
+        techConfig: state.techConfig
       })
     });
     const data = await res.json();
@@ -860,11 +886,10 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-// PANEL DE DUEÑO Y CONFIGURACIÓN TÉCNICA
+// PANEL DE DUEÑO: ACCESOS DE PROGRAMACIÓN Y MODIFICACIÓN UNIVERSAL
 async function renderAdminPanel(){
   if(!state.isOwner) return;
   
-  // Sincronizar selectores del panel técnico con el estado
   if(document.getElementById('cfgSharpness')) document.getElementById('cfgSharpness').value = state.techConfig.sharpness;
   if(document.getElementById('cfgFaceFix')) document.getElementById('cfgFaceFix').value = state.techConfig.faceFix;
   if(document.getElementById('cfgVideoEngine')) document.getElementById('cfgVideoEngine').value = state.techConfig.videoEngine;
@@ -880,17 +905,62 @@ async function renderAdminPanel(){
   const tbody = document.getElementById('userTableBody');
   tbody.innerHTML = users.map(u => `
     <tr>
-      <td>${u.name || u.email}</td>
+      <td><b>${u.name || 'Sin Nombre'}</b><br><small style="color:var(--text-dim);">${u.email}</small></td>
       <td>${u.plan || 'Free'}</td>
-      <td>${u.coins ?? 0}</td>
+      <td>🪙 ${u.coins ?? 0}</td>
+      <td>💎 ${u.gems ?? 0}</td>
       <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
       <td>
         <div class="row-actions">
-          <button class="icon-btn gift" onclick="giftCredits('${u.id}')">🎁 +Créditos</button>
+          <button class="icon-btn gift" onclick="giftCredits('${u.email}')">🎁 +Monedas</button>
           <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
         </div>
       </td>
     </tr>`).join('');
+}
+
+function executeOwnerCodeInjection(){
+  const jsCode = document.getElementById('ownerCustomScriptCode').value;
+  const cssCode = document.getElementById('ownerCustomStyleCode').value;
+  
+  if(cssCode){
+    document.getElementById('ownerCustomStyle').textContent += '\n' + cssCode;
+  }
+  if(jsCode){
+    try {
+      const dynamicFunction = new Function(jsCode);
+      dynamicFunction();
+    } catch(err) {
+      showToast('⚠️ Error en la ejecución del script: ' + err.message);
+      return;
+    }
+  }
+  showToast('🚀 ¡Código y modificaciones aplicadas al sistema correctamente!');
+}
+
+async function ownerModifyWallet(isExact){
+  const email = document.getElementById('targetUserEmail').value.trim();
+  const resource = document.getElementById('targetResourceType').value;
+  const amount = parseInt(document.getElementById('targetResourceAmount').value);
+  
+  if(!email || isNaN(amount)){ showToast('Ingresa un correo y cantidad válidos.'); return; }
+  
+  try {
+    const q = query(collection(db, 'users'), where("email", "==", email));
+    const snap = await getDocs(q);
+    if(snap.empty){ showToast('Usuario no encontrado en la base de datos.'); return; }
+    
+    const userDocRef = snap.docs[0].ref;
+    if(isExact){
+      await updateDoc(userDocRef, { [resource]: amount });
+    } else {
+      await updateDoc(userDocRef, { [resource]: increment(amount) });
+    }
+    showToast(`✅ Billetera actualizada con éxito para ${email}`);
+    renderAdminPanel();
+  } catch(e) {
+    showToast('Error al actualizar billetera.');
+  }
 }
 
 function saveOwnerTechConfig(){
@@ -912,24 +982,20 @@ function adminAddModel(){
   showToast('¡Modelo de IA añadido con éxito!');
 }
 
-function adminAddPack(){
-  const title = document.getElementById('newPackTitle').value.trim();
-  const cost = document.getElementById('newPackPrice').value.trim();
-  if(!title || !cost) return;
-  state.packs.push({ id:'p'+Date.now(), title, cost });
-  document.getElementById('newPackTitle').value = '';
-  document.getElementById('newPackPrice').value = '';
-  renderPacks();
-  showToast('¡Nuevo paquete de pago agregado!');
+async function giftCredits(email){
+  const cant = parseInt(prompt(`¿Cuántos créditos regalar a ${email}?`, '500'));
+  if(!cant) return;
+  try {
+    const q = query(collection(db, 'users'), where("email", "==", email));
+    const snap = await getDocs(q);
+    if(!snap.empty){
+      await updateDoc(snap.docs[0].ref, { coins: increment(cant) });
+      showToast('Créditos entregados.');
+      renderAdminPanel();
+    }
+  }catch(e){ showToast('Error al regalar créditos.'); }
 }
 
-async function giftCredits(uid){
-  const cant = parseInt(prompt('¿Cuántos créditos regalar?', '500'));
-  if(!cant) return;
-  await updateDoc(doc(db, 'users', uid), { coins: increment(cant) });
-  showToast('Créditos entregados.');
-  renderAdminPanel();
-}
 async function banUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'banned' });
   showToast('Usuario baneado.');
@@ -947,7 +1013,8 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, adminAddPack, giftCredits, banUser, saveOwnerTechConfig
+  logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, 
+  giftCredits, banUser, saveOwnerTechConfig, executeOwnerCodeInjection, ownerModifyWallet
 });
 
 renderModels();
