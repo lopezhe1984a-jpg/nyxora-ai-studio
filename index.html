@@ -42,7 +42,7 @@
   button{ font-family:inherit; cursor:pointer; border:none; }
   ::selection{ background:var(--violet); color:#fff; }
 
-  /* ---------- Layout shell ---------- */
+  /* Layout shell */
   #app{ display:none; min-height:100vh; }
   #app.active{ display:flex; }
   #authScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
@@ -100,7 +100,7 @@
   .view.active{ display:block; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
-  /* ---------- Menú móvil ---------- */
+  /* Menú móvil */
   .hamburger-btn{
     display:none; background:var(--panel-2); border:1px solid var(--line);
     color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
@@ -109,7 +109,7 @@
   .sidebar-overlay{ display:none; position:fixed; inset:0; background:#000000aa; z-index:55; }
   .sidebar-overlay.show{ display:block; }
 
-  /* ---------- Auth screen ---------- */
+  /* Auth screen */
   .auth-card{
     width:100%; max-width:400px; background:var(--panel);
     border:1px solid var(--line); border-radius:20px; padding:36px 30px;
@@ -132,11 +132,11 @@
   .auth-head p{ color:var(--text-dim); font-size:13px; }
   .field{ margin-bottom:14px; }
   .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
-  .field input{
+  .field input, .field select{
     width:100%; padding:12px 14px; background:var(--bg-1); border:1px solid var(--line);
     border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s;
   }
-  .field input:focus{ border-color:var(--violet); }
+  .field input:focus, .field select:focus{ border-color:var(--violet); }
   .btn{
     width:100%; padding:13px; border-radius:10px; font-weight:700; font-size:14px; text-align:center;
     transition:transform .12s, opacity .12s;
@@ -153,24 +153,19 @@
   .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); cursor:pointer; }
   .owner-link:hover{ color:var(--gold); }
 
-  /* ---------- Dashboard studio ---------- */
+  /* Studio Dashboard */
   .view-head{ margin-bottom:22px; }
   .view-head h2{ font-size:24px; margin-bottom:4px; }
   .view-head p{ color:var(--text-dim); font-size:13.5px; }
 
   .gen-hero{
-    position:relative; border-radius:20px; padding:36px 28px; margin-bottom:26px;
+    position:relative; border-radius:20px; padding:30px 24px; margin-bottom:24px;
     background:radial-gradient(ellipse at 30% 20%, #8B5CF622, transparent 60%), var(--panel);
-    border:1px solid var(--line); overflow:hidden; text-align:center;
+    border:1px solid var(--line); overflow:hidden; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
   }
-  .core-orb{
-    width:90px; height:90px; margin:0 auto 16px; border-radius:50%; position:relative;
-    background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 38%, #1b0f42 100%);
-    box-shadow:0 0 60px 12px #8B5CF655;
-    animation:pulseOrb 3.2s ease-in-out infinite;
-  }
-  .gen-hero h3{ font-size:19px; margin-bottom:6px; }
-  .gen-hero p{ color:var(--text-dim); font-size:13px; max-width:480px; margin:0 auto; }
+  .mode-switch-tabs{ display:flex; gap:8px; background:var(--bg-1); padding:4px; border-radius:12px; border:1px solid var(--line); }
+  .mode-tab{ padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; background:transparent; color:var(--text-dim); }
+  .mode-tab.active{ background:var(--violet); color:#fff; }
 
   .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
   @media (max-width:900px){
@@ -214,7 +209,7 @@
   .canvas-area{ margin-top:24px; }
   .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
   .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; }
-  .result-card img{ width:100%; height:100%; object-fit:cover; }
+  .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
   .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
   .spinner{ width:26px; height:26px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
   @keyframes spin{ to{ transform:rotate(360deg);} }
@@ -224,7 +219,7 @@
   .stat-row:last-child{ border-bottom:none; }
   .stat-row .v{ font-weight:700; }
 
-  /* ---------- Credits & Plans view ---------- */
+  /* Credits & Plans */
   .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
   .claim-card .l{ font-weight:700; font-size:14px; }
   .claim-card .s{ font-size:12px; color:var(--text-dim); }
@@ -248,7 +243,7 @@
   .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
   .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
 
-  /* ---------- Owner panel ---------- */
+  /* Owner Advanced Dynamic Panel */
   .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
   .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
   .user-table-wrap{ overflow-x:auto; }
@@ -258,12 +253,14 @@
   .status-tag{ font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700; }
   .status-tag.active{ background:#33E5FF22; color:var(--cyan); }
   .status-tag.banned{ background:#FF5C7A22; color:var(--danger); }
-  .status-tag.muted{ background:#F5B94222; color:var(--gold); }
   .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
   .icon-btn{ background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim); padding:5px 9px; border-radius:7px; font-size:11px; }
   .icon-btn:hover{ color:var(--text); border-color:#3a3d55; }
   .icon-btn.danger:hover{ color:var(--danger); border-color:var(--danger); }
   .icon-btn.gift:hover{ color:var(--gold); border-color:var(--gold); }
+
+  .admin-form-row{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-top:12px; align-items:end; }
+  @media(max-width:768px){ .admin-form-row{ grid-template-columns:1fr; } }
 
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
@@ -272,14 +269,11 @@
     transition:all .3s; z-index:100; box-shadow:0 10px 30px #0008;
   }
   .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-
-  .empty-note{ background:#33E5FF12; border:1px solid #33E5FF33; border-radius:12px; padding:14px 16px; font-size:12.5px; color:#9dd7e6; line-height:1.6; margin-top:16px; }
-  .empty-note b{ color:var(--cyan); }
 </style>
 </head>
 <body>
 
-<!-- ================= AUTH SCREEN ================= -->
+<!-- AUTH SCREEN -->
 <div id="authScreen">
   <div class="auth-card">
     <div class="auth-head">
@@ -316,7 +310,7 @@
   </div>
 </div>
 
-<!-- ================= APP MAIN SHELL ================= -->
+<!-- APP MAIN SHELL -->
 <div id="app">
   <div style="flex:1; display:flex; flex-direction:column; width:100%;">
     <div class="topbar">
@@ -335,7 +329,7 @@
 
     <div class="shell">
       <div class="sidebar" id="mainSidebar">
-        <button class="nav-item active" data-view="generate" onclick="switchView('generate')"><span class="ic">✨</span>Generar</button>
+        <button class="nav-item active" data-view="generate" onclick="switchView('generate')"><span class="ic">✨</span>Estudio Creativo</button>
         <button class="nav-item" data-view="gallery" onclick="switchView('gallery')"><span class="ic">🖼️</span>Galería Global</button>
         <button class="nav-item" data-view="credits" onclick="switchView('credits')"><span class="ic">🪙</span>Créditos & Bonos</button>
         <button class="nav-item" data-view="plans" onclick="switchView('plans')"><span class="ic">👑</span>Planes Premium</button>
@@ -347,47 +341,59 @@
 
       <div class="main">
 
-        <!-- ===== GENERATE VIEW ===== -->
+        <!-- GENERATE VIEW -->
         <div class="view active" id="view-generate">
           <div class="view-head">
-            <h2>Estudio de Generación Avanzada</h2>
-            <p>Imágenes hiperrealistas, calidad de cine y fotorrealismo absoluto.</p>
+            <h2>Estudio de Generación de Imágenes y Videos</h2>
+            <p>Modelos de última generación para fotorrealismo extremo y producciones audiovisuales de cine.</p>
           </div>
 
           <div class="gen-hero">
-            <div class="core-orb"></div>
-            <h3>Núcleo de IA Conectado</h3>
-            <p>Escribe tu prompt con total libertad. El motor procesará tu diseño con la máxima resolución y nitidez.</p>
+            <div>
+              <h3 id="modeTitle">Creación de Imágenes Master</h3>
+              <p id="modeDesc">Genera fotorrealismo supremo con control total de nitidez y resolución 4K.</p>
+            </div>
+            <div class="mode-switch-tabs">
+              <button class="mode-tab active" id="tabImg" onclick="switchStudioMode('image')">🖼️ Imágenes</button>
+              <button class="mode-tab" id="tabVid" onclick="switchStudioMode('video')">🎥 Videos (Cortos/Largos)</button>
+            </div>
           </div>
 
           <div class="studio-grid">
             <div class="panel">
-              <h4>Prompt Creativo</h4>
-              <textarea id="promptInput" placeholder="Ej: retrato editorial fotorrealista de una exploradora cibernética en una ciudad con neón, iluminación cinematográfica dramática, 85mm, ultra detallado..."></textarea>
+              <h4>Prompt Descriptivo</h4>
+              <textarea id="promptInput" placeholder="Ej: retrato fotorrealista hiperdetallado, iluminación cinematográfica dramática, 85mm, estudio profesional..."></textarea>
 
-              <h4 style="margin-top:20px;">Modelos de Generación</h4>
-              <div class="model-grid" id="imageModelGrid"></div>
+              <h4 style="margin-top:20px;">Modelos Disponibles</h4>
+              <div class="model-grid" id="modelGrid"></div>
 
-              <div class="opts-row">
+              <div class="opts-row" id="imageOptionsRow">
                 <select class="chip-select" id="optFormat">
-                  <option>Formato · Cuadrado (1:1)</option>
-                  <option>Formato · Historia (9:16)</option>
-                  <option>Formato · Cine (16:9)</option>
+                  <option value="1:1">Formato · Cuadrado (1:1)</option>
+                  <option value="9:16">Formato · Historia / TikTok (9:16)</option>
+                  <option value="16:9">Formato · Cine (16:9)</option>
                 </select>
                 <select class="chip-select" id="optQuality">
-                  <option>Calidad Master HD</option>
-                  <option>Calidad Ultra Cinema 4K</option>
+                  <option value="HD">Calidad Master HD</option>
+                  <option value="4K">Calidad Ultra Cinema 4K</option>
                 </select>
-                <select class="chip-select" id="optCount">
-                  <option>1 resultado</option>
-                  <option>2 resultados</option>
+              </div>
+
+              <div class="opts-row" id="videoOptionsRow" style="display:none;">
+                <select class="chip-select" id="optVideoType">
+                  <option value="short">🎬 Video Corto (Reel / TikTok - 5s a 10s)</option>
+                  <option value="long">📽️ Video Largo (Cinemático - 30s a 60s)</option>
+                </select>
+                <select class="chip-select" id="optVideoFps">
+                  <option value="24">24 FPS (Cine)</option>
+                  <option value="60">60 FPS (Ultra Fluido)</option>
                 </select>
               </div>
 
               <div class="gen-actions">
-                <button class="btn btn-primary" onclick="runGeneration()">⚡ Generar con IA</button>
+                <button class="btn btn-primary" onclick="runGeneration()">⚡ Generar Ahora</button>
                 <button class="btn btn-ghost" onclick="magicPrompt()">🪄 Mejorar Prompt</button>
-                <button class="btn btn-ghost" onclick="promptToJSON()">{ } Ver Estructura JSON</button>
+                <button class="btn btn-ghost" onclick="promptToJSON()">{ } Ver JSON</button>
               </div>
 
               <div class="canvas-area">
@@ -403,21 +409,21 @@
                 <h4>Estado de la Cuenta</h4>
                 <div class="stat-row"><span>Suscripción</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
                 <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 30</span></div>
-                <div class="stat-row"><span>Modelo activo</span><span class="v" id="activeModelLabel">Aurora Vision</span></div>
+                <div class="stat-row"><span>Motor activo</span><span class="v" id="activeModelLabel">Aurora Vision</span></div>
               </div>
               <div class="panel">
                 <h4>Parámetros Técnicos JSON</h4>
                 <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
   "engine": "nyxora-core",
-  "resolution": "4K",
-  "realism": "maximum"
+  "type": "image",
+  "resolution": "4K"
 }</pre>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- ===== GALLERY VIEW ===== -->
+        <!-- GALLERY VIEW -->
         <div class="view" id="view-gallery">
           <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube.</p></div>
           <div class="result-grid" id="galleryGrid">
@@ -425,10 +431,9 @@
           </div>
         </div>
 
-        <!-- ===== CREDITS VIEW ===== -->
+        <!-- CREDITS VIEW -->
         <div class="view" id="view-credits">
           <div class="view-head"><h2>Créditos y Bonificaciones</h2><p>Obtén recursos diarios para mantener tus creaciones activas.</p></div>
-
           <div class="claim-card">
             <div><div class="l">🪙 Bono Diario de Créditos</div><div class="s">150 créditos gratis cada 24 horas</div></div>
             <button class="btn btn-primary btn-sm" onclick="claimDaily('coin')">Reclamar</button>
@@ -437,16 +442,11 @@
             <div><div class="l">💎 Gemas Semanales</div><div class="s">20 gemas para efectos avanzados</div></div>
             <button class="btn btn-primary btn-sm" onclick="claimDaily('gem')">Reclamar</button>
           </div>
-
           <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Recargas de Créditos</h4>
-          <div class="price-grid">
-            <div class="price-card"><div class="amt">100</div><div class="unit">créditos</div><div class="cost">$4.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('100 créditos')">Adquirir</button></div>
-            <div class="price-card popular"><div class="badge">Más Popular</div><div class="amt">500</div><div class="unit">créditos</div><div class="cost">$14.99</div><button class="btn btn-primary btn-sm" onclick="mockPurchase('500 créditos')">Adquirir</button></div>
-            <div class="price-card"><div class="amt">1500</div><div class="unit">créditos</div><div class="cost">$34.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('1500 créditos')">Adquirir</button></div>
-          </div>
+          <div class="price-grid" id="dynamicPriceGrid"></div>
         </div>
 
-        <!-- ===== PLANS VIEW ===== -->
+        <!-- PLANS VIEW -->
         <div class="view" id="view-plans">
           <div class="view-head"><h2>Planes Premium</h2><p>Lleva tu estudio al siguiente nivel con acceso ilimitado y ultra resolución.</p></div>
           <div class="plans-grid">
@@ -459,42 +459,49 @@
             <div class="plan-card featured">
               <h3>👑 Pro Creator</h3>
               <div class="price">$19.99<span>/mes</span></div>
-              <ul><li>Generaciones masivas prioritarias</li><li>Todos los modelos de ultra fotorrealismo</li><li>Resolución Cinema 4K</li><li>150 créditos diarios automáticos</li></ul>
+              <ul><li>Generaciones masivas prioritarias</li><li>Todos los modelos de ultra fotorrealismo e imagen/video</li><li>Resolución Cinema 4K y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
               <button class="btn btn-primary" onclick="mockPurchase('Suscripción Pro Mensual')">Elegir Pro</button>
-            </div>
-            <div class="plan-card">
-              <h3>💎 VIP Master Anual</h3>
-              <div class="price">$149<span>/año</span></div>
-              <ul><li>Acceso total sin restricciones</li><li>Modelos exclusivos en desarrollo</li><li>500 créditos diarios</li><li>Soporte prioritario 24/7</li></ul>
-              <button class="btn btn-ghost" onclick="mockPurchase('Suscripción VIP Anual')">Elegir VIP</button>
             </div>
           </div>
         </div>
 
-        <!-- ===== OWNER PANEL VIEW ===== -->
+        <!-- OWNER PANEL VIEW -->
         <div class="view" id="view-owner">
-          <div class="view-head"><h2>Panel de Administración del Dueño</h2><p>Control total absoluto, gestión de usuarios, economía y moderación global.</p></div>
-          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Autenticación de Propietario verificada. Tienes privilegios totales e indefinidos sin costo en la plataforma.</span></div>
+          <div class="view-head"><h2>Panel de Administración y Mejora Dinámica</h2><p>Control total absoluto: agrega nuevos modelos de IA, paquetes, edita funciones o gestiona usuarios.</p></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño activado. Tienes control absoluto, ilimitado y sin costo sobre toda la plataforma.</span></div>
 
-          <div class="panel">
-            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-              <h4 style="margin-bottom:0;">Base de Usuarios Registrados</h4>
-              <input type="text" id="userSearchInput" class="chip-select" style="min-width:220px;" placeholder="Buscar usuario..." oninput="renderUserTable()">
+          <!-- Administrar Modelos de IA -->
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>Agregar o Gestionar Modelos de IA (Imagen / Video)</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input type="text" id="newModelName" placeholder="Ej: NyxMotion Ultra"></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo</label>
+                <select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option></select>
+              </div>
+              <button class="btn btn-primary" onclick="adminAddModel()">+ Añadir Modelo</button>
             </div>
-            <div class="user-table-wrap">
-              <table class="user-table">
-                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Estado</th><th>Acciones de Dueño</th></tr></thead>
-                <tbody id="userTableBody"></tbody>
-              </table>
+            <div id="adminModelList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+
+          <!-- Administrar Paquetes de Precios -->
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>Agregar Paquete de Precios / Recarga</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Título / Cantidad</label><input type="text" id="newPackTitle" placeholder="Ej: 1000 Créditos Studio"></div>
+              <div class="field" style="margin-bottom:0;"><label>Precio ($)</label><input type="text" id="newPackPrice" placeholder="$24.99"></div>
+              <button class="btn btn-primary" onclick="adminAddPack()">+ Añadir Paquete</button>
             </div>
           </div>
 
-          <div class="panel" style="margin-top:18px;">
-            <h4>Métricas Generales del Servidor</h4>
-            <div class="stat-row"><span>Usuarios totales en la red</span><span class="v" id="statUsers">—</span></div>
-            <div class="stat-row"><span>Cuentas activas hoy</span><span class="v" id="statActive">—</span></div>
-            <div class="stat-row"><span>Cuentas con restricciones</span><span class="v" id="statBanned">—</span></div>
-            <div class="stat-row"><span>Créditos totales circulantes</span><span class="v" id="statCredits">—</span></div>
+          <!-- Lista de Usuarios -->
+          <div class="panel">
+            <h4 style="margin-bottom:14px;">Base de Usuarios Registrados</h4>
+            <div class="user-table-wrap">
+              <table class="user-table">
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -505,17 +512,11 @@
 
 <div class="toast" id="toast"></div>
 
-<!-- ================= SCRIPTS DE CONEXIÓN Y FIREBASE ================= -->
+<!-- SCRIPTS FIREBASE Y LÓGICA -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-import {
-  getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
-  signInWithEmailAndPassword, signOut, sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, getDocs, increment
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, increment, deleteDoc } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
@@ -530,7 +531,6 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-// URL de tu Cloudflare Worker (el puente seguro hacia la IA)
 const GENERATION_PROXY_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
 
 const state = {
@@ -541,31 +541,65 @@ const state = {
   gems: 0,
   diamonds: 0,
   gensToday: 0,
-  selectedImageModel: 'aurora-vision',
+  studioMode: 'image', // 'image' o 'video'
+  selectedModel: 'aurora-vision',
   gallery: [],
+  models: [
+    { id:'aurora-vision', name:'Aurora Vision', type:'image', tag:'Fotorrealismo general', badge:'Popular' },
+    { id:'nyx-portrait', name:'Nyx Portrait', type:'image', tag:'Retratos y personas', badge:'HD' },
+    { id:'obsidian-max', name:'Obsidian Max', type:'image', tag:'Detalle 4K Supremo', badge:'Ultra' },
+    { id:'nyx-video-cinematic', name:'NyxMotion Cinematic', type:'video', tag:'Videos largos y cortos', badge:'Motion' },
+    { id:'veo-motion-pro', name:'Veo Motion Pro', type:'video', tag:'Alta definición fluida', badge:'Pro' }
+  ],
+  packs: [
+    { id:'p1', title:'100 créditos', cost:'$4.99' },
+    { id:'p2', title:'500 créditos', cost:'$14.99', popular:true },
+    { id:'p3', title:'1500 créditos', cost:'$34.99' }
+  ]
 };
 
-const IMAGE_MODELS = [
-  { id:'aurora-vision', name:'Aurora Vision', tag:'Fotorrealismo general', badge:'Popular' },
-  { id:'nyx-portrait', name:'Nyx Portrait', tag:'Retratos y personas', badge:'HD' },
-  { id:'obsidian-max', name:'Obsidian Max', tag:'Detalle 4K Supremo', badge:'Ultra' },
-  { id:'vantablack-pro', name:'Vantablack Pro', tag:'Precisión de estudio', badge:'Pro' },
-];
-
 function renderModels(){
-  const imgGrid = document.getElementById('imageModelGrid');
-  if(!imgGrid) return;
-  imgGrid.innerHTML = IMAGE_MODELS.map(m => `
-    <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('${m.id}')">
+  const grid = document.getElementById('modelGrid');
+  if(!grid) return;
+  const filtered = state.models.filter(m => m.type === state.studioMode);
+  grid.innerHTML = filtered.map(m => `
+    <div class="model-card ${m.id===state.selectedModel?'selected':''}" onclick="selectModel('${m.id}')">
       <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
       ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
     </div>`).join('');
 }
+
 function selectModel(id){
-  state.selectedImageModel = id;
-  const label = IMAGE_MODELS.find(m=>m.id===id).name;
-  document.getElementById('activeModelLabel').textContent = label;
+  state.selectedModel = id;
+  const found = state.models.find(m=>m.id===id);
+  if(found) document.getElementById('activeModelLabel').textContent = found.name;
   renderModels();
+}
+
+function switchStudioMode(mode){
+  state.studioMode = mode;
+  document.getElementById('tabImg').classList.toggle('active', mode==='image');
+  document.getElementById('tabVid').classList.toggle('active', mode==='video');
+  document.getElementById('modeTitle').textContent = mode === 'image' ? 'Creación de Imágenes Master' : 'Producción de Videos (Cortos y Largos)';
+  document.getElementById('modeDesc').textContent = mode === 'image' ? 'Genera fotorrealismo supremo con control total de nitidez.' : 'Crea animaciones fluidas, reels, TikToks o producciones cinemáticas completas.';
+  document.getElementById('imageOptionsRow').style.display = mode === 'image' ? 'flex' : 'none';
+  document.getElementById('videoOptionsRow').style.display = mode === 'video' ? 'flex' : 'none';
+  
+  // Seleccionar primer modelo disponible para ese modo
+  const first = state.models.find(m => m.type === mode);
+  if(first) selectModel(first.id);
+  renderModels();
+}
+
+function renderPacks(){
+  const grid = document.getElementById('dynamicPriceGrid');
+  if(!grid) return;
+  grid.innerHTML = state.packs.map(p => `
+    <div class="price-card ${p.popular?'popular':''}">
+      ${p.popular?'<div class="badge">Más Popular</div>':''}
+      <div class="amt">${p.title}</div><div class="cost">${p.cost}</div>
+      <button class="btn ${p.popular?'btn-primary':'btn-ghost'} btn-sm" onclick="mockPurchase('${p.title}')">Adquirir</button>
+    </div>`).join('');
 }
 
 function showForm(which){
@@ -584,12 +618,10 @@ async function handleLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
   if(!email || !pass){ showAuthError('Completa todos los campos.'); return; }
-  try{
-    await signInWithEmailAndPassword(auth, email, pass);
-  }catch(err){
-    showAuthError('Correo o contraseña incorrectos.');
-  }
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(err){ showAuthError('Correo o contraseña incorrectos.'); }
 }
+
 async function handleRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
@@ -598,27 +630,16 @@ async function handleRegister(){
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, 'users', cred.user.uid), {
-      name, email,
-      coins: 150, gems: 0, diamonds: 0,
-      plan: 'Free Studio',
-      status: 'active',
-      isOwner: false,
-      createdAt: new Date().toISOString(),
+      name, email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status: 'active', isOwner: false, createdAt: new Date().toISOString(),
     });
-  }catch(err){
-    showAuthError(err.message);
-  }
+  }catch(err){ showAuthError(err.message); }
 }
+
 async function handleReset(){
   const email = document.getElementById('resetEmail').value.trim();
   if(!email){ showAuthError('Ingresa tu correo.'); return; }
-  try{
-    await sendPasswordResetEmail(auth, email);
-    showToast('Enlace de recuperación enviado.');
-    showForm('login');
-  }catch(err){
-    showAuthError(err.message);
-  }
+  try{ await sendPasswordResetEmail(auth, email); showToast('Enlace enviado.'); showForm('login'); }
+  catch(err){ showAuthError(err.message); }
 }
 async function logout(){ await signOut(auth); }
 
@@ -628,9 +649,7 @@ onAuthStateChanged(auth, async (user) => {
     let snap = await getDoc(doc(db, 'users', user.uid));
     if(!snap.exists()){
       await setDoc(doc(db, 'users', user.uid), {
-        name: user.email.split('@')[0], email: user.email,
-        coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false,
-        createdAt: new Date().toISOString(),
+        name: user.email.split('@')[0], email: user.email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false, createdAt: new Date().toISOString(),
       });
       snap = await getDoc(doc(db, 'users', user.uid));
     }
@@ -660,7 +679,8 @@ function enterApp(){
   document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — Acceso Total Libre' : 'Prueba Pro — 3 días';
   updateCurrencyUI();
   loadGallery();
-  if(state.isOwner) renderUserTable();
+  renderPacks();
+  if(state.isOwner) renderAdminPanel();
   showToast(state.isOwner ? 'Bienvenido, dueño absoluto.' : `Bienvenido al estudio, ${state.currentUser}`);
 }
 
@@ -669,7 +689,7 @@ function switchView(view){
   document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
-  if(view === 'owner' && state.isOwner) renderUserTable();
+  if(view === 'owner' && state.isOwner) renderAdminPanel();
   if(window.innerWidth <= 900) closeSidebar();
 }
 function toggleSidebar(){
@@ -685,7 +705,7 @@ function closeSidebar(){
 async function runGeneration(){
   const prompt = document.getElementById('promptInput').value.trim();
   if(!prompt){ showToast('Escribe un prompt descriptivo.'); return; }
-  const cost = 10;
+  const cost = state.studioMode === 'video' ? 30 : 10;
   
   if(!state.isOwner && state.coins < cost){
     showToast('Créditos insuficientes. Reclama tu bono o recarga.');
@@ -700,47 +720,38 @@ async function runGeneration(){
   document.getElementById('gensToday').textContent = state.gensToday + ' / 30';
   updateCurrencyUI();
 
-  const count = parseInt(document.getElementById('optCount').value) || 1;
   const grid = document.getElementById('resultGrid');
-  grid.innerHTML = '';
+  grid.innerHTML = '<div class="result-card"><div class="spinner"></div></div>';
 
-  for(let i=0; i<count; i++){
-    const card = document.createElement('div');
-    card.className = 'result-card';
-    card.innerHTML = '<div class="spinner"></div>';
-    grid.appendChild(card);
-
-    try{
-      const freshToken = await auth.currentUser.getIdToken(true);
-      const res = await fetch(GENERATION_PROXY_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ idToken: freshToken, prompt, model: state.selectedImageModel })
-      });
-      const data = await res.json();
-      if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
-      
-      const img = data.imageUrl;
-      card.innerHTML = `<img src="${img}" alt="resultado">`;
-      saveToGallery(img);
-    }catch(err){
-      card.innerHTML = `<div class="result-empty" style="color:var(--danger)">⚠️ Error de generación</div>`;
-      showToast('Fallo al conectar con el motor de IA.');
+  try{
+    const freshToken = await auth.currentUser.getIdToken(true);
+    const res = await fetch(GENERATION_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ idToken: freshToken, prompt, model: state.selectedModel, mode: state.studioMode })
+    });
+    const data = await res.json();
+    if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
+    
+    const mediaUrl = data.mediaUrl;
+    if(state.studioMode === 'video'){
+      grid.innerHTML = `<div class="result-card"><video src="${mediaUrl}" controls autoplay loop></video></div>`;
+    } else {
+      grid.innerHTML = `<div class="result-card"><img src="${mediaUrl}" alt="resultado"></div>`;
     }
+    saveToGallery(mediaUrl);
+  }catch(err){
+    grid.innerHTML = `<div class="result-card"><div class="result-empty" style="color:var(--danger)">⚠️ Error al generar</div></div>`;
+    showToast('Fallo al conectar con el motor de IA.');
   }
 }
 
 async function saveToGallery(url){
   try{
-    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), {
-      url, createdAt: new Date().toISOString()
-    });
+    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), { url, createdAt: new Date().toISOString() });
     state.gallery.unshift(url);
     renderGallery();
-  }catch(e){
-    state.gallery.unshift(url);
-    renderGallery();
-  }
+  }catch(e){ state.gallery.unshift(url); renderGallery(); }
 }
 
 async function loadGallery(){
@@ -758,7 +769,10 @@ function renderGallery(){
     grid.innerHTML = '<div class="result-card"><div class="result-empty">Sin creaciones en galería.</div></div>';
     return;
   }
-  grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="arte"></div>`).join('');
+  grid.innerHTML = state.gallery.map(url => {
+    const isVid = url.includes('.mp4') || url.includes('video') || state.studioMode === 'video';
+    return `<div class="result-card">${isVid ? `<video src="${url}" controls></video>` : `<img src="${url}" alt="arte">`}</div>`;
+  }).join('');
 }
 
 function magicPrompt(){
@@ -770,7 +784,7 @@ function magicPrompt(){
 
 function promptToJSON(){
   const prompt = document.getElementById('promptInput').value.trim();
-  const obj = { prompt: prompt || '—', style: state.selectedImageModel, quality: "4K Master", lighting: "Studio Cinematic" };
+  const obj = { prompt: prompt || '—', mode: state.studioMode, model: state.selectedModel, quality: "4K Master" };
   document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
   showToast('Estructura JSON actualizada.');
 }
@@ -784,9 +798,7 @@ async function claimDaily(type){
   showToast('¡Recursos reclamados con éxito!');
 }
 
-function mockPurchase(item){
-  showToast(`Simulación de pasarela segura para: ${item}`);
-}
+function mockPurchase(item){ showToast(`Pasarela segura simulada para: ${item}`); }
 
 function updateCurrencyUI(){
   document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
@@ -794,19 +806,21 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-// PANEL DE DUEÑO AVANZADO
-let ownerUsersCache = [];
-async function renderUserTable(){
+// PANEL DE DUEÑO DINÁMICO
+async function renderAdminPanel(){
   if(!state.isOwner) return;
+  // Model list
+  const list = document.getElementById('adminModelList');
+  list.innerHTML = state.models.map(m => `
+    <div style="background:var(--panel-2); border:1px solid var(--line); padding:8px 12px; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
+      <b>${m.name}</b> <span style="color:var(--text-faint);">(${m.type})</span>
+    </div>`).join('');
+
+  // Users table
   const snap = await getDocs(collection(db, 'users'));
-  ownerUsersCache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-
-  const query = (document.getElementById('userSearchInput')?.value || '').toLowerCase();
-  const filtered = query ? ownerUsersCache.filter(u => (u.name||'').toLowerCase().includes(query)) : ownerUsersCache;
-
+  const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
   const tbody = document.getElementById('userTableBody');
-  if(!tbody) return;
-  tbody.innerHTML = filtered.map(u => `
+  tbody.innerHTML = users.map(u => `
     <tr>
       <td>${u.name || u.email}</td>
       <td>${u.plan || 'Free'}</td>
@@ -816,15 +830,32 @@ async function renderUserTable(){
         <div class="row-actions">
           <button class="icon-btn gift" onclick="giftCredits('${u.id}')">🎁 +Créditos</button>
           <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
-          <button class="icon-btn" onclick="unbanUser('${u.id}')">✅ Activar</button>
         </div>
       </td>
     </tr>`).join('');
+}
 
-  document.getElementById('statUsers').textContent = ownerUsersCache.length;
-  document.getElementById('statActive').textContent = ownerUsersCache.filter(u => u.status === 'active').length;
-  document.getElementById('statBanned').textContent = ownerUsersCache.filter(u => u.status === 'banned').length;
-  document.getElementById('statCredits').textContent = ownerUsersCache.reduce((a,b)=>a+(b.coins||0),0);
+function adminAddModel(){
+  const name = document.getElementById('newModelName').value.trim();
+  const type = document.getElementById('newModelType').value;
+  if(!name) return;
+  const id = name.toLowerCase().replace(/\s+/g, '-');
+  state.models.push({ id, name, type, tag: type==='image' ? 'Modelo Personalizado' : 'Video Dinámico', badge: 'Custom' });
+  document.getElementById('newModelName').value = '';
+  renderModels();
+  renderAdminPanel();
+  showToast('¡Modelo de IA añadido con éxito!');
+}
+
+function adminAddPack(){
+  const title = document.getElementById('newPackTitle').value.trim();
+  const cost = document.getElementById('newPackPrice').value.trim();
+  if(!title || !cost) return;
+  state.packs.push({ id:'p'+Date.now(), title, cost });
+  document.getElementById('newPackTitle').value = '';
+  document.getElementById('newPackPrice').value = '';
+  renderPacks();
+  showToast('¡Nuevo paquete de pago agregado!');
 }
 
 async function giftCredits(uid){
@@ -832,17 +863,12 @@ async function giftCredits(uid){
   if(!cant) return;
   await updateDoc(doc(db, 'users', uid), { coins: increment(cant) });
   showToast('Créditos entregados.');
-  renderUserTable();
+  renderAdminPanel();
 }
 async function banUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'banned' });
-  showToast('Usuario baneado de la red.');
-  renderUserTable();
-}
-async function unbanUser(uid){
-  await updateDoc(doc(db, 'users', uid), { status: 'active' });
-  showToast('Usuario reactivado.');
-  renderUserTable();
+  showToast('Usuario baneado.');
+  renderAdminPanel();
 }
 
 let toastTimer;
@@ -856,10 +882,11 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  logout, selectModel, toggleSidebar, giftCredits, banUser, unbanUser, renderUserTable
+  logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, adminAddPack, giftCredits, banUser
 });
 
 renderModels();
+renderPacks();
 showForm('login');
 </script>
 </body>
