@@ -501,22 +501,17 @@
 
         <!-- ===== API CONNECTION VIEW ===== -->
         <div class="view" id="view-api">
-          <div class="view-head"><h2>Conexión API</h2><p>Así es como conectas NYXORA a un motor de generación real.</p></div>
+          <div class="view-head"><h2>Motor de generación</h2><p>Así funciona la conexión de NYXORA con la IA, para cualquier usuario registrado.</p></div>
           <div class="panel">
             <h4>Estado actual</h4>
             <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7;">
-              Ahora mismo el botón "Generar" funciona en <b>modo demo</b>: simula el proceso y muestra imágenes de ejemplo, para que puedas probar todo el flujo (créditos, modelos, formatos) sin necesidad de una clave todavía.
+              NYXORA genera imágenes reales a través de un servidor intermedio (proxy) que guarda de forma segura la clave de Google AI Studio del dueño de la app. Ningún usuario, ni siquiera abriendo el código fuente, puede ver esa clave — solo necesitas tener sesión iniciada en NYXORA.
             </p>
-            <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;">
-              NYXORA ya trae integrada la llamada a <b>Google AI Studio (API de Gemini)</b> para generación de imágenes. Solo pega tu clave abajo — se guarda únicamente en la memoria de esta pestaña del navegador, nunca se escribe en el archivo ni se envía a ningún servidor propio de NYXORA. Al cerrar o recargar la página, se borra.
+            <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;" id="proxyStatusText">
+              Comprobando conexión con el motor de generación...
             </p>
-            <div class="field" style="margin-top:14px;"><label>Clave de API de Google AI Studio</label><input type="password" id="apiKey" placeholder="Pega aquí tu clave (empieza distinto según el tipo de clave)"></div>
-            <div class="field"><label>Modelo de imagen (ajustable)</label><input type="text" id="apiModel" value="gemini-3.1-flash-image-preview" placeholder="gemini-3.1-flash-image-preview"></div>
-            <button class="btn btn-primary" style="width:auto; padding:11px 20px;" onclick="saveApiConfig()">Conectar</button>
-            <span id="apiStatusTag" style="margin-left:10px; font-size:12px; color:var(--text-faint);">No conectado</span>
             <div class="empty-note">
-              Google cambia de vez en cuando el nombre exacto del modelo de imagen disponible en AI Studio. Si ves un error de "modelo no encontrado", entra a <a href="https://aistudio.google.com" target="_blank" style="color:var(--cyan);">aistudio.google.com</a>, revisa qué modelo de generación de imágenes tienes habilitado y escríbelo en el campo de arriba.<br><br>
-              Nunca compartas tu clave con nadie ni la pegues en apps no verificadas. Como esta clave fue escrita en un chat, te recomendamos regenerarla desde AI Studio por seguridad.
+              Esta pantalla es informativa. La configuración del proxy (URL del servidor y clave de Gemini) se hace una sola vez en el código, no aquí — eso lo controla el dueño de la app, no cada usuario.
             </div>
           </div>
         </div>
@@ -527,7 +522,10 @@
           <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario verificada por Firebase — privilegios reales sobre la base de datos.</span></div>
 
           <div class="panel">
-            <h4>Usuarios registrados</h4>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+              <h4 style="margin-bottom:0;">Usuarios registrados</h4>
+              <input type="text" id="userSearchInput" class="chip-select" style="min-width:220px;" placeholder="Buscar por nombre o correo..." oninput="renderUserTable()">
+            </div>
             <table class="user-table">
               <thead><tr><th>Usuario</th><th>Plan</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody id="userTableBody"></tbody>
@@ -537,6 +535,9 @@
           <div class="panel" style="margin-top:18px;">
             <h4>Métricas rápidas</h4>
             <div class="stat-row"><span>Usuarios totales</span><span class="v" id="statUsers">—</span></div>
+            <div class="stat-row"><span>Usuarios activos</span><span class="v" id="statActive">—</span></div>
+            <div class="stat-row"><span>Usuarios baneados/silenciados</span><span class="v" id="statBanned">—</span></div>
+            <div class="stat-row"><span>Créditos totales en circulación</span><span class="v" id="statCredits">—</span></div>
           </div>
           <div class="empty-note">"Eliminar" borra el perfil y sus datos de Firestore, pero no la cuenta de inicio de sesión en Firebase Authentication — eso requiere el script de administrador que se ejecuta fuera del navegador (ver instrucciones que te compartí aparte).</div>
         </div>
@@ -586,6 +587,15 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
+/* ---------------------------------------------------------------------
+   2) PEGA AQUÍ LA URL DE TU CLOUDFLARE WORKER (nyxora-proxy)
+   La consigues siguiendo las instrucciones de nyxora-proxy-worker.js
+   Ejemplo: "https://nyxora-proxy.tu-usuario.workers.dev"
+   Mientras diga "PEGA_AQUI...", la app funciona en modo demo (imágenes
+   de muestra) para que puedas seguir probando todo lo demás.
+--------------------------------------------------------------------- */
+const GENERATION_PROXY_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
+
 /* ================= ESTADO EN MEMORIA ================= */
 const state = {
   uid: null,
@@ -598,8 +608,6 @@ const state = {
   selectedImageModel: 'aurora-vision',
   selectedVideoModel: 'aurora-motion',
   gallery: [],
-  apiConfigured: false,
-  apiKey: null,
 };
 
 const IMAGE_MODELS = [
@@ -770,6 +778,7 @@ function switchView(view){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
   if(view === 'owner' && state.isOwner) renderUserTable();
+  if(view === 'api') updateProxyStatusText();
   if(window.innerWidth <= 900) closeSidebar();
 }
 function toggleSidebar(){
@@ -789,26 +798,22 @@ const SAMPLE_IMAGES = [
   'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=600&q=80',
 ];
 
-// Llamada real a la API de Gemini (Google AI Studio). La clave nunca se escribe
-// en este archivo: vive solo en memoria mientras esta pestaña está abierta.
-async function callGeminiImage(prompt){
-  const key = state.apiKey;
-  const model = (document.getElementById('apiModel').value.trim()) || 'gemini-3.1-flash-image-preview';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-  const body = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: { responseModalities: ["TEXT", "IMAGE"] }
-  };
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-    body: JSON.stringify(body)
-  });
-  if(!res.ok){
-    const errText = await res.text().catch(()=> '');
-    throw new Error(`La API respondió ${res.status}. ${errText.slice(0,180)}`);
+// Llamada real a través de TU proxy en Cloudflare Worker — protege tu clave de Gemini,
+// que nunca llega al navegador del usuario. Cada usuario solo necesita estar logueado.
+async function callProxyImage(prompt){
+  if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
+    throw new Error('MODO_DEMO');
   }
+  const idToken = await auth.currentUser.getIdToken();
+  const res = await fetch(GENERATION_PROXY_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ idToken, prompt, model: 'gemini-3.1-flash-image-preview' })
+  });
   const data = await res.json();
+  if(!res.ok || data.error){
+    throw new Error(data.error || `El servidor respondió ${res.status}`);
+  }
   const parts = data?.candidates?.[0]?.content?.parts || [];
   const imgPart = parts.find(p => p.inlineData || p.inline_data);
   if(imgPart){
@@ -862,21 +867,21 @@ async function runGeneration(){
     card.innerHTML = '<div class="spinner"></div>';
     grid.appendChild(card);
 
-    if(state.apiConfigured && state.apiKey){
-      try{
-        const img = await callGeminiImage(prompt);
-        card.innerHTML = `<img src="${img}" alt="resultado">`;
-        await saveGeneratedImage(img, prompt);
-      }catch(err){
+    try{
+      const img = await callProxyImage(prompt);
+      card.innerHTML = `<img src="${img}" alt="resultado">`;
+      await saveGeneratedImage(img, prompt);
+    }catch(err){
+      if(err.message === 'MODO_DEMO'){
+        await new Promise(r => setTimeout(r, 700 + i*300));
+        const img = SAMPLE_IMAGES[Math.floor(Math.random()*SAMPLE_IMAGES.length)];
+        card.innerHTML = `<img src="${img}" alt="resultado (modo demo)">`;
+        state.gallery.unshift(img);
+        renderGallery();
+      } else {
         card.innerHTML = `<div class="result-empty">⚠️ ${err.message}</div>`;
-        showToast('Error al generar con la API. Revisa "Conexión API".');
+        showToast('Error al generar. Revisa el proxy en el código.');
       }
-    } else {
-      await new Promise(r => setTimeout(r, 700 + i*300));
-      const img = SAMPLE_IMAGES[Math.floor(Math.random()*SAMPLE_IMAGES.length)];
-      card.innerHTML = `<img src="${img}" alt="resultado (modo demo)">`;
-      state.gallery.unshift(img);
-      renderGallery();
     }
   }
   updateJsonPreview(prompt);
@@ -956,48 +961,82 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-/* ================= CONEXIÓN API (Gemini) ================= */
-function saveApiConfig(){
-  const key = document.getElementById('apiKey').value.trim();
-  if(!key){ showToast('Pega tu clave de API primero.'); return; }
-  state.apiKey = key;
-  state.apiConfigured = true;
-  document.getElementById('apiStatusTag').textContent = '● Conectado (esta sesión)';
-  document.getElementById('apiStatusTag').style.color = 'var(--cyan)';
-  showToast('Conectado. Ve a "Generar" — ahora usará Gemini de verdad.');
+/* ================= ESTADO DEL MOTOR DE GENERACIÓN ================= */
+function updateProxyStatusText(){
+  const el = document.getElementById('proxyStatusText');
+  if(!el) return;
+  if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
+    el.innerHTML = '⚪ Modo demo: el proxy todavía no está configurado en el código, así que "Generar" muestra imágenes de ejemplo.';
+  } else {
+    el.innerHTML = `🟢 Conectado a: <span class="mono">${GENERATION_PROXY_URL}</span>`;
+  }
 }
 
 /* ================= PANEL DEL DUEÑO (Firestore real) ================= */
+const PLAN_CYCLE = ['Free', 'Pro', 'VIP'];
 let ownerUsersCache = [];
 async function renderUserTable(){
   const snap = await getDocs(collection(db, 'users'));
   ownerUsersCache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+
+  const query = (document.getElementById('userSearchInput')?.value || '').toLowerCase().trim();
+  const filtered = query
+    ? ownerUsersCache.filter(u => (u.name||'').toLowerCase().includes(query) || (u.email||'').toLowerCase().includes(query))
+    : ownerUsersCache;
+
   const tbody = document.getElementById('userTableBody');
-  tbody.innerHTML = ownerUsersCache.map(u => `
-    <tr>
-      <td>${u.name || u.email || u.id.slice(0,8)}</td>
-      <td>${u.plan || 'Free'}</td>
-      <td>${u.coins ?? 0}</td>
-      <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
-      <td>
-        <div class="row-actions">
-          <button class="icon-btn gift" onclick="giftUser('${u.id}')">🎁 Regalar</button>
-          <button class="icon-btn" onclick="muteUser('${u.id}')">🔇 Silenciar</button>
-          <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
-          <button class="icon-btn danger" onclick="removeUser('${u.id}')">🗑 Eliminar</button>
-        </div>
-      </td>
-    </tr>`).join('');
+  if(filtered.length === 0){
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:20px;">Sin resultados para "${query}".</td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map(u => `
+      <tr>
+        <td>${u.name || u.email || u.id.slice(0,8)}</td>
+        <td>
+          <button class="icon-btn" onclick="cyclePlan('${u.id}','${u.plan||'Free'}')" title="Toca para cambiar de plan">${u.plan || 'Free'} 🔄</button>
+        </td>
+        <td>${u.coins ?? 0}</td>
+        <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
+        <td>
+          <div class="row-actions">
+            <button class="icon-btn gift" onclick="giftUser('${u.id}')">🎁 Regalar</button>
+            <button class="icon-btn" onclick="muteUser('${u.id}')">🔇 Silenciar</button>
+            <button class="icon-btn" onclick="unbanUser('${u.id}')">✅ Reactivar</button>
+            <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
+            <button class="icon-btn danger" onclick="removeUser('${u.id}')">🗑 Eliminar</button>
+          </div>
+        </td>
+      </tr>`).join('');
+  }
+
+  // Métricas rápidas, calculadas sobre TODOS los usuarios (no solo el filtro de búsqueda)
   document.getElementById('statUsers').textContent = ownerUsersCache.length;
+  document.getElementById('statActive').textContent = ownerUsersCache.filter(u => (u.status||'active') === 'active').length;
+  document.getElementById('statBanned').textContent = ownerUsersCache.filter(u => u.status === 'banned' || u.status === 'muted').length;
+  document.getElementById('statCredits').textContent = ownerUsersCache.reduce((sum,u) => sum + (u.coins||0), 0);
 }
 async function giftUser(uid){
-  await updateDoc(doc(db, 'users', uid), { coins: increment(500) });
-  showToast('500 créditos regalados.');
+  const amountStr = prompt('¿Cuántos créditos quieres regalar?', '500');
+  const amount = parseInt(amountStr);
+  if(!amount || amount <= 0){ return; }
+  await updateDoc(doc(db, 'users', uid), { coins: increment(amount) });
+  showToast(`${amount} créditos regalados.`);
+  renderUserTable();
+}
+async function cyclePlan(uid, currentPlan){
+  const idx = PLAN_CYCLE.indexOf(currentPlan);
+  const nextPlan = PLAN_CYCLE[(idx + 1) % PLAN_CYCLE.length];
+  await updateDoc(doc(db, 'users', uid), { plan: nextPlan });
+  showToast(`Plan cambiado a ${nextPlan}.`);
   renderUserTable();
 }
 async function muteUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'muted' });
   showToast('Usuario silenciado.');
+  renderUserTable();
+}
+async function unbanUser(uid){
+  await updateDoc(doc(db, 'users', uid), { status: 'active' });
+  showToast('Usuario reactivado.');
   renderUserTable();
 }
 async function banUser(uid){
@@ -1006,6 +1045,7 @@ async function banUser(uid){
   renderUserTable();
 }
 async function removeUser(uid){
+  if(!confirm('¿Seguro que quieres eliminar este perfil de la base de datos? No se puede deshacer.')) return;
   await deleteDoc(doc(db, 'users', uid));
   showToast('Perfil eliminado de la base de datos.');
   renderUserTable();
@@ -1024,8 +1064,8 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  saveApiConfig, giftUser, muteUser, banUser, removeUser, logout, selectModel,
-  toggleSidebar
+  giftUser, cyclePlan, muteUser, unbanUser, banUser, removeUser, renderUserTable,
+  logout, selectModel, toggleSidebar
 });
 
 /* ================= INIT ================= */
