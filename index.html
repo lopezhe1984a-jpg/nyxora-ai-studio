@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NYXORA — AI Creative Studio</title>
+<title>NYXORA — AI Creative Studio & Production Hub</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-0:#07070C;
     --bg-1:#0D0E17;
-    --bg-2:#14162308;
+    --bg-2:#141623;
     --panel:#12131E;
     --panel-2:#1A1C2B;
     --line:#252838;
@@ -82,7 +82,7 @@
 
   .shell{ display:flex; flex:1; width:100%; }
   .sidebar{
-    width:220px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--line);
+    width:230px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--line);
     display:flex; flex-direction:column; gap:4px; min-height:calc(100vh - 68px);
   }
   .nav-item{
@@ -100,7 +100,7 @@
   .view.active{ display:block; }
   @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
 
-  /* ---------- Menú móvil (hamburguesa) ---------- */
+  /* ---------- Menú móvil ---------- */
   .hamburger-btn{
     display:none; background:var(--panel-2); border:1px solid var(--line);
     color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
@@ -146,32 +146,30 @@
   .btn-primary:hover{ opacity:.92; }
   .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
   .btn-ghost:hover{ border-color:var(--violet); }
-  .btn-owner{ background:linear-gradient(135deg, var(--gold), #B8860B); color:#0A0A12; }
   .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
   .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
   .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
   .auth-note{ text-align:center; font-size:11px; color:var(--text-faint); margin-top:18px; line-height:1.5; }
-  .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); }
+  .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); cursor:pointer; }
   .owner-link:hover{ color:var(--gold); }
 
-  /* ---------- Dashboard / generate view ---------- */
+  /* ---------- Dashboard studio ---------- */
   .view-head{ margin-bottom:22px; }
   .view-head h2{ font-size:24px; margin-bottom:4px; }
   .view-head p{ color:var(--text-dim); font-size:13.5px; }
 
   .gen-hero{
-    position:relative; border-radius:20px; padding:40px 28px; margin-bottom:26px;
+    position:relative; border-radius:20px; padding:36px 28px; margin-bottom:26px;
     background:radial-gradient(ellipse at 30% 20%, #8B5CF622, transparent 60%), var(--panel);
     border:1px solid var(--line); overflow:hidden; text-align:center;
   }
   .core-orb{
-    width:110px; height:110px; margin:0 auto 18px; border-radius:50%; position:relative;
+    width:90px; height:90px; margin:0 auto 16px; border-radius:50%; position:relative;
     background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 38%, #1b0f42 100%);
-    box-shadow:0 0 70px 14px #8B5CF655;
-    animation:coreSpin 8s linear infinite, pulseOrb 3.2s ease-in-out infinite;
+    box-shadow:0 0 60px 12px #8B5CF655;
+    animation:pulseOrb 3.2s ease-in-out infinite;
   }
-  @keyframes coreSpin{ from{ filter:hue-rotate(0deg);} to{ filter:hue-rotate(30deg);} }
-  .gen-hero h3{ font-size:19px; margin-bottom:8px; }
+  .gen-hero h3{ font-size:19px; margin-bottom:6px; }
   .gen-hero p{ color:var(--text-dim); font-size:13px; max-width:480px; margin:0 auto; }
 
   .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
@@ -196,7 +194,7 @@
   }
   textarea:focus{ border-color:var(--violet); }
 
-  .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(150px,1fr)); gap:10px; margin-top:14px; }
+  .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; margin-top:14px; }
   .model-card{
     background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;
     cursor:pointer; transition:border-color .15s, transform .1s;
@@ -208,9 +206,9 @@
   .model-card .m-badge{ display:inline-block; margin-top:6px; font-size:9.5px; padding:2px 6px; border-radius:6px; background:#8B5CF633; color:#C9B8FF; font-weight:700; }
 
   .opts-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
-  .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; }
+  .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; outline:none; }
 
-  .gen-actions{ display:flex; gap:10px; margin-top:18px; }
+  .gen-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
   .gen-actions .btn{ width:auto; padding:12px 22px; }
 
   .canvas-area{ margin-top:24px; }
@@ -226,17 +224,17 @@
   .stat-row:last-child{ border-bottom:none; }
   .stat-row .v{ font-weight:700; }
 
-  /* ---------- Credits view ---------- */
+  /* ---------- Credits & Plans view ---------- */
   .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
   .claim-card .l{ font-weight:700; font-size:14px; }
   .claim-card .s{ font-size:12px; color:var(--text-dim); }
-  .btn-sm{ padding:9px 16px; font-size:12.5px; border-radius:9px; }
+  .btn-sm{ padding:9px 16px; font-size:12.5px; border-radius:9px; width:auto; }
 
   .price-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-top:16px; }
   .price-card{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; position:relative; }
   .price-card.popular{ border-color:var(--violet); }
   .price-card .badge{ position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--violet); color:#fff; font-size:10px; font-weight:700; padding:3px 10px; border-radius:100px; }
-  .price-card .amt{ font-size:26px; font-weight:900; font-family:'Orbitron'; margin:8px 0 2px; }
+  .price-card .amt{ font-size:24px; font-weight:900; font-family:'Orbitron'; margin:8px 0 2px; }
   .price-card .unit{ font-size:11px; color:var(--text-faint); margin-bottom:12px; }
   .price-card .cost{ font-size:15px; font-weight:700; color:var(--gold); margin-bottom:12px; }
 
@@ -250,10 +248,11 @@
   .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
   .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
 
-  /* ---------- Admin / Owner view ---------- */
+  /* ---------- Owner panel ---------- */
   .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
   .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
-  .user-table{ width:100%; border-collapse:collapse; margin-top:14px; }
+  .user-table-wrap{ overflow-x:auto; }
+  .user-table{ width:100%; border-collapse:collapse; margin-top:14px; min-width:600px; }
   .user-table th{ text-align:left; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px; border-bottom:1px solid var(--line); }
   .user-table td{ padding:11px 10px; font-size:13.5px; border-bottom:1px solid var(--line); }
   .status-tag{ font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700; }
@@ -276,7 +275,6 @@
 
   .empty-note{ background:#33E5FF12; border:1px solid #33E5FF33; border-radius:12px; padding:14px 16px; font-size:12.5px; color:#9dd7e6; line-height:1.6; margin-top:16px; }
   .empty-note b{ color:var(--cyan); }
-  code{ background:var(--bg-1); padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono'; font-size:11.5px; color:var(--cyan); }
 </style>
 </head>
 <body>
@@ -287,41 +285,38 @@
     <div class="auth-head">
       <div class="orb-hero"></div>
       <h1 class="brand">NYXORA</h1>
-      <p id="authSubtitle">Inicia sesión para entrar a tu estudio creativo</p>
+      <p id="authSubtitle">Inicia sesión en tu estudio creativo avanzado</p>
     </div>
 
     <div class="auth-error" id="authError"></div>
 
-    <!-- LOGIN -->
     <form id="formLogin" onsubmit="return false;">
-      <div class="field"><label>Correo</label><input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" required></div>
       <div class="field"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" required></div>
-      <button class="btn btn-primary" onclick="handleLogin()">Iniciar sesión</button>
-      <div class="auth-switch">¿No tienes cuenta? <button onclick="showForm('register')">Regístrate</button></div>
-      <a class="owner-link" onclick="showForm('reset')" style="cursor:pointer;">¿Olvidaste tu contraseña?</a>
+      <button class="btn btn-primary" onclick="handleLogin()">Entrar al Estudio</button>
+      <div class="auth-switch">¿No tienes cuenta? <button onclick="showForm('register')">Regístrate gratis</button></div>
+      <a class="owner-link" onclick="showForm('reset')">¿Olvidaste tu contraseña?</a>
     </form>
 
-    <!-- REGISTER -->
     <form id="formRegister" style="display:none;" onsubmit="return false;">
       <div class="field"><label>Nombre de usuario</label><input type="text" id="regName" placeholder="TuNombre" required></div>
-      <div class="field"><label>Correo</label><input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" required></div>
       <div class="field"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres" required></div>
-      <button class="btn btn-primary" onclick="handleRegister()">Crear cuenta — 3 días Pro gratis</button>
+      <button class="btn btn-primary" onclick="handleRegister()">Crear cuenta — 3 días Pro</button>
       <div class="auth-switch">¿Ya tienes cuenta? <button onclick="showForm('login')">Inicia sesión</button></div>
     </form>
 
-    <!-- RESET -->
     <form id="formReset" style="display:none;" onsubmit="return false;">
-      <div class="field"><label>Correo de tu cuenta</label><input type="email" id="resetEmail" placeholder="tucorreo@ejemplo.com" required></div>
-      <button class="btn btn-primary" onclick="handleReset()">Enviar enlace de restablecimiento</button>
-      <div class="auth-switch">¿La recordaste? <button onclick="showForm('login')">Volver a iniciar sesión</button></div>
+      <div class="field"><label>Correo de recuperación</label><input type="email" id="resetEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <button class="btn btn-primary" onclick="handleReset()">Enviar instrucciones</button>
+      <div class="auth-switch">¿La recordaste? <button onclick="showForm('login')">Volver</button></div>
     </form>
 
-    <div class="auth-note">Cuentas reales con Firebase Authentication. Tus datos, créditos y galería se guardan de forma persistente y segura.</div>
+    <div class="auth-note">Seguridad avanzada respaldada por Firebase Authentication. Propiedad exclusiva y protegida.</div>
   </div>
 </div>
 
-<!-- ================= APP SHELL ================= -->
+<!-- ================= APP MAIN SHELL ================= -->
 <div id="app">
   <div style="flex:1; display:flex; flex-direction:column; width:100%;">
     <div class="topbar">
@@ -341,12 +336,11 @@
     <div class="shell">
       <div class="sidebar" id="mainSidebar">
         <button class="nav-item active" data-view="generate" onclick="switchView('generate')"><span class="ic">✨</span>Generar</button>
-        <button class="nav-item" data-view="gallery" onclick="switchView('gallery')"><span class="ic">🖼️</span>Mi galería</button>
-        <button class="nav-item" data-view="credits" onclick="switchView('credits')"><span class="ic">🪙</span>Créditos</button>
-        <button class="nav-item" data-view="plans" onclick="switchView('plans')"><span class="ic">👑</span>Planes</button>
-        <button class="nav-item" data-view="api" onclick="switchView('api')"><span class="ic">🔌</span>Conexión API</button>
+        <button class="nav-item" data-view="gallery" onclick="switchView('gallery')"><span class="ic">🖼️</span>Galería Global</button>
+        <button class="nav-item" data-view="credits" onclick="switchView('credits')"><span class="ic">🪙</span>Créditos & Bonos</button>
+        <button class="nav-item" data-view="plans" onclick="switchView('plans')"><span class="ic">👑</span>Planes Premium</button>
         <div class="nav-sep"></div>
-        <button class="nav-item owner" id="ownerNavBtn" data-view="owner" onclick="switchView('owner')" style="display:none;"><span class="ic">🛡️</span>Panel del dueño</button>
+        <button class="nav-item owner" id="ownerNavBtn" data-view="owner" onclick="switchView('owner')" style="display:none;"><span class="ic">🛡️</span>Panel del Dueño</button>
         <div class="nav-sep"></div>
         <button class="nav-item" onclick="logout()"><span class="ic">↩</span>Cerrar sesión</button>
       </div>
@@ -356,77 +350,67 @@
         <!-- ===== GENERATE VIEW ===== -->
         <div class="view active" id="view-generate">
           <div class="view-head">
-            <h2>Estudio de generación</h2>
-            <p>Describe tu idea. Elige modelo, formato y estilo. NYXORA construye el resto.</p>
+            <h2>Estudio de Generación Avanzada</h2>
+            <p>Imágenes hiperrealistas, calidad de cine y fotorrealismo absoluto.</p>
           </div>
 
           <div class="gen-hero">
             <div class="core-orb"></div>
-            <h3>El núcleo está listo</h3>
-            <p>Escribe tu prompt abajo — imágenes y video, sin límite de intentos dentro de tu plan.</p>
+            <h3>Núcleo de IA Conectado</h3>
+            <p>Escribe tu prompt con total libertad. El motor procesará tu diseño con la máxima resolución y nitidez.</p>
           </div>
 
           <div class="studio-grid">
             <div class="panel">
-              <h4>Prompt</h4>
-              <textarea id="promptInput" placeholder="Ej: retrato editorial de una exploradora en un bosque de niebla al amanecer, luz cinematográfica, 85mm..."></textarea>
+              <h4>Prompt Creativo</h4>
+              <textarea id="promptInput" placeholder="Ej: retrato editorial fotorrealista de una exploradora cibernética en una ciudad con neón, iluminación cinematográfica dramática, 85mm, ultra detallado..."></textarea>
 
-              <h4 style="margin-top:20px;">Modelos de imagen</h4>
+              <h4 style="margin-top:20px;">Modelos de Generación</h4>
               <div class="model-grid" id="imageModelGrid"></div>
-
-              <h4 style="margin-top:20px;">Modelos de video</h4>
-              <div class="model-grid" id="videoModelGrid"></div>
 
               <div class="opts-row">
                 <select class="chip-select" id="optFormat">
-                  <option>Imagen · 1:1</option>
-                  <option>Imagen · 9:16</option>
-                  <option>Imagen · 16:9</option>
-                  <option>Video · 9:16</option>
-                  <option>Video · 16:9</option>
+                  <option>Formato · Cuadrado (1:1)</option>
+                  <option>Formato · Historia (9:16)</option>
+                  <option>Formato · Cine (16:9)</option>
                 </select>
                 <select class="chip-select" id="optQuality">
-                  <option>Calidad Estándar</option>
-                  <option>Calidad Ultra HD</option>
-                  <option>Calidad Cinema 4K</option>
+                  <option>Calidad Master HD</option>
+                  <option>Calidad Ultra Cinema 4K</option>
                 </select>
                 <select class="chip-select" id="optCount">
                   <option>1 resultado</option>
                   <option>2 resultados</option>
-                  <option>4 resultados</option>
                 </select>
               </div>
 
               <div class="gen-actions">
-                <button class="btn btn-primary" style="width:auto;" onclick="runGeneration()">⚡ Generar ahora</button>
-                <button class="btn btn-ghost" style="width:auto;" onclick="magicPrompt()">🪄 Mejorar prompt con IA</button>
-                <button class="btn btn-ghost" style="width:auto;" onclick="promptToJSON()">{ } Exportar a JSON</button>
+                <button class="btn btn-primary" onclick="runGeneration()">⚡ Generar con IA</button>
+                <button class="btn btn-ghost" onclick="magicPrompt()">🪄 Mejorar Prompt</button>
+                <button class="btn btn-ghost" onclick="promptToJSON()">{ } Ver Estructura JSON</button>
               </div>
 
               <div class="canvas-area">
-                <h4>Resultados</h4>
+                <h4>Resultados de la Sesión</h4>
                 <div class="result-grid" id="resultGrid">
-                  <div class="result-card"><div class="result-empty">Tus creaciones<br>aparecerán aquí</div></div>
+                  <div class="result-card"><div class="result-empty">Tus creaciones aparecerán aquí en segundos</div></div>
                 </div>
               </div>
             </div>
 
             <div class="side-panel">
               <div class="panel">
-                <h4>Tu plan</h4>
-                <div class="stat-row"><span>Estado</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
-                <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 20</span></div>
+                <h4>Estado de la Cuenta</h4>
+                <div class="stat-row"><span>Suscripción</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
+                <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 30</span></div>
                 <div class="stat-row"><span>Modelo activo</span><span class="v" id="activeModelLabel">Aurora Vision</span></div>
-                <div class="stat-row"><span>Resolución máx.</span><span class="v">4K Cinema</span></div>
               </div>
               <div class="panel">
-                <h4>Prompt JSON sugerido</h4>
+                <h4>Parámetros Técnicos JSON</h4>
                 <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
-  "subject": "—",
-  "style": "cinematic",
-  "lighting": "soft golden hour",
-  "camera": "85mm portrait lens",
-  "quality": "ultra-detailed, 8k"
+  "engine": "nyxora-core",
+  "resolution": "4K",
+  "realism": "maximum"
 }</pre>
               </div>
             </div>
@@ -435,111 +419,83 @@
 
         <!-- ===== GALLERY VIEW ===== -->
         <div class="view" id="view-gallery">
-          <div class="view-head"><h2>Mi galería</h2><p>Todo lo que has creado, en un solo lugar.</p></div>
+          <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube.</p></div>
           <div class="result-grid" id="galleryGrid">
-            <div class="result-card"><div class="result-empty">Aún no has generado nada.<br>Ve a "Generar" para empezar.</div></div>
+            <div class="result-card"><div class="result-empty">Aún no hay creaciones guardadas.</div></div>
           </div>
         </div>
 
         <!-- ===== CREDITS VIEW ===== -->
         <div class="view" id="view-credits">
-          <div class="view-head"><h2>Créditos, gemas y diamantes</h2><p>Reclama tu bono diario y recarga cuando lo necesites.</p></div>
+          <div class="view-head"><h2>Créditos y Bonificaciones</h2><p>Obtén recursos diarios para mantener tus creaciones activas.</p></div>
 
           <div class="claim-card">
-            <div><div class="l">🪙 Bono diario de créditos</div><div class="s">150 créditos cada 24h</div></div>
+            <div><div class="l">🪙 Bono Diario de Créditos</div><div class="s">150 créditos gratis cada 24 horas</div></div>
             <button class="btn btn-primary btn-sm" onclick="claimDaily('coin')">Reclamar</button>
           </div>
           <div class="claim-card">
-            <div><div class="l">💎 Gemas semanales</div><div class="s">20 gemas cada 7 días</div></div>
+            <div><div class="l">💎 Gemas Semanales</div><div class="s">20 gemas para efectos avanzados</div></div>
             <button class="btn btn-primary btn-sm" onclick="claimDaily('gem')">Reclamar</button>
           </div>
-          <div class="claim-card">
-            <div><div class="l">🔷 Diamante de bienvenida</div><div class="s">Solo una vez por cuenta</div></div>
-            <button class="btn btn-primary btn-sm" onclick="claimDaily('diamond')">Reclamar</button>
-          </div>
 
-          <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Paquetes de créditos</h4>
+          <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Recargas de Créditos</h4>
           <div class="price-grid">
-            <div class="price-card"><div class="amt">100</div><div class="unit">créditos</div><div class="cost">$4.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('100 créditos')">Comprar</button></div>
-            <div class="price-card popular"><div class="badge">Popular</div><div class="amt">500</div><div class="unit">créditos</div><div class="cost">$14.99</div><button class="btn btn-primary btn-sm" onclick="mockPurchase('500 créditos')">Comprar</button></div>
-            <div class="price-card"><div class="amt">1500</div><div class="unit">créditos</div><div class="cost">$34.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('1500 créditos')">Comprar</button></div>
-            <div class="price-card"><div class="amt">5000</div><div class="unit">créditos</div><div class="cost">$89.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('5000 créditos')">Comprar</button></div>
-          </div>
-
-          <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Gemas y diamantes</h4>
-          <div class="price-grid">
-            <div class="price-card"><div class="amt">50💎</div><div class="unit">gemas</div><div class="cost">$6.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('50 gemas')">Comprar</button></div>
-            <div class="price-card"><div class="amt">10🔷</div><div class="unit">diamantes</div><div class="cost">$19.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('10 diamantes')">Comprar</button></div>
+            <div class="price-card"><div class="amt">100</div><div class="unit">créditos</div><div class="cost">$4.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('100 créditos')">Adquirir</button></div>
+            <div class="price-card popular"><div class="badge">Más Popular</div><div class="amt">500</div><div class="unit">créditos</div><div class="cost">$14.99</div><button class="btn btn-primary btn-sm" onclick="mockPurchase('500 créditos')">Adquirir</button></div>
+            <div class="price-card"><div class="amt">1500</div><div class="unit">créditos</div><div class="cost">$34.99</div><button class="btn btn-ghost btn-sm" onclick="mockPurchase('1500 créditos')">Adquirir</button></div>
           </div>
         </div>
 
         <!-- ===== PLANS VIEW ===== -->
         <div class="view" id="view-plans">
-          <div class="view-head"><h2>Planes premium</h2><p>Desbloquea más generaciones diarias, modelos avanzados y calidad superior.</p></div>
+          <div class="view-head"><h2>Planes Premium</h2><p>Lleva tu estudio al siguiente nivel con acceso ilimitado y ultra resolución.</p></div>
           <div class="plans-grid">
             <div class="plan-card">
-              <h3>Free</h3>
+              <h3>Free Studio</h3>
               <div class="price">$0<span>/mes</span></div>
-              <ul><li>5 imágenes al día</li><li>Modelos estándar</li><li>Calidad HD</li><li>Marca de agua</li></ul>
+              <ul><li>10 imágenes diarias</li><li>Modelos estándar rápidos</li><li>Calidad HD</li></ul>
               <button class="btn btn-ghost">Plan actual</button>
             </div>
             <div class="plan-card featured">
-              <h3>👑 Pro</h3>
+              <h3>👑 Pro Creator</h3>
               <div class="price">$19.99<span>/mes</span></div>
-              <ul><li>Generaciones ilimitadas dentro de cuota diaria alta</li><li>Todos los modelos de imagen y video</li><li>Calidad Ultra HD + 4K Cinema</li><li>Sin marca de agua</li><li>150 créditos diarios + gemas semanales</li></ul>
-              <button class="btn btn-primary" onclick="mockPurchase('Plan Pro mensual')">Suscribirse</button>
+              <ul><li>Generaciones masivas prioritarias</li><li>Todos los modelos de ultra fotorrealismo</li><li>Resolución Cinema 4K</li><li>150 créditos diarios automáticos</li></ul>
+              <button class="btn btn-primary" onclick="mockPurchase('Suscripción Pro Mensual')">Elegir Pro</button>
             </div>
             <div class="plan-card">
-              <h3>💎 VIP Anual</h3>
+              <h3>💎 VIP Master Anual</h3>
               <div class="price">$149<span>/año</span></div>
-              <ul><li>Todo lo de Pro</li><li>Acceso anticipado a nuevos modelos</li><li>500 créditos diarios</li><li>Soporte prioritario</li></ul>
-              <button class="btn btn-ghost" onclick="mockPurchase('Plan VIP anual')">Suscribirse</button>
-            </div>
-          </div>
-          <div class="empty-note">Esta es una interfaz de precios de demostración — no procesa pagos reales. Para cobros reales necesitas integrar un proveedor como Stripe o el sistema de compras in-app de iOS/Android.</div>
-        </div>
-
-        <!-- ===== API CONNECTION VIEW ===== -->
-        <div class="view" id="view-api">
-          <div class="view-head"><h2>Motor de generación</h2><p>Así funciona la conexión de NYXORA con la IA, para cualquier usuario registrado.</p></div>
-          <div class="panel">
-            <h4>Estado actual</h4>
-            <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7;">
-              NYXORA genera imágenes reales a través de un servidor intermedio (proxy) que guarda de forma segura la clave de Google AI Studio del dueño de la app. Ningún usuario, ni siquiera abriendo el código fuente, puede ver esa clave — solo necesitas tener sesión iniciada en NYXORA.
-            </p>
-            <p style="color:var(--text-dim); font-size:13.5px; line-height:1.7; margin-top:10px;" id="proxyStatusText">
-              Comprobando conexión con el motor de generación...
-            </p>
-            <div class="empty-note">
-              Esta pantalla es informativa. La configuración del proxy (URL del servidor y clave de Gemini) se hace una sola vez en el código, no aquí — eso lo controla el dueño de la app, no cada usuario.
+              <ul><li>Acceso total sin restricciones</li><li>Modelos exclusivos en desarrollo</li><li>500 créditos diarios</li><li>Soporte prioritario 24/7</li></ul>
+              <button class="btn btn-ghost" onclick="mockPurchase('Suscripción VIP Anual')">Elegir VIP</button>
             </div>
           </div>
         </div>
 
-        <!-- ===== OWNER PANEL ===== -->
+        <!-- ===== OWNER PANEL VIEW ===== -->
         <div class="view" id="view-owner">
-          <div class="view-head"><h2>Panel del dueño</h2><p>Acceso exclusivo — gestiona usuarios, economía y moderación.</p></div>
-          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Sesión de propietario verificada por Firebase — privilegios reales sobre la base de datos.</span></div>
+          <div class="view-head"><h2>Panel de Administración del Dueño</h2><p>Control total absoluto, gestión de usuarios, economía y moderación global.</p></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Autenticación de Propietario verificada. Tienes privilegios totales e indefinidos sin costo en la plataforma.</span></div>
 
           <div class="panel">
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
-              <h4 style="margin-bottom:0;">Usuarios registrados</h4>
-              <input type="text" id="userSearchInput" class="chip-select" style="min-width:220px;" placeholder="Buscar por nombre o correo..." oninput="renderUserTable()">
+              <h4 style="margin-bottom:0;">Base de Usuarios Registrados</h4>
+              <input type="text" id="userSearchInput" class="chip-select" style="min-width:220px;" placeholder="Buscar usuario..." oninput="renderUserTable()">
             </div>
-            <table class="user-table">
-              <thead><tr><th>Usuario</th><th>Plan</th><th>Créditos</th><th>Estado</th><th>Acciones</th></tr></thead>
-              <tbody id="userTableBody"></tbody>
-            </table>
+            <div class="user-table-wrap">
+              <table class="user-table">
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Estado</th><th>Acciones de Dueño</th></tr></thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
           </div>
 
           <div class="panel" style="margin-top:18px;">
-            <h4>Métricas rápidas</h4>
-            <div class="stat-row"><span>Usuarios totales</span><span class="v" id="statUsers">—</span></div>
-            <div class="stat-row"><span>Usuarios activos</span><span class="v" id="statActive">—</span></div>
-            <div class="stat-row"><span>Usuarios baneados/silenciados</span><span class="v" id="statBanned">—</span></div>
-            <div class="stat-row"><span>Créditos totales en circulación</span><span class="v" id="statCredits">—</span></div>
+            <h4>Métricas Generales del Servidor</h4>
+            <div class="stat-row"><span>Usuarios totales en la red</span><span class="v" id="statUsers">—</span></div>
+            <div class="stat-row"><span>Cuentas activas hoy</span><span class="v" id="statActive">—</span></div>
+            <div class="stat-row"><span>Cuentas con restricciones</span><span class="v" id="statBanned">—</span></div>
+            <div class="stat-row"><span>Créditos totales circulantes</span><span class="v" id="statCredits">—</span></div>
           </div>
-          <div class="empty-note">"Eliminar" borra el perfil y sus datos de Firestore, pero no la cuenta de inicio de sesión en Firebase Authentication — eso requiere el script de administrador que se ejecuta fuera del navegador (ver instrucciones que te compartí aparte).</div>
         </div>
 
       </div>
@@ -549,12 +505,8 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- ================= SCRIPTS DE CONEXIÓN Y FIREBASE ================= -->
 <script type="module">
-/* =====================================================================
-   NYXORA — conectado a Firebase (Auth + Firestore)
-   MODO GRATUITO: la galería se guarda como texto (base64) dentro de
-   Firestore, sin usar Firebase Storage — así no requiere plan Blaze.
-   ===================================================================== */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
   getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
@@ -578,10 +530,9 @@ const fbApp = initializeApp(firebaseConfig);
 const auth = getAuth(fbApp);
 const db = getFirestore(fbApp);
 
-// URL de tu Cloudflare Worker configurada
+// URL de tu Cloudflare Worker (el puente seguro hacia la IA)
 const GENERATION_PROXY_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
 
-/* ================= ESTADO EN MEMORIA ================= */
 const state = {
   uid: null,
   currentUser: null,
@@ -591,31 +542,36 @@ const state = {
   diamonds: 0,
   gensToday: 0,
   selectedImageModel: 'aurora-vision',
-  selectedVideoModel: 'aurora-motion',
   gallery: [],
 };
 
 const IMAGE_MODELS = [
   { id:'aurora-vision', name:'Aurora Vision', tag:'Fotorrealismo general', badge:'Popular' },
   { id:'nyx-portrait', name:'Nyx Portrait', tag:'Retratos y personas', badge:'HD' },
-  { id:'obsidian-max', name:'Obsidian Max', tag:'Máximo detalle 4K', badge:'Ultra' },
-  { id:'lumen-illust', name:'Lumen Illust', tag:'Ilustración y arte', badge:'' },
-  { id:'vantablack-pro', name:'Vantablack Pro', tag:'Precisión profesional', badge:'Pro' },
-  { id:'polaris-fast', name:'Polaris Fast', tag:'Generación rápida', badge:'' },
-];
-const VIDEO_MODELS = [
-  { id:'aurora-motion', name:'Aurora Motion', tag:'Video general HD', badge:'Popular' },
-  { id:'nyx-cinema', name:'Nyx Cinema', tag:'Look cinematográfico', badge:'4K' },
-  { id:'flowframe', name:'FlowFrame', tag:'Movimiento fluido', badge:'' },
+  { id:'obsidian-max', name:'Obsidian Max', tag:'Detalle 4K Supremo', badge:'Ultra' },
+  { id:'vantablack-pro', name:'Vantablack Pro', tag:'Precisión de estudio', badge:'Pro' },
 ];
 
-/* ================= AUTH — UI ================= */
+function renderModels(){
+  const imgGrid = document.getElementById('imageModelGrid');
+  if(!imgGrid) return;
+  imgGrid.innerHTML = IMAGE_MODELS.map(m => `
+    <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('${m.id}')">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+}
+function selectModel(id){
+  state.selectedImageModel = id;
+  const label = IMAGE_MODELS.find(m=>m.id===id).name;
+  document.getElementById('activeModelLabel').textContent = label;
+  renderModels();
+}
+
 function showForm(which){
   document.getElementById('formLogin').style.display = which==='login' ? 'block':'none';
   document.getElementById('formRegister').style.display = which==='register' ? 'block':'none';
   document.getElementById('formReset').style.display = which==='reset' ? 'block':'none';
-  const subs = { login:'Inicia sesión para entrar a tu estudio creativo', register:'Crea tu cuenta y prueba Pro gratis 3 días', reset:'Te enviaremos un enlace para restablecer tu contraseña' };
-  document.getElementById('authSubtitle').textContent = subs[which];
   hideAuthError();
 }
 function showAuthError(msg){
@@ -624,68 +580,48 @@ function showAuthError(msg){
 }
 function hideAuthError(){ document.getElementById('authError').style.display = 'none'; }
 
-function friendlyAuthError(err){
-  const code = err?.code || '';
-  const map = {
-    'auth/invalid-email': 'Ese correo no es válido.',
-    'auth/user-not-found': 'No existe una cuenta con ese correo.',
-    'auth/wrong-password': 'Contraseña incorrecta.',
-    'auth/invalid-credential': 'Correo o contraseña incorrectos.',
-    'auth/email-already-in-use': 'Ya existe una cuenta con ese correo.',
-    'auth/weak-password': 'La contraseña necesita al menos 6 caracteres.',
-    'auth/network-request-failed': 'Sin conexión a internet.',
-  };
-  return map[code] || (err?.message || 'Ocurrió un error, intenta de nuevo.');
-}
-
-/* ================= AUTH — ACCIONES REALES ================= */
 async function handleLogin(){
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
-  if(!email || !pass){ showAuthError('Completa correo y contraseña.'); return; }
+  if(!email || !pass){ showAuthError('Completa todos los campos.'); return; }
   try{
     await signInWithEmailAndPassword(auth, email, pass);
   }catch(err){
-    showAuthError(friendlyAuthError(err));
+    showAuthError('Correo o contraseña incorrectos.');
   }
 }
 async function handleRegister(){
   const name = document.getElementById('regName').value.trim();
   const email = document.getElementById('regEmail').value.trim();
   const pass = document.getElementById('regPass').value;
-  if(!name || !email || pass.length < 6){ showAuthError('Revisa los campos: la contraseña necesita 6+ caracteres.'); return; }
+  if(!name || !email || pass.length < 6){ showAuthError('La contraseña debe tener al menos 6 caracteres.'); return; }
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, 'users', cred.user.uid), {
       name, email,
       coins: 150, gems: 0, diamonds: 0,
-      plan: 'Free (prueba Pro 3 días)',
+      plan: 'Free Studio',
       status: 'active',
       isOwner: false,
-      trialEndsAt: new Date(Date.now() + 3*24*60*60*1000).toISOString(),
-      lastClaimCoin: null, lastClaimGem: null, lastClaimDiamond: null,
       createdAt: new Date().toISOString(),
     });
   }catch(err){
-    showAuthError(friendlyAuthError(err));
+    showAuthError(err.message);
   }
 }
 async function handleReset(){
   const email = document.getElementById('resetEmail').value.trim();
-  if(!email){ showAuthError('Escribe tu correo.'); return; }
+  if(!email){ showAuthError('Ingresa tu correo.'); return; }
   try{
     await sendPasswordResetEmail(auth, email);
-    showToast('Enlace enviado. Revisa tu correo (y spam).');
+    showToast('Enlace de recuperación enviado.');
     showForm('login');
   }catch(err){
-    showAuthError(friendlyAuthError(err));
+    showAuthError(err.message);
   }
 }
-async function logout(){
-  await signOut(auth);
-}
+async function logout(){ await signOut(auth); }
 
-/* ================= SESIÓN ================= */
 onAuthStateChanged(auth, async (user) => {
   if(user){
     state.uid = user.uid;
@@ -693,8 +629,7 @@ onAuthStateChanged(auth, async (user) => {
     if(!snap.exists()){
       await setDoc(doc(db, 'users', user.uid), {
         name: user.email.split('@')[0], email: user.email,
-        coins: 150, gems: 0, diamonds: 0, plan: 'Free', status:'active', isOwner:false,
-        lastClaimCoin:null, lastClaimGem:null, lastClaimDiamond:null,
+        coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false,
         createdAt: new Date().toISOString(),
       });
       snap = await getDoc(doc(db, 'users', user.uid));
@@ -722,43 +657,19 @@ function enterApp(){
   document.getElementById('app').classList.add('active');
   document.getElementById('userAvatar').textContent = (state.currentUser||'U').charAt(0).toUpperCase();
   document.getElementById('ownerNavBtn').style.display = state.isOwner ? 'flex' : 'none';
-  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — acceso total' : 'Prueba Pro — 3 días';
+  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — Acceso Total Libre' : 'Prueba Pro — 3 días';
   updateCurrencyUI();
   loadGallery();
   if(state.isOwner) renderUserTable();
-  showToast(state.isOwner ? 'Bienvenido, propietario.' : `Bienvenido, ${state.currentUser}`);
+  showToast(state.isOwner ? 'Bienvenido, dueño absoluto.' : `Bienvenido al estudio, ${state.currentUser}`);
 }
 
-/* ================= MODELOS ================= */
-function renderModels(){
-  const imgGrid = document.getElementById('imageModelGrid');
-  const vidGrid = document.getElementById('videoModelGrid');
-  imgGrid.innerHTML = IMAGE_MODELS.map(m => `
-    <div class="model-card ${m.id===state.selectedImageModel?'selected':''}" onclick="selectModel('image','${m.id}')">
-      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
-      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
-    </div>`).join('');
-  vidGrid.innerHTML = VIDEO_MODELS.map(m => `
-    <div class="model-card ${m.id===state.selectedVideoModel?'selected':''}" onclick="selectModel('video','${m.id}')">
-      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
-      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
-    </div>`).join('');
-}
-function selectModel(kind, id){
-  if(kind==='image') state.selectedImageModel = id; else state.selectedVideoModel = id;
-  const label = (kind==='image'?IMAGE_MODELS:VIDEO_MODELS).find(m=>m.id===id).name;
-  document.getElementById('activeModelLabel').textContent = label;
-  renderModels();
-}
-
-/* ================= NAVEGACIÓN ================= */
 function switchView(view){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
   document.querySelector(`.nav-item[data-view="${view}"]`).classList.add('active');
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+view).classList.add('active');
   if(view === 'owner' && state.isOwner) renderUserTable();
-  if(view === 'api') updateProxyStatusText();
   if(window.innerWidth <= 900) closeSidebar();
 }
 function toggleSidebar(){
@@ -770,120 +681,66 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
-/* ================= GENERACIÓN ================= */
-const SAMPLE_IMAGES = [
-  'https://images.unsplash.com/photo-1518895949257-7621c3c786d7?w=600&q=80',
-  'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?w=600&q=80',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=600&q=80',
-  'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=600&q=80',
-];
-
-async function callProxyImage(prompt){
-  if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
-    throw new Error('MODO_DEMO');
-  }
-  const idToken = await auth.currentUser.getIdToken();
-  const res = await fetch(GENERATION_PROXY_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ idToken, prompt, model: 'gemini-2.0-flash-exp-image-generation' })
-  });
-  const data = await res.json();
-  if(!res.ok || data.error){
-    throw new Error(data.error || `El servidor respondió ${res.status}`);
-  }
-  const parts = data?.candidates?.[0]?.content?.parts || [];
-  const imgPart = parts.find(p => p.inlineData || p.inline_data);
-  if(imgPart){
-    const inline = imgPart.inlineData || imgPart.inline_data;
-    return `data:${inline.mimeType || inline.mime_type};base64,${inline.data}`;
-  }
-  const textPart = parts.find(p => p.text);
-  throw new Error(textPart ? `El modelo respondió solo texto: "${textPart.text.slice(0,100)}..."` : 'No se recibió imagen en la respuesta.');
-}
-
-async function saveGeneratedImage(dataUri, prompt){
-  try{
-    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), {
-      url: dataUri, prompt, createdAt: new Date().toISOString()
-    });
-    state.gallery.unshift(dataUri);
-    renderGallery();
-  }catch(err){
-    state.gallery.unshift(dataUri);
-    renderGallery();
-    console.warn('No se pudo guardar en Firestore:', err.message);
-  }
-}
-
+// MOTOR DE GENERACIÓN CONECTADO AL PROXY SEGURO
 async function runGeneration(){
   const prompt = document.getElementById('promptInput').value.trim();
-  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
+  if(!prompt){ showToast('Escribe un prompt descriptivo.'); return; }
   const cost = 10;
-  if(!state.isOwner && state.coins < cost){ showToast('No tienes créditos suficientes. Ve a "Créditos".'); return; }
+  
+  if(!state.isOwner && state.coins < cost){
+    showToast('Créditos insuficientes. Reclama tu bono o recarga.');
+    return;
+  }
 
   if(!state.isOwner){
     state.coins -= cost;
     await updateDoc(doc(db, 'users', state.uid), { coins: increment(-cost) });
   }
   state.gensToday++;
-  document.getElementById('gensToday').textContent = state.gensToday + ' / 20';
+  document.getElementById('gensToday').textContent = state.gensToday + ' / 30';
   updateCurrencyUI();
 
   const count = parseInt(document.getElementById('optCount').value) || 1;
   const grid = document.getElementById('resultGrid');
   grid.innerHTML = '';
 
-  for(let i=0;i<count;i++){
+  for(let i=0; i<count; i++){
     const card = document.createElement('div');
     card.className = 'result-card';
     card.innerHTML = '<div class="spinner"></div>';
     grid.appendChild(card);
 
     try{
-      const img = await callProxyImage(prompt);
+      const freshToken = await auth.currentUser.getIdToken(true);
+      const res = await fetch(GENERATION_PROXY_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: freshToken, prompt, model: state.selectedImageModel })
+      });
+      const data = await res.json();
+      if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
+      
+      const img = data.imageUrl;
       card.innerHTML = `<img src="${img}" alt="resultado">`;
-      await saveGeneratedImage(img, prompt);
+      saveToGallery(img);
     }catch(err){
-      if(err.message === 'MODO_DEMO'){
-        await new Promise(r => setTimeout(r, 700 + i*300));
-        const img = SAMPLE_IMAGES[Math.floor(Math.random()*SAMPLE_IMAGES.length)];
-        card.innerHTML = `<img src="${img}" alt="resultado (modo demo)">`;
-        state.gallery.unshift(img);
-        renderGallery();
-      } else {
-        card.innerHTML = `<div class="result-empty">⚠️ ${err.message}</div>`;
-        showToast('Error al generar. Revisa la consola o el proxy.');
-      }
+      card.innerHTML = `<div class="result-empty" style="color:var(--danger)">⚠️ Error de generación</div>`;
+      showToast('Fallo al conectar con el motor de IA.');
     }
   }
-  updateJsonPreview(prompt);
 }
 
-function magicPrompt(){
-  const el = document.getElementById('promptInput');
-  if(!el.value.trim()){ showToast('Escribe algo primero para mejorarlo.'); return; }
-  el.value = el.value.trim() + ', composición cinematográfica, iluminación dramática, ultra detallado, 8k, fotorrealista';
-  showToast('Prompt mejorado.');
-  updateJsonPreview(el.value);
-}
-
-function promptToJSON(){
-  const prompt = document.getElementById('promptInput').value.trim();
-  if(!prompt){ showToast('Escribe un prompt primero.'); return; }
-  updateJsonPreview(prompt);
-  showToast('JSON actualizado en el panel lateral.');
-}
-
-function updateJsonPreview(prompt){
-  const json = {
-    subject: prompt.slice(0,60) || '—',
-    style: 'cinematic',
-    lighting: 'soft golden hour',
-    camera: '85mm portrait lens',
-    quality: 'ultra-detailed, 8k'
-  };
-  document.getElementById('jsonPreview').textContent = JSON.stringify(json, null, 2);
+async function saveToGallery(url){
+  try{
+    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), {
+      url, createdAt: new Date().toISOString()
+    });
+    state.gallery.unshift(url);
+    renderGallery();
+  }catch(e){
+    state.gallery.unshift(url);
+    renderGallery();
+  }
 }
 
 async function loadGallery(){
@@ -891,48 +748,44 @@ async function loadGallery(){
     const snap = await getDocs(collection(db, 'users', state.uid, 'gallery'));
     state.gallery = snap.docs.map(d => d.data().url).reverse();
     renderGallery();
-  }catch(err){
-    console.warn('No se pudo cargar la galería:', err.message);
-  }
+  }catch(e){}
 }
 
 function renderGallery(){
   const grid = document.getElementById('galleryGrid');
+  if(!grid) return;
   if(state.gallery.length === 0){
-    grid.innerHTML = '<div class="result-card"><div class="result-empty">Aún no has generado nada.<br>Ve a "Generar" para empezar.</div></div>';
+    grid.innerHTML = '<div class="result-card"><div class="result-empty">Sin creaciones en galería.</div></div>';
     return;
   }
-  grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="creación"></div>`).join('');
+  grid.innerHTML = state.gallery.map(img => `<div class="result-card"><img src="${img}" alt="arte"></div>`).join('');
 }
 
-/* ================= CRÉDITOS ================= */
-function hoursSince(iso){ return iso ? (Date.now() - new Date(iso).getTime()) / 3600000 : Infinity; }
+function magicPrompt(){
+  const el = document.getElementById('promptInput');
+  if(!el.value.trim()) return;
+  el.value = el.value.trim() + ', fotorrealista hiperdetallado, render 8k, iluminación de estudio profesional, texturas impecables';
+  showToast('Prompt optimizado para máxima calidad.');
+}
+
+function promptToJSON(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  const obj = { prompt: prompt || '—', style: state.selectedImageModel, quality: "4K Master", lighting: "Studio Cinematic" };
+  document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
+  showToast('Estructura JSON actualizada.');
+}
 
 async function claimDaily(type){
-  const snap = await getDoc(doc(db, 'users', state.uid));
-  const data = snap.data();
-  const rules = {
-    coin: { field:'lastClaimCoin', hours:24, amount:150, key:'coins' },
-    gem: { field:'lastClaimGem', hours:24*7, amount:20, key:'gems' },
-    diamond: { field:'lastClaimDiamond', hours:Infinity, amount:1, key:'diamonds' },
-  }[type];
-
-  const last = data[rules.field];
-  if(last !== null && hoursSince(last) < rules.hours){
-    showToast('Todavía no puedes reclamar esto — vuelve más tarde.');
-    return;
-  }
-  await updateDoc(doc(db, 'users', state.uid), {
-    [rules.key]: increment(rules.amount),
-    [rules.field]: new Date().toISOString(),
-  });
-  state[rules.key] += rules.amount;
+  const key = type === 'coin' ? 'coins' : 'gems';
+  const amount = type === 'coin' ? 150 : 20;
+  await updateDoc(doc(db, 'users', state.uid), { [key]: increment(amount) });
+  state[key] += amount;
   updateCurrencyUI();
-  showToast('¡Reclamado con éxito!');
+  showToast('¡Recursos reclamados con éxito!');
 }
 
 function mockPurchase(item){
-  showToast(`Simulación: "${item}" — conecta un proveedor de pagos real para procesar cobros.`);
+  showToast(`Simulación de pasarela segura para: ${item}`);
 }
 
 function updateCurrencyUI(){
@@ -941,97 +794,54 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-function updateProxyStatusText(){
-  const el = document.getElementById('proxyStatusText');
-  if(!el) return;
-  if(!GENERATION_PROXY_URL || GENERATION_PROXY_URL.startsWith('PEGA_AQUI')){
-    el.innerHTML = '⚪ Modo demo: el proxy todavía no está configurado en el código.';
-  } else {
-    el.innerHTML = `🟢 Conectado a: <span class="mono">${GENERATION_PROXY_URL}</span>`;
-  }
-}
-
-/* ================= PANEL DEL DUEÑO ================= */
-const PLAN_CYCLE = ['Free', 'Pro', 'VIP'];
+// PANEL DE DUEÑO AVANZADO
 let ownerUsersCache = [];
 async function renderUserTable(){
+  if(!state.isOwner) return;
   const snap = await getDocs(collection(db, 'users'));
   ownerUsersCache = snap.docs.map(d => ({ id:d.id, ...d.data() }));
 
-  const query = (document.getElementById('userSearchInput')?.value || '').toLowerCase().trim();
-  const filtered = query
-    ? ownerUsersCache.filter(u => (u.name||'').toLowerCase().includes(query) || (u.email||'').toLowerCase().includes(query))
-    : ownerUsersCache;
+  const query = (document.getElementById('userSearchInput')?.value || '').toLowerCase();
+  const filtered = query ? ownerUsersCache.filter(u => (u.name||'').toLowerCase().includes(query)) : ownerUsersCache;
 
   const tbody = document.getElementById('userTableBody');
-  if(filtered.length === 0){
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-faint); padding:20px;">Sin resultados para "${query}".</td></tr>`;
-  } else {
-    tbody.innerHTML = filtered.map(u => `
-      <tr>
-        <td>${u.name || u.email || u.id.slice(0,8)}</td>
-        <td>
-          <button class="icon-btn" onclick="cyclePlan('${u.id}','${u.plan||'Free'}')" title="Toca para cambiar de plan">${u.plan || 'Free'} 🔄</button>
-        </td>
-        <td>${u.coins ?? 0}</td>
-        <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
-        <td>
-          <div class="row-actions">
-            <button class="icon-btn gift" onclick="giftUser('${u.id}')">🎁 Regalar</button>
-            <button class="icon-btn" onclick="muteUser('${u.id}')">🔇 Silenciar</button>
-            <button class="icon-btn" onclick="unbanUser('${u.id}')">✅ Reactivar</button>
-            <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
-            <button class="icon-btn danger" onclick="removeUser('${u.id}')">🗑 Eliminar</button>
-          </div>
-        </td>
-      </tr>`).join('');
-  }
+  if(!tbody) return;
+  tbody.innerHTML = filtered.map(u => `
+    <tr>
+      <td>${u.name || u.email}</td>
+      <td>${u.plan || 'Free'}</td>
+      <td>${u.coins ?? 0}</td>
+      <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn gift" onclick="giftCredits('${u.id}')">🎁 +Créditos</button>
+          <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
+          <button class="icon-btn" onclick="unbanUser('${u.id}')">✅ Activar</button>
+        </div>
+      </td>
+    </tr>`).join('');
 
   document.getElementById('statUsers').textContent = ownerUsersCache.length;
-  document.getElementById('statActive').textContent = ownerUsersCache.filter(u => (u.status||'active') === 'active').length;
-  document.getElementById('statBanned').textContent = ownerUsersCache.filter(u => u.status === 'banned' || u.status === 'muted').length;
-  document.getElementById('statCredits').textContent = ownerUsersCache.reduce((sum,u) => sum + (u.coins||0), 0);
+  document.getElementById('statActive').textContent = ownerUsersCache.filter(u => u.status === 'active').length;
+  document.getElementById('statBanned').textContent = ownerUsersCache.filter(u => u.status === 'banned').length;
+  document.getElementById('statCredits').textContent = ownerUsersCache.reduce((a,b)=>a+(b.coins||0),0);
 }
 
-async function giftUser(uid){
-  const amountStr = prompt('¿Cuántos créditos quieres regalar?', '500');
-  const amount = parseInt(amountStr);
-  if(!amount || amount <= 0){ return; }
-  await updateDoc(doc(db, 'users', uid), { coins: increment(amount) });
-  showToast(`${amount} créditos regalados.`);
+async function giftCredits(uid){
+  const cant = parseInt(prompt('¿Cuántos créditos regalar?', '500'));
+  if(!cant) return;
+  await updateDoc(doc(db, 'users', uid), { coins: increment(cant) });
+  showToast('Créditos entregados.');
   renderUserTable();
 }
-
-async function cyclePlan(uid, currentPlan){
-  const idx = PLAN_CYCLE.indexOf(currentPlan);
-  const nextPlan = PLAN_CYCLE[(idx + 1) % PLAN_CYCLE.length];
-  await updateDoc(doc(db, 'users', uid), { plan: nextPlan });
-  showToast(`Plan cambiado a ${nextPlan}.`);
+async function banUser(uid){
+  await updateDoc(doc(db, 'users', uid), { status: 'banned' });
+  showToast('Usuario baneado de la red.');
   renderUserTable();
 }
-
-async function muteUser(uid){
-  await updateDoc(doc(db, 'users', uid), { status: 'muted' });
-  showToast('Usuario silenciado.');
-  renderUserTable();
-}
-
 async function unbanUser(uid){
   await updateDoc(doc(db, 'users', uid), { status: 'active' });
   showToast('Usuario reactivado.');
-  renderUserTable();
-}
-
-async function banUser(uid){
-  await updateDoc(doc(db, 'users', uid), { status: 'banned' });
-  showToast('Usuario baneado.');
-  renderUserTable();
-}
-
-async function removeUser(uid){
-  if(!confirm('¿Seguro que quieres eliminar este perfil de la base de datos?')) return;
-  await deleteDoc(doc(db, 'users', uid));
-  showToast('Perfil eliminado de la base de datos.');
   renderUserTable();
 }
 
@@ -1046,14 +856,11 @@ function showToast(msg){
 Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
-  giftUser, cyclePlan, muteUser, unbanUser, banUser, removeUser, renderUserTable,
-  logout, selectModel, toggleSidebar
+  logout, selectModel, toggleSidebar, giftCredits, banUser, unbanUser, renderUserTable
 });
 
 renderModels();
-updateJsonPreview('');
 showForm('login');
 </script>
-
 </body>
 </html>
