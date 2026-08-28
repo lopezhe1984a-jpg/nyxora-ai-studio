@@ -378,7 +378,7 @@
                 <input type="text" id="refImageInput" placeholder="https://ejemplo.com/tu-foto.jpg (Conserva tus rasgos y cabello)">
               </div>
 
-              <h4 style="margin-top:20px;">Modelos Disponibles</h4>
+              <h4 style="margin-top:20px;">Modelos Disponibles (Incluye Modelos Pro Gratis de Alta Gama)</h4>
               <div class="model-grid" id="modelGrid"></div>
 
               <div class="opts-row" id="imageOptionsRow">
@@ -390,6 +390,7 @@
                 <select class="chip-select" id="optQuality">
                   <option value="HD">Calidad Master HD</option>
                   <option value="4K">Calidad Ultra Cinema 4K</option>
+                  <option value="128K">Calidad Fractal 128K (COSMIC-ULTIMATE)</option>
                 </select>
               </div>
 
@@ -406,7 +407,7 @@
 
               <div class="gen-actions">
                 <button class="btn btn-primary" onclick="runGeneration()">⚡ Generar Ahora</button>
-                <button class="btn btn-ghost" onclick="magicPrompt()">🪄 Mejorar Prompt</button>
+                <button class="btn btn-ghost" onclick="magicPrompt()">🪄 Mejorar Prompt Maestro</button>
                 <button class="btn btn-ghost" onclick="promptToJSON()">{ } Ver JSON</button>
               </div>
 
@@ -430,8 +431,9 @@
                 <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
   "engine": "nyxora-core",
   "type": "image",
-  "resolution": "4K",
-  "preserve_reference": true
+  "resolution": "128K",
+  "preserve_reference": true,
+  "cosmic_ultimate_omni": true
 }</pre>
               </div>
             </div>
@@ -474,7 +476,7 @@
             <div class="plan-card featured">
               <h3>👑 Pro Creator</h3>
               <div class="price">$19.99<span>/mes</span></div>
-              <ul><li>Generaciones masivas prioritarias</li><li>Todos los modelos de ultra fotorrealismo e imagen/video</li><li>Resolución Cinema 4K y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
+              <ul><li>Generaciones masivas prioritarias</li><li>Todos los modelos de ultra fotorrealismo e imagen/video</li><li>Resolución Fractal 128K y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
               <button class="btn btn-primary" onclick="mockPurchase('Suscripción Pro Mensual')">Elegir Pro</button>
             </div>
           </div>
@@ -482,13 +484,13 @@
 
         <!-- OWNER PANEL VIEW (UNIVERSAL & AVANZADO) -->
         <div class="view" id="view-owner">
-          <div class="view-head"><h2>Panel de Dueño & Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras, monedas, gemas, regalos y modelos de IA sin errores.</p></div>
+          <div class="view-head"><h2>Panel de Dueño & Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA sin errores.</p></div>
           <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
 
           <!-- MÓDULO 1: CENTRO DE PROGRAMACIÓN Y EDICIÓN DE CÓDIGO HTML/CSS/JS EN VIVO -->
           <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
             <h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
-            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante. Capacidad completa para revertir, retroceder, deshacer, restaurar, resetear, limpiar, borrar y editar cualquier código o parámetro.</p>
             
             <div class="field">
               <label>Editor de Código JS / Funciones Customizadas</label>
@@ -498,13 +500,16 @@
               <label>Editor de Estilos CSS Raíz</label>
               <textarea id="ownerCustomStyleCode" class="mono" style="min-height:80px;" placeholder="/* Escribe estilos CSS adicionales o sobreescribe clases */"></textarea>
             </div>
-            <button class="btn btn-primary" onclick="executeOwnerCodeInjection()">⚡ Compilar y Aplicar Código al Sistema</button>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="executeOwnerCodeInjection()">⚡ Compilar y Aplicar Código</button>
+              <button class="btn btn-ghost" onclick="resetOwnerCodeEdits()">🔄 Resetear / Limpiar Código Custom</button>
+            </div>
           </div>
 
-          <!-- MÓDULO 2: CONTROL GLOBAL DE BILLETERAS, MONEDAS, GEMAS Y DIAMANTES -->
+          <!-- MÓDULO 2: CONTROL GLOBAL DE BILLETERAS, MONEDAS, GEMAS Y DIAMANTES (AMPLIADO CON RESTAR Y MODIFICAR) -->
           <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
-            <h4 style="color:var(--gold);">🪙 Administración Global de Billeteras (Monedas, Gemas, Diamantes, Regalos)</h4>
-            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Asigna o modifica recursos económicos de cualquier usuario registrado de forma instantánea.</p>
+            <h4 style="color:var(--gold);">🪙 Administración Global de Billeteras (Sumar, Restar, Modificar, Quitar y Eliminar Monedas, Gemas, Diamantes)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Asigna, quita, disminuye, resta, elimina o fija recursos económicos y billeteras de cualquier usuario registrado de forma instantánea para corregir errores al instante.</p>
             
             <div class="admin-form-row">
               <div class="field" style="margin-bottom:0;"><label>Correo del Usuario Objetivo</label><input type="text" id="targetUserEmail" placeholder="usuario@ejemplo.com"></div>
@@ -515,37 +520,39 @@
                   <option value="diamonds">🔷 Diamantes</option>
                 </select>
               </div>
-              <div class="field" style="margin-bottom:0;"><label>Cantidad a Sumar/Fijar</label><input type="number" id="targetResourceAmount" placeholder="1000"></div>
+              <div class="field" style="margin-bottom:0;"><label>Cantidad (Valor)</label><input type="number" id="targetResourceAmount" placeholder="1000"></div>
             </div>
-            <div style="margin-top:12px; display:flex; gap:10px;">
-              <button class="btn btn-gold" onclick="ownerModifyWallet(false)">➕ Añadir Recursos</button>
-              <button class="btn btn-ghost" onclick="ownerModifyWallet(true)">🔄 Establecer Valor Exacto</button>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" onclick="ownerModifyWallet('add')">➕ Añadir / Sumar</button>
+              <button class="btn btn-ghost" onclick="ownerModifyWallet('subtract')">➖ Quitar / Restar</button>
+              <button class="btn btn-ghost" onclick="ownerModifyWallet('set')">🔄 Establecer Valor Exacto</button>
+              <button class="btn btn-ghost" onclick="ownerModifyWallet('clear')" style="color:var(--danger); border-color:var(--danger);">🗑️ Limpiar / Borrar Billetera</button>
             </div>
           </div>
 
           <!-- MÓDULO 3: CONTROL TÉCNICO DE FOTORREALISMO Y NITIDEZ -->
           <div class="panel" style="margin-bottom:20px;">
-            <h4>🎛️ Control Técnico de Fotorrealismo & Nitidez</h4>
+            <h4>🎛️ Control Técnico de Fotorrealismo & Nitidez (COSMIC-ULTIMATE OMNI-REALISM)</h4>
             <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:12px;">
               <div class="field" style="margin-bottom:0;">
-                <label>Filtro de Nitidez Avanzada</label>
+                <label>Filtro de Nitidez Atómica</label>
                 <select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
-                  <option value="ultra">Ultra Definición 8K (Recomendado)</option>
-                  <option value="max">Máximo Enfoque Facial</option>
+                  <option value="atomic">Nitidez Atómica 128K (COSMIC-ULTIMATE)</option>
+                  <option value="ultra">Ultra Definición 8K</option>
                   <option value="balanced">Balanceado Natural</option>
                 </select>
               </div>
               <div class="field" style="margin-bottom:0;">
-                <label>Corrección Anti-Distorsión Rostros</label>
+                <label>Preservación Absoluta Identidad Facial</label>
                 <select class="chip-select" id="cfgFaceFix" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
-                  <option value="on">Activado (Estricto Realismo)</option>
+                  <option value="absolute">Activado (Preservación Absoluta + Piel Molecular)</option>
                   <option value="off">Desactivado</option>
                 </select>
               </div>
               <div class="field" style="margin-bottom:0;">
-                <label>Motor de Render Video</label>
+                <label>Motor de Render Video / Física</label>
                 <select class="chip-select" id="cfgVideoEngine" style="width:100%; padding:11px;" onchange="saveOwnerTechConfig()">
-                  <option value="cinematic">NyxMotion Cinematic Pro</option>
+                  <option value="cosmic">Omni-Realism Physics Engine Pro</option>
                   <option value="fluid">Veo Motion Fluido 60FPS</option>
                 </select>
               </div>
@@ -556,7 +563,7 @@
           <div class="panel" style="margin-bottom:20px;">
             <h4>🤖 Agregar o Gestionar Modelos de IA & Paquetes</h4>
             <div class="admin-form-row">
-              <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input type="text" id="newModelName" placeholder="Ej: NyxMotion Ultra"></div>
+              <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input type="text" id="newModelName" placeholder="Ej: COSMIC-ULTIMATE PRO"></div>
               <div class="field" style="margin-bottom:0;"><label>Tipo</label>
                 <select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option></select>
               </div>
@@ -570,7 +577,7 @@
             <h4 style="margin-bottom:14px;">🗄️ Base de Datos Completa de Registros & Monitoreo en Vivo</h4>
             <div class="user-table-wrap">
               <table class="user-table">
-                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Diamantes</th><th>Estado</th><th>Acciones</th></tr></thead>
                 <tbody id="userTableBody"></tbody>
               </table>
             </div>
@@ -614,10 +621,11 @@ const state = {
   diamonds: 0,
   gensToday: 0,
   studioMode: 'image',
-  selectedModel: 'aurora-vision',
+  selectedModel: 'cosmic-ultimate-omni',
   gallery: [],
-  techConfig: { sharpness: 'ultra', faceFix: 'on', videoEngine: 'cinematic' },
+  techConfig: { sharpness: 'atomic', faceFix: 'absolute', videoEngine: 'cosmic' },
   models: [
+    { id:'cosmic-ultimate-omni', name:'Cosmic Ultimate Omni', type:'image', tag:'Fotorrealismo Fractal 128K', badge:'Gratis / Pro' },
     { id:'aurora-vision', name:'Aurora Vision', type:'image', tag:'Fotorrealismo general', badge:'Popular' },
     { id:'nyx-portrait', name:'Nyx Portrait', type:'image', tag:'Retratos y personas', badge:'HD' },
     { id:'obsidian-max', name:'Obsidian Max', type:'image', tag:'Detalle 4K Supremo', badge:'Ultra' },
@@ -804,7 +812,7 @@ async function runGeneration(){
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         idToken: freshToken, 
-        prompt, 
+        prompt: prompt + ' --no blemishes, stains, texts, watermarks, deformations', 
         refImage,
         model: state.selectedModel, 
         mode: state.studioMode,
@@ -820,7 +828,7 @@ async function runGeneration(){
     grid.innerHTML = `
       <div class="result-card">
         ${isVid ? `<video src="${mediaUrl}" controls autoplay loop></video>` : `<img src="${mediaUrl}" alt="resultado">`}
-        <a class="download-btn" href="${mediaUrl}" target="_blank" download="nyxora-output">📥 Descargar</a>
+        <a class="download-btn" href="${mediaUrl}" target="_blank" download="nyxora-output" rel="noopener">📥 Descargar</a>
       </div>
     `;
     saveToGallery(mediaUrl);
@@ -858,7 +866,7 @@ function renderGallery(){
     return `
       <div class="result-card">
         ${isVid ? `<video src="${url}" controls></video>` : `<img src="${url}" alt="arte">`}
-        <a class="download-btn" href="${url}" target="_blank" download="nyxora-output">📥 Descargar</a>
+        <a class="download-btn" href="${url}" target="_blank" download="nyxora-output" rel="noopener">📥 Descargar</a>
       </div>
     `;
   }).join('');
@@ -867,14 +875,30 @@ function renderGallery(){
 function magicPrompt(){
   const el = document.getElementById('promptInput');
   if(!el.value.trim()) return;
-  el.value = el.value.trim() + ', fotorrealismo extremo, textura de piel ultra detallada, 8k resolution, iluminación cinematográfica profesional, sin distorsiones, enfoque perfecto';
-  showToast('Prompt optimizado para máxima nitidez.');
+  el.value = el.value.trim() + ', COSMIC-ULTIMATE OMNI-REALISM, 128K fractal resolution, atomic sharpness, absolute facial identity preservation, flawless skin tone, pristine anatomy, molecular physics --no blemishes, stains, texts, watermarks, deformations';
+  showToast('Prompt optimizado con reglas COSMIC-ULTIMATE.');
 }
 
 function promptToJSON(){
   const prompt = document.getElementById('promptInput').value.trim();
-  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
-  const obj = { prompt: prompt || '—', refImage: refImage || null, preserve_facial_features: true, keep_reference_hair: true, mode: state.studioMode, model: state.selectedModel, quality: "8K Cinema Master", techConfig: state.techConfig };
+  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput'].value.trim() : '';
+  const obj = { 
+    prompt: prompt || '—', 
+    refImage: refImage || null, 
+    preserve_facial_features: true, 
+    keep_reference_hair: true, 
+    mode: state.studioMode, 
+    model: state.selectedModel, 
+    quality: "128K Fractal Resolution", 
+    techConfig: state.techConfig,
+    cosmic_ultimate_directives: {
+      atomic_sharpness: true,
+      absolute_identity_preservation: true,
+      flawless_skin_tone: true,
+      molecular_physics: true,
+      negative_prompt: "blemishes, stains, texts, watermarks, deformations"
+    }
+  };
   document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
   showToast('Estructura JSON actualizada.');
 }
@@ -896,7 +920,7 @@ function updateCurrencyUI(){
   document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
 }
 
-// PANEL DE DUEÑO: ACCESOS DE PROGRAMACIÓN Y MODIFICACIÓN UNIVERSAL
+// PANEL DE DUEÑO: ACCESOS DE PROGRAMACIÓN Y MODIFICACIÓN UNIVERSAL (CON RESTAR Y MODIFICAR)
 async function renderAdminPanel(){
   if(!state.isOwner) return;
   
@@ -919,10 +943,11 @@ async function renderAdminPanel(){
       <td>${u.plan || 'Free'}</td>
       <td>🪙 ${u.coins ?? 0}</td>
       <td>💎 ${u.gems ?? 0}</td>
+      <td>🔷 ${u.diamonds ?? 0}</td>
       <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
       <td>
         <div class="row-actions">
-          <button class="icon-btn gift" onclick="giftCredits('${u.email}')">🎁 +Monedas</button>
+          <button class="icon-btn gift" onclick="giftCredits('${u.email}')">🎁 Gestionar</button>
           <button class="icon-btn danger" onclick="banUser('${u.id}')">⛔ Banear</button>
         </div>
       </td>
@@ -948,12 +973,19 @@ function executeOwnerCodeInjection(){
   showToast('🚀 ¡Código y modificaciones aplicadas al sistema correctamente!');
 }
 
-async function ownerModifyWallet(isExact){
+function resetOwnerCodeEdits(){
+  document.getElementById('ownerCustomScriptCode').value = '';
+  document.getElementById('ownerCustomStyleCode').value = '';
+  showToast('🔄 Ediciones de código limpiadas y reseteadas.');
+}
+
+async function ownerModifyWallet(action){
   const email = document.getElementById('targetUserEmail').value.trim();
   const resource = document.getElementById('targetResourceType').value;
   const amount = parseInt(document.getElementById('targetResourceAmount').value);
   
-  if(!email || isNaN(amount)){ showToast('Ingresa un correo y cantidad válidos.'); return; }
+  if(!email){ showToast('Ingresa un correo de usuario válido.'); return; }
+  if(action !== 'clear' && isNaN(amount)){ showToast('Ingresa una cantidad válida.'); return; }
   
   try {
     const q = query(collection(db, 'users'), where("email", "==", email));
@@ -961,15 +993,19 @@ async function ownerModifyWallet(isExact){
     if(snap.empty){ showToast('Usuario no encontrado en la base de datos.'); return; }
     
     const userDocRef = snap.docs[0].ref;
-    if(isExact){
+    if(action === 'set'){
       await updateDoc(userDocRef, { [resource]: amount });
-    } else {
+    } else if(action === 'add'){
       await updateDoc(userDocRef, { [resource]: increment(amount) });
+    } else if(action === 'subtract'){
+      await updateDoc(userDocRef, { [resource]: increment(-amount) });
+    } else if(action === 'clear'){
+      await updateDoc(userDocRef, { [resource]: 0 });
     }
-    showToast(`✅ Billetera actualizada con éxito para ${email}`);
+    showToast(`✅ Billetera actualizada (${action}) con éxito para ${email}`);
     renderAdminPanel();
   } catch(e) {
-    showToast('Error al actualizar billetera.');
+    showToast('Error al modificar billetera.');
   }
 }
 
@@ -985,25 +1021,27 @@ function adminAddModel(){
   const type = document.getElementById('newModelType').value;
   if(!name) return;
   const id = name.toLowerCase().replace(/\s+/g, '-');
-  state.models.push({ id, name, type, tag: type==='image' ? 'Modelo Personalizado' : 'Video Dinámico', badge: 'Custom' });
+  state.models.push({ id, name, type, tag: type==='image' ? 'Modelo Fotorrealista Gratuito' : 'Video Dinámico Pro', badge: 'Free/Pro' });
   document.getElementById('newModelName').value = '';
   renderModels();
   renderAdminPanel();
-  showToast('¡Modelo de IA añadido con éxito!');
+  showToast('¡Modelo de IA de alta gama añadido con éxito!');
 }
 
 async function giftCredits(email){
-  const cant = parseInt(prompt(`¿Cuántos créditos regalar a ${email}?`, '500'));
-  if(!cant) return;
+  const cant = prompt(`¿Qué operación deseas realizar para ${email}? Ingresa cantidad a sumar (ej: 500) o restar (ej: -200):`, '500');
+  if(cant === null) return;
+  const val = parseInt(cant);
+  if(isNaN(val)) return;
   try {
     const q = query(collection(db, 'users'), where("email", "==", email));
     const snap = await getDocs(q);
     if(!snap.empty){
-      await updateDoc(snap.docs[0].ref, { coins: increment(cant) });
-      showToast('Créditos entregados.');
+      await updateDoc(snap.docs[0].ref, { coins: increment(val) });
+      showToast('Billetera de créditos actualizada correctamente.');
       renderAdminPanel();
     }
-  }catch(e){ showToast('Error al regalar créditos.'); }
+  }catch(e){ showToast('Error al actualizar créditos.'); }
 }
 
 async function banUser(uid){
@@ -1024,7 +1062,7 @@ Object.assign(window, {
   handleLogin, handleRegister, handleReset, showForm, switchView,
   runGeneration, magicPrompt, promptToJSON, claimDaily, mockPurchase,
   logout, selectModel, toggleSidebar, switchStudioMode, adminAddModel, 
-  giftCredits, banUser, saveOwnerTechConfig, executeOwnerCodeInjection, ownerModifyWallet
+  giftCredits, banUser, saveOwnerTechConfig, executeOwnerCodeInjection, ownerModifyWallet, resetOwnerCodeEdits
 });
 
 renderModels();
