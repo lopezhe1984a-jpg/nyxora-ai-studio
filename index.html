@@ -373,6 +373,11 @@
               <h4>Prompt Descriptivo</h4>
               <textarea id="promptInput" placeholder="Ej: retrato fotorrealista hiperdetallado, iluminación cinematográfica dramática, 85mm, estudio profesional..."></textarea>
 
+              <div class="field" style="margin-top:16px;">
+                <label>🖼️ Imagen de Referencia / Rostro (Opcional - URL o Base64)</label>
+                <input type="text" id="refImageInput" placeholder="https://ejemplo.com/tu-foto.jpg (Conserva tus rasgos y cabello)">
+              </div>
+
               <h4 style="margin-top:20px;">Modelos Disponibles</h4>
               <div class="model-grid" id="modelGrid"></div>
 
@@ -425,7 +430,8 @@
                 <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
   "engine": "nyxora-core",
   "type": "image",
-  "resolution": "4K"
+  "resolution": "4K",
+  "preserve_reference": true
 }</pre>
               </div>
             </div>
@@ -770,6 +776,8 @@ function closeSidebar(){
 // MOTOR DE GENERACIÓN CONECTADO AL PROXY SEGURO
 async function runGeneration(){
   const prompt = document.getElementById('promptInput').value.trim();
+  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
+  
   if(!prompt){ showToast('Escribe un prompt descriptivo.'); return; }
   const cost = state.studioMode === 'video' ? 30 : 10;
   
@@ -797,6 +805,7 @@ async function runGeneration(){
       body: JSON.stringify({ 
         idToken: freshToken, 
         prompt, 
+        refImage,
         model: state.selectedModel, 
         mode: state.studioMode,
         techConfig: state.techConfig
@@ -864,7 +873,8 @@ function magicPrompt(){
 
 function promptToJSON(){
   const prompt = document.getElementById('promptInput').value.trim();
-  const obj = { prompt: prompt || '—', mode: state.studioMode, model: state.selectedModel, quality: "8K Cinema Master", techConfig: state.techConfig };
+  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
+  const obj = { prompt: prompt || '—', refImage: refImage || null, preserve_facial_features: true, keep_reference_hair: true, mode: state.studioMode, model: state.selectedModel, quality: "8K Cinema Master", techConfig: state.techConfig };
   document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
   showToast('Estructura JSON actualizada.');
 }
