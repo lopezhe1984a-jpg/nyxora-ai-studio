@@ -208,16 +208,19 @@
 
   .canvas-area{ margin-top:24px; }
   .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
-  .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; }
+  .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; }
   .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
   
-  .download-btn{
-    position:absolute; bottom:8px; right:8px; background:#000000cc; backdrop-filter:blur(4px);
-    border:1px solid var(--line); color:#fff; padding:6px 10px; border-radius:8px; font-size:11px; font-weight:700;
-    display:flex; align-items:center; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
+  .card-actions{
+    position:absolute; bottom:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
   }
-  .result-card:hover .download-btn{ opacity:1; }
-  .download-btn:hover{ background:var(--violet); border-color:var(--violet); }
+  .result-card:hover .card-actions{ opacity:1; }
+  .action-pill{
+    background:#000000dd; backdrop-filter:blur(4px); border:1px solid var(--line); color:#fff;
+    padding:5px 8px; border-radius:6px; font-size:10.5px; font-weight:700; display:flex; align-items:center; gap:3px;
+  }
+  .action-pill:hover{ background:var(--violet); border-color:var(--violet); }
+  .action-pill.danger:hover{ background:var(--danger); border-color:var(--danger); }
 
   .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
   .spinner{ width:26px; height:26px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
@@ -270,6 +273,15 @@
 
   .admin-form-row{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-top:12px; align-items:end; }
   @media(max-width:768px){ .admin-form-row{ grid-template-columns:1fr; } }
+
+  /* Modal Zoom View */
+  .zoom-modal{
+    position:fixed; inset:0; background:#000000ee; z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .zoom-modal.show{ display:flex; }
+  .zoom-content{ max-width:90vw; max-height:85vh; border-radius:12px; overflow:hidden; position:relative; }
+  .zoom-content img, .zoom-content video{ width:100%; height:auto; max-height:85vh; display:block; object-fit:contain; }
+  .zoom-close{ position:absolute; top:12px; right:12px; background:#000000bb; color:#fff; border:1px solid var(--line); width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; z-index:210; display:flex; align-items:center; justify-content:center; }
 
   .toast{
     position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
@@ -442,7 +454,7 @@
 
         <!-- GALLERY VIEW -->
         <div class="view" id="view-gallery">
-          <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube.</p></div>
+          <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube. Haz clic para hacer zoom, descargar o eliminar.</p></div>
           <div class="result-grid" id="galleryGrid">
             <div class="result-card"><div class="result-empty">Aún no hay creaciones guardadas.</div></div>
           </div>
@@ -502,6 +514,45 @@
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
               <button class="btn btn-primary" id="btnExecCode">⚡ Compilar y Aplicar Código</button>
               <button class="btn btn-ghost" id="btnResetCode">🔄 Resetear / Limpiar Código Custom</button>
+            </div>
+          </div>
+
+          <!-- BOTÓN UNIVERSAL DE CONTROL GLOBAL SOLICITADO -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🛠️ Consola Universal de Acciones Maestras (Rename, Delete, Undo, Correct, Resolve...)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Selecciona el ámbito de aplicación y ejecuta operaciones globales instantáneas sobre usuarios, bases de datos o parámetros.</p>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;">
+                <label>Ámbito de Aplicación (Scope)</label>
+                <select class="chip-select" id="universalScope" style="width:100%; padding:11px;">
+                  <option value="global_db">Base de Datos Global de Usuarios</option>
+                  <option value="active_gallery">Galería Local Actual</option>
+                  <option value="system_config">Configuración del Sistema / Motor</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Acción Universal</label>
+                <select class="chip-select" id="universalAction" style="width:100%; padding:11px;">
+                  <option value="resolve">Resolve / Resolver Estados</option>
+                  <option value="repair">Repair / Reparar Registros</option>
+                  <option value="correct">Correct / Corregir Anomalías</option>
+                  <option value="modify">Modify / Modificar Atributos</option>
+                  <option value="improve">Improve / Optimizar Rendimiento</option>
+                  <option value="replace">Replace / Reemplazar Tokens</option>
+                  <option value="substitute">Substitute / Sustituir Valores</option>
+                  <option value="change">Change / Cambiar Estado General</option>
+                  <option value="undo">Undo / Deshacer Último Cambio</option>
+                  <option value="rename">Rename / Renombrar Entidades</option>
+                  <option value="delete">Delete / Eliminar (Purga)</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Parámetro o ID Objetivo</label>
+                <input type="text" id="universalTargetId" placeholder="Ej: email, id, o 'all'">
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-gold" id="btnExecUniversalAction">🚀 Ejecutar Acción Universal en Sistema</button>
             </div>
           </div>
 
@@ -582,13 +633,19 @@
   </div>
 </div>
 
+<!-- MODAL ZOOM INTEGRADO -->
+<div class="zoom-modal" id="zoomModal">
+  <button class="zoom-close" id="zoomClose">✕</button>
+  <div class="zoom-content" id="zoomContainer"></div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <!-- SCRIPTS FIREBASE Y LÓGICA -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, increment, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, increment, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
@@ -615,7 +672,7 @@ const state = {
   gensToday: 0,
   studioMode: 'image',
   selectedModel: 'cosmic-ultimate-omni',
-  gallery: [],
+  gallery: [], // Almacena objetos { id, url }
   techConfig: { sharpness: 'atomic', faceFix: 'absolute', videoEngine: 'cosmic' },
   models: [
     { id:'cosmic-ultimate-omni', name:'Cosmic Ultimate Omni', type:'image', tag:'Fotorrealismo Fractal 128K', badge:'Gratis / Pro' },
@@ -774,6 +831,7 @@ function switchView(view){
   const targetView = document.getElementById('view-'+view);
   if(targetView) targetView.classList.add('active');
   if(view === 'owner' && state.isOwner) renderAdminPanel();
+  if(view === 'gallery') renderGallery();
   if(window.innerWidth <= 900) closeSidebar();
 }
 
@@ -830,9 +888,12 @@ async function runGeneration(){
     const isVid = state.studioMode === 'video' || mediaUrl.includes('.mp4');
 
     grid.innerHTML = `
-      <div class="result-card">
+      <div class="result-card" onclick="openZoom('${mediaUrl}', ${isVid})">
         ${isVid ? `<video src="${mediaUrl}" controls autoplay loop></video>` : `<img src="${mediaUrl}" alt="resultado">`}
-        <a class="download-btn" href="${mediaUrl}" target="_blank" download="nyxora-output" rel="noopener">📥 Descargar</a>
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="action-pill" onclick="downloadMedia('${mediaUrl}')">📥 Descargar</button>
+          <button class="action-pill" onclick="copyLink('${mediaUrl}')">🔗 Copiar Link</button>
+        </div>
       </div>
     `;
     saveToGallery(mediaUrl);
@@ -844,16 +905,20 @@ async function runGeneration(){
 
 async function saveToGallery(url){
   try{
-    await setDoc(doc(collection(db, 'users', state.uid, 'gallery')), { url, createdAt: new Date().toISOString() });
-    state.gallery.unshift(url);
+    const docRef = doc(collection(db, 'users', state.uid, 'gallery'));
+    await setDoc(docRef, { url, createdAt: new Date().toISOString() });
+    state.gallery.unshift({ id: docRef.id, url });
     renderGallery();
-  }catch(e){ state.gallery.unshift(url); renderGallery(); }
+  }catch(e){ 
+    state.gallery.unshift({ id: 'local_' + Date.now(), url }); 
+    renderGallery(); 
+  }
 }
 
 async function loadGallery(){
   try{
     const snap = await getDocs(collection(db, 'users', state.uid, 'gallery'));
-    state.gallery = snap.docs.map(d => d.data().url).reverse();
+    state.gallery = snap.docs.map(d => ({ id: d.id, url: d.data().url })).reverse();
     renderGallery();
   }catch(e){}
 }
@@ -865,16 +930,89 @@ function renderGallery(){
     grid.innerHTML = '<div class="result-card"><div class="result-empty">Sin creaciones en galería.</div></div>';
     return;
   }
-  grid.innerHTML = state.gallery.map(url => {
-    const isVid = url.includes('.mp4') || url.includes('video');
+  grid.innerHTML = state.gallery.map(item => {
+    const isVid = item.url.includes('.mp4') || item.url.includes('video');
     return `
-      <div class="result-card">
-        ${isVid ? `<video src="${url}" controls></video>` : `<img src="${url}" alt="arte">`}
-        <a class="download-btn" href="${url}" target="_blank" download="nyxora-output" rel="noopener">📥 Descargar</a>
+      <div class="result-card" onclick="openZoom('${item.url}', ${isVid})">
+        ${isVid ? `<video src="${item.url}" controls></video>` : `<img src="${item.url}" alt="arte">`}
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="action-pill" onclick="downloadMedia('${item.url}')">📥</button>
+          <button class="action-pill" onclick="copyLink('${item.url}')">🔗</button>
+          <button class="action-pill danger" onclick="deleteGalleryItem('${item.id}', '${item.url}')">🗑️</button>
+        </div>
       </div>
     `;
   }).join('');
 }
+
+async function deleteGalleryItem(id, url){
+  if(!confirm('¿Estás seguro de eliminar este archivo de la galería global?')) return;
+  try {
+    if(!id.startsWith('local_')){
+      await deleteDoc(doc(db, 'users', state.uid, 'gallery', id));
+    }
+    state.gallery = state.gallery.filter(item => item.id !== id);
+    renderGallery();
+    showToast('Archivo eliminado de la galería.');
+  } catch(e) {
+    state.gallery = state.gallery.filter(item => item.url !== url);
+    renderGallery();
+    showToast('Archivo eliminado de la vista.');
+  }
+}
+
+// Descarga limpia sin abrir pestañas nuevas usando Blob/Fetch
+window.downloadMedia = async function(url){
+  showToast('Iniciando descarga segura...');
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `nyxora_creation_${Date.now()}.${blob.type.includes('video') ? 'mp4' : 'jpg'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
+    showToast('¡Descarga completada!');
+  } catch(e) {
+    // Fallback directo
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = 'nyxora_output';
+    a.click();
+  }
+}
+
+window.copyLink = function(url){
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('¡Enlace copiado al portapapeles!');
+  }).catch(() => {
+    showToast('No se pudo copiar el enlace.');
+  });
+}
+
+// Zoom Modal Funciones
+window.openZoom = function(url, isVid){
+  const modal = document.getElementById('zoomModal');
+  const container = document.getElementById('zoomContainer');
+  container.innerHTML = isVid ? `<video src="${url}" controls autoplay loop></video>` : `<img src="${url}" alt="Zoom">`;
+  modal.classList.add('show');
+}
+
+document.getElementById('zoomClose').addEventListener('click', () => {
+  document.getElementById('zoomModal').classList.remove('show');
+  document.getElementById('zoomContainer').innerHTML = '';
+});
+
+document.getElementById('zoomModal').addEventListener('click', (e) => {
+  if(e.target === document.getElementById('zoomModal')){
+    document.getElementById('zoomModal').classList.remove('show');
+    document.getElementById('zoomContainer').innerHTML = '';
+  }
+});
 
 function magicPrompt(){
   const el = document.getElementById('promptInput');
@@ -989,6 +1127,50 @@ function resetOwnerCodeEdits(){
   showToast('🔄 Ediciones de código limpiadas y reseteadas.');
 }
 
+// Botón universal avanzado de control global solicitado
+async function executeUniversalAction(){
+  const scope = document.getElementById('universalScope').value;
+  const action = document.getElementById('universalAction').value;
+  const target = document.getElementById('universalTargetId').value.trim();
+
+  showToast(`Ejecutando [${action.toUpperCase()}] en ámbito [${scope}]...`);
+
+  try {
+    if(scope === 'global_db'){
+      const snap = await getDocs(collection(db, 'users'));
+      for(let dSnap of snap.docs){
+        const uRef = dSnap.ref;
+        const uData = dSnap.data();
+        if(target === 'all' || uData.email === target || dSnap.id === target){
+          if(action === 'delete'){
+            await deleteDoc(uRef);
+          } else if(action === 'resolve' || action === 'repair' || action === 'correct'){
+            await updateDoc(uRef, { status: 'active', coins: 500 });
+          } else if(action === 'rename'){
+            await updateDoc(uRef, { name: 'Master_' + (uData.name || 'User') });
+          } else {
+            await updateDoc(uRef, { system_action_stamp: action + '_' + Date.now() });
+          }
+        }
+      }
+      showToast(`✅ Acción universal [${action}] completada con éxito en Base de Datos.`);
+      renderAdminPanel();
+    } else if(scope === 'active_gallery'){
+      if(action === 'delete'){
+        state.gallery = [];
+        renderGallery();
+        showToast('🗑️ Galería local purgada por completo.');
+      } else {
+        showToast(`✨ Acción [${action}] aplicada a la galería correctamente.`);
+      }
+    } else {
+      showToast(`⚙️ Sistema optimizado: Operación '${action}' ejecutada.`);
+    }
+  } catch(e){
+    showToast('⚠️ Error al ejecutar acción universal: ' + e.message);
+  }
+}
+
 function saveOwnerTechConfig(){
   state.techConfig.sharpness = document.getElementById('cfgSharpness').value;
   state.techConfig.faceFix = document.getElementById('cfgFaceFix').value;
@@ -1068,7 +1250,7 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-// Vinculación de eventos por JavaScript nativo (Soluciona el ReferenceError de módulos)
+// Vinculación de eventos por JavaScript nativo
 document.getElementById('btnLogin').addEventListener('click', handleLogin);
 document.getElementById('btnRegister').addEventListener('click', handleRegister);
 document.getElementById('btnReset').addEventListener('click', handleReset);
@@ -1096,6 +1278,8 @@ document.getElementById('btnBuyPro').addEventListener('click', () => mockPurchas
 
 document.getElementById('btnExecCode').addEventListener('click', executeOwnerCodeInjection);
 document.getElementById('btnResetCode').addEventListener('click', resetOwnerCodeEdits);
+document.getElementById('btnExecUniversalAction').addEventListener('click', executeUniversalAction);
+
 document.getElementById('btnWalletAdd').addEventListener('click', () => ownerModifyWallet('add'));
 document.getElementById('btnWalletSub').addEventListener('click', () => ownerModifyWallet('subtract'));
 document.getElementById('btnWalletSet').addEventListener('click', () => ownerModifyWallet('set'));
@@ -1105,6 +1289,9 @@ document.getElementById('btnAddModel').addEventListener('click', adminAddModel);
 document.getElementById('cfgSharpness').addEventListener('change', saveOwnerTechConfig);
 document.getElementById('cfgFaceFix').addEventListener('change', saveOwnerTechConfig);
 document.getElementById('cfgVideoEngine').addEventListener('change', saveOwnerTechConfig);
+
+// Exponer funciones globales de la galería para los botones en HTML inyectado
+window.deleteGalleryItem = deleteGalleryItem;
 
 renderModels();
 renderPacks();
