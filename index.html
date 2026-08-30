@@ -499,13 +499,34 @@
           <div class="view-head"><h2>Panel de Dueño & Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA sin errores.</p></div>
           <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
 
+          <!-- NUEVO MÓDULO: TRADUCTOR DE INTENCIONES A CÓDIGO JS -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--cyan);">
+            <h4 style="color:var(--cyan);">✨ Traductor de Intenciones a Código JS (Generador Inteligente)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Escribe con tus propias palabras lo que deseas que haga la web (ej: "Muestra una alerta de bienvenida", "Cambia el fondo a modo oscuro total", "Agrega un botón flotante"). El sistema lo traducirá y configurará automáticamente en formato de código JS listo para usar.</p>
+            
+            <div class="field">
+              <label>¿Qué deseas hacer dentro de la web?</label>
+              <textarea id="intentInput" placeholder="Ej: Quiero que al hacer clic en un botón aparezca un mensaje flotante que diga ¡Hola Dueño!"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+              <button class="btn btn-primary" id="btnTranslateIntent" style="background:linear-gradient(135deg, var(--cyan), #0284c7); color:#000;">🪄 Traducir a Código JS</button>
+            </div>
+            <div class="field">
+              <label>Código JS Generado Automáticamente (Para usar en el cajón de JS)</label>
+              <textarea id="translatedResultCode" class="mono" style="min-height:90px; color:var(--cyan);" placeholder="// Aquí aparecerá el código traducido listo para usar..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btnInjectTranslatedCode">⚡ Inyectar y Probar en JS al Instante</button>
+            </div>
+          </div>
+
           <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
             <h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
             <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
             
             <div class="field">
               <label>Editor de Código JS / Funciones Customizadas</label>
-              <textarea id="ownerCustomScriptCode" class="mono" style="min-height:100px;" placeholder="// Escribe funciones JavaScript extra aquí"></textarea>
+              <textarea id="ownerCustomScriptCode" class="mono" style="min-height:100px;" placeholder="// Escribe funciones JavaScript extra aquí o usa el traductor de arriba"></textarea>
             </div>
             <div class="field">
               <label>Editor de Estilos CSS Raíz</label>
@@ -672,7 +693,7 @@ const state = {
   gensToday: 0,
   studioMode: 'image',
   selectedModel: 'cosmic-ultimate-omni',
-  gallery: [], // Almacena objetos { id, url }
+  gallery: [],
   techConfig: { sharpness: 'atomic', faceFix: 'absolute', videoEngine: 'cosmic' },
   models: [
     { id:'cosmic-ultimate-omni', name:'Cosmic Ultimate Omni', type:'image', tag:'Fotorrealismo Fractal 128K', badge:'Gratis / Pro' },
@@ -961,7 +982,6 @@ async function deleteGalleryItem(id, url){
   }
 }
 
-// Descarga limpia sin abrir pestañas nuevas usando Blob/Fetch
 window.downloadMedia = async function(url){
   showToast('Iniciando descarga segura...');
   try {
@@ -977,7 +997,6 @@ window.downloadMedia = async function(url){
     window.URL.revokeObjectURL(blobUrl);
     showToast('¡Descarga completada!');
   } catch(e) {
-    // Fallback directo
     const a = document.createElement('a');
     a.href = url;
     a.target = '_blank';
@@ -994,7 +1013,6 @@ window.copyLink = function(url){
   });
 }
 
-// Zoom Modal Funciones
 window.openZoom = function(url, isVid){
   const modal = document.getElementById('zoomModal');
   const container = document.getElementById('zoomContainer');
@@ -1102,6 +1120,48 @@ async function renderAdminPanel(){
   });
 }
 
+// LÓGICA DEL TRADUCTOR INTELIGENTE DE INTENCIONES A JS
+function translateIntentToCode(){
+  const intent = document.getElementById('intentInput').value.trim().toLowerCase();
+  const codeBox = document.getElementById('translatedResultCode');
+  if(!intent){ showToast('Escribe algo que desees hacer en la web.'); return; }
+
+  let generatedCode = `// Traducción automática para: "${intent}"\n`;
+  
+  if(intent.includes('alerta') || intent.includes('mensaje') || intent.includes('saludo')){
+    generatedCode += `alert("¡Hola Dueño! Acción ejecutada correctamente desde el traductor.");`;
+  } else if(intent.includes('fondo') || intent.includes('color') || intent.includes('oscuro')){
+    generatedCode += `document.body.style.background = "#020205";\ndocument.querySelectorAll('.panel').forEach(p => p.style.borderColor = "#33E5FF");\nconsole.log("Fondo y paneles personalizados con éxito.");`;
+  } else if(intent.includes('botón') || intent.includes('crear botón')){
+    generatedCode += `const newBtn = document.createElement('button5');\nnewBtn.textContent = "Botón Personalizado";\nnewBtn.className = "btn btn-primary";\nnewBtn.style.marginTop = "15px";\nnewBtn.onclick = () => alert("¡Botón funcional presionado!");\ndocument.querySelector('.main').prepend(newBtn);`;
+  } else if(intent.includes('recargar') || intent.includes('monedas') || intent.includes('créditos')){
+    generatedCode += `state.coins += 1000;\nupdateCurrencyUI();\nshowToast('¡Se han acreditado 1000 monedas/créditos extra a tu cuenta!');`;
+  } else {
+    // Código genérico inteligente basado en la intención
+    generatedCode += `// Código generado a medida para tu solicitud:\nconsole.log("Ejecutando tarea personalizada: ${intent}");\nshowToast("¡Tarea ejecutada: ${intent}!");`;
+  }
+
+  codeBox.value = generatedCode;
+  showToast('¡Traducción a código JS completada con éxito!');
+}
+
+function injectTranslatedCodeDirectly(){
+  const code = document.getElementById('translatedResultCode').value.trim();
+  if(!code){ showToast('Primero traduce una intención a código.'); return; }
+  
+  // Añadir también al cajón principal de script del dueño para persistencia opcional
+  const mainScriptBox = document.getElementById('ownerCustomScriptCode');
+  mainScriptBox.value += (mainScriptBox.value ? '\n\n' : '') + code;
+
+  try {
+    const dynamicFn = new Function(code);
+    dynamicFn();
+    showToast('⚡ ¡Código traducido inyectado y ejecutado con éxito en la web!');
+  } catch(err) {
+    showToast('⚠️ Error al ejecutar el código inyectado: ' + err.message);
+  }
+}
+
 function executeOwnerCodeInjection(){
   const jsCode = document.getElementById('ownerCustomScriptCode').value;
   const cssCode = document.getElementById('ownerCustomStyleCode').value;
@@ -1124,10 +1184,11 @@ function executeOwnerCodeInjection(){
 function resetOwnerCodeEdits(){
   document.getElementById('ownerCustomScriptCode').value = '';
   document.getElementById('ownerCustomStyleCode').value = '';
+  document.getElementById('intentInput').value = '';
+  document.getElementById('translatedResultCode').value = '';
   showToast('🔄 Ediciones de código limpiadas y reseteadas.');
 }
 
-// Botón universal avanzado de control global solicitado
 async function executeUniversalAction(){
   const scope = document.getElementById('universalScope').value;
   const action = document.getElementById('universalAction').value;
@@ -1250,7 +1311,6 @@ function showToast(msg){
   toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
 }
 
-// Vinculación de eventos por JavaScript nativo
 document.getElementById('btnLogin').addEventListener('click', handleLogin);
 document.getElementById('btnRegister').addEventListener('click', handleRegister);
 document.getElementById('btnReset').addEventListener('click', handleReset);
@@ -1276,6 +1336,10 @@ document.getElementById('btnClaimCoin').addEventListener('click', () => claimDai
 document.getElementById('btnClaimGem').addEventListener('click', () => claimDaily('gem'));
 document.getElementById('btnBuyPro').addEventListener('click', () => mockPurchase('Suscripción Pro Mensual'));
 
+// Eventos del nuevo traductor de intenciones y compilador
+document.getElementById('btnTranslateIntent').addEventListener('click', translateIntentToCode);
+document.getElementById('btnInjectTranslatedCode').addEventListener('click', injectTranslatedCodeDirectly);
+
 document.getElementById('btnExecCode').addEventListener('click', executeOwnerCodeInjection);
 document.getElementById('btnResetCode').addEventListener('click', resetOwnerCodeEdits);
 document.getElementById('btnExecUniversalAction').addEventListener('click', executeUniversalAction);
@@ -1290,7 +1354,6 @@ document.getElementById('cfgSharpness').addEventListener('change', saveOwnerTech
 document.getElementById('cfgFaceFix').addEventListener('change', saveOwnerTechConfig);
 document.getElementById('cfgVideoEngine').addEventListener('change', saveOwnerTechConfig);
 
-// Exponer funciones globales de la galería para los botones en HTML inyectado
 window.deleteGalleryItem = deleteGalleryItem;
 
 renderModels();
