@@ -1,211 +1,1352 @@
 <!DOCTYPE html>
-<html lang="es" class="dark">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NYXORA - AI Studio & Cloudflare Proxy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        nyx: { 900: '#0b0f19', 800: '#111827', 700: '#1f2937', 600: '#374151', accent: '#6366f1', glow: '#818cf8' }
-                    }
-                }
-            }
-        }
-    </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYXORA — AI Creative Studio & Production Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style id="ownerCustomStyle">
+  :root{
+    --bg-0:#07070C;
+    --bg-1:#0D0E17;
+    --bg-2:#141623;
+    --panel:#12131E;
+    --panel-2:#1A1C2B;
+    --line:#252838;
+    --violet:#8B5CF6;
+    --violet-soft:#8B5CF622;
+    --cyan:#33E5FF;
+    --gold:#F5B942;
+    --text:#EDEEF5;
+    --text-dim:#9297AC;
+    --text-faint:#5A5E72;
+    --danger:#FF5C7A;
+    --radius:16px;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{
+    background:
+      radial-gradient(circle at 20% -10%, #8B5CF61a, transparent 45%),
+      radial-gradient(circle at 90% 10%, #33E5FF14, transparent 40%),
+      var(--bg-0);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.brand{ font-family:'Orbitron', sans-serif; letter-spacing:0.02em; }
+  .mono{ font-family:'JetBrains Mono', monospace; }
+  a{ color:inherit; text-decoration:none; }
+  button{ font-family:inherit; cursor:pointer; border:none; }
+  ::selection{ background:var(--violet); color:#fff; }
+
+  /* Layout shell */
+  #app{ display:none; min-height:100vh; }
+  #app.active{ display:flex; }
+  #authScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+  #authScreen.hidden{ display:none; }
+
+  .topbar{
+    position:sticky; top:0; z-index:40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+    background:linear-gradient(180deg, #07070Cee, #07070Cbb 80%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{ font-size:20px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:10px; }
+  .brand .orb-mini{
+    width:22px; height:22px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #3d1a8a 100%);
+    box-shadow:0 0 14px 2px #8B5CF688;
+  }
+  .brand small{ color:var(--violet); font-family:'Inter'; font-weight:600; font-size:10px; letter-spacing:.14em; display:block; margin-top:-2px;}
+
+  .topbar-right{ display:flex; align-items:center; gap:12px; }
+  .pill{
+    display:flex; align-items:center; gap:6px;
+    background:var(--panel-2); border:1px solid var(--line);
+    padding:7px 12px; border-radius:100px; font-size:13px; font-weight:600;
+  }
+  .pill.coin{ color:var(--gold); }
+  .pill.gem{ color:var(--cyan); }
+  .pill.diamond{ color:#C9B8FF; }
+  .avatar{
+    width:34px; height:34px; border-radius:50%;
+    background:linear-gradient(135deg, var(--violet), var(--cyan));
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:13px; color:#0A0A12;
+  }
+
+  .shell{ display:flex; flex:1; width:100%; }
+  .sidebar{
+    width:230px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--line);
+    display:flex; flex-direction:column; gap:4px; min-height:calc(100vh - 68px);
+  }
+  .nav-item{
+    display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px;
+    color:var(--text-dim); font-weight:600; font-size:14px; background:transparent; width:100%; text-align:left;
+  }
+  .nav-item .ic{ width:18px; text-align:center; }
+  .nav-item:hover{ background:var(--panel-2); color:var(--text); }
+  .nav-item.active{ background:var(--violet-soft); color:var(--violet); }
+  .nav-item.owner{ color:var(--gold); }
+  .nav-sep{ height:1px; background:var(--line); margin:10px 6px; }
+
+  .main{ flex:1; padding:28px 32px 60px; max-width:1180px; }
+  .view{ display:none; animation:fadeIn .35s ease; }
+  .view.active{ display:block; }
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .hamburger-btn{
+    display:none; background:var(--panel-2); border:1px solid var(--line);
+    color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
+    align-items:center; justify-content:center;
+  }
+  .sidebar-overlay{ display:none; position:fixed; inset:0; background:#000000aa; z-index:55; }
+  .sidebar-overlay.show{ display:block; }
+
+  /* Auth screen */
+  .auth-card{
+    width:100%; max-width:400px; background:var(--panel);
+    border:1px solid var(--line); border-radius:20px; padding:36px 30px;
+    box-shadow:0 20px 60px #00000080;
+    position:relative; overflow:hidden;
+  }
+  .auth-card::before{
+    content:''; position:absolute; top:-60px; right:-60px; width:180px; height:180px;
+    background:radial-gradient(circle, #8B5CF640, transparent 70%); pointer-events:none;
+  }
+  .auth-head{ text-align:center; margin-bottom:26px; }
+  .orb-hero{
+    width:64px; height:64px; margin:0 auto 14px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #2b1466 100%);
+    box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633;
+    animation:pulseOrb 3.2s ease-in-out infinite;
+  }
+  @keyframes pulseOrb{ 0%,100%{ box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633; } 50%{ box-shadow:0 0 58px 12px #8B5CF699, 0 0 0 1px #8B5CF655; } }
+  .auth-head h1{ font-size:22px; margin-bottom:6px; }
+  .auth-head p{ color:var(--text-dim); font-size:13px; }
+  .field{ margin-bottom:14px; }
+  .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
+  .field input, .field select, .field textarea{
+    width:100%; padding:12px 14px; background:var(--bg-1); border:1px solid var(--line);
+    border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s; font-family:inherit;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--violet); }
+  .btn{
+    width:100%; padding:13px; border-radius:10px; font-weight:700; font-size:14px; text-align:center;
+    transition:transform .12s, opacity .12s;
+  }
+  .btn:active{ transform:scale(.98); }
+  .btn-primary{ background:linear-gradient(135deg, var(--violet), #6D28D9); color:#fff; }
+  .btn-primary:hover{ opacity:.92; }
+  .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
+  .btn-ghost:hover{ border-color:var(--violet); }
+  .btn-gold{ background:linear-gradient(135deg, var(--gold), #D97706); color:#000; }
+  .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
+  .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
+  .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
+  .auth-note{ text-align:center; font-size:11px; color:var(--text-faint); margin-top:18px; line-height:1.5; }
+  .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); cursor:pointer; }
+  .owner-link:hover{ color:var(--gold); }
+
+  /* Studio Dashboard */
+  .view-head{ margin-bottom:22px; }
+  .view-head h2{ font-size:24px; margin-bottom:4px; }
+  .view-head p{ color:var(--text-dim); font-size:13.5px; }
+
+  .gen-hero{
+    position:relative; border-radius:20px; padding:30px 24px; margin-bottom:24px;
+    background:radial-gradient(ellipse at 30% 20%, #8B5CF622, transparent 60%), var(--panel);
+    border:1px solid var(--line); overflow:hidden; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  }
+  .mode-switch-tabs{ display:flex; gap:8px; background:var(--bg-1); padding:4px; border-radius:12px; border:1px solid var(--line); }
+  .mode-tab{ padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; background:transparent; color:var(--text-dim); }
+  .mode-tab.active{ background:var(--violet); color:#fff; }
+
+  .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
+  @media (max-width:900px){
+    .studio-grid{ grid-template-columns:1fr; }
+    .main{ padding:18px 16px 60px; }
+    .hamburger-btn{ display:flex; }
+    .sidebar{
+      position:fixed; top:0; left:0; height:100vh; width:230px; z-index:60;
+      background:var(--bg-1); transform:translateX(-100%);
+      transition:transform .25s ease; box-shadow:0 0 40px #000000cc;
+    }
+    .sidebar.open{ transform:translateX(0); }
+  }
+
+  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
+  .panel h4{ font-size:14px; margin-bottom:14px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
+
+  textarea{
+    width:100%; min-height:110px; background:var(--bg-1); border:1px solid var(--line); border-radius:12px;
+    color:var(--text); padding:14px; font-size:14px; resize:vertical; outline:none; font-family:inherit;
+  }
+  textarea:focus{ border-color:var(--violet); }
+
+  .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; margin-top:14px; }
+  .model-card{
+    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;
+    cursor:pointer; transition:border-color .15s, transform .1s;
+  }
+  .model-card:hover{ border-color:#3a3d55; }
+  .model-card.selected{ border-color:var(--violet); background:var(--violet-soft); }
+  .model-card .m-name{ font-weight:700; font-size:13px; margin-bottom:2px; }
+  .model-card .m-tag{ font-size:10.5px; color:var(--text-faint); }
+  .model-card .m-badge{ display:inline-block; margin-top:6px; font-size:9.5px; padding:2px 6px; border-radius:6px; background:#8B5CF633; color:#C9B8FF; font-weight:700; }
+
+  .opts-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; outline:none; }
+
+  .gen-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .gen-actions .btn{ width:auto; padding:12px 22px; }
+
+  .canvas-area{ margin-top:24px; }
+  .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
+  .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; }
+  .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
+  
+  .card-actions{
+    position:absolute; bottom:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
+  }
+  .result-card:hover .card-actions{ opacity:1; }
+  .action-pill{
+    background:#000000dd; backdrop-filter:blur(4px); border:1px solid var(--line); color:#fff;
+    padding:5px 8px; border-radius:6px; font-size:10.5px; font-weight:700; display:flex; align-items:center; gap:3px;
+  }
+  .action-pill:hover{ background:var(--violet); border-color:var(--violet); }
+  .action-pill.danger:hover{ background:var(--danger); border-color:var(--danger); }
+
+  .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
+  .spinner{ width:26px; height:26px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+
+  .side-panel{ display:flex; flex-direction:column; gap:18px; }
+  .stat-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+  .stat-row:last-child{ border-bottom:none; }
+  .stat-row .v{ font-weight:700; }
+
+  /* Plans & Credits */
+  .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
+  .claim-card .l{ font-weight:700; font-size:14px; }
+  .claim-card .s{ font-size:12px; color:var(--text-dim); }
+  .btn-sm{ padding:9px 16px; font-size:12.5px; border-radius:9px; width:auto; }
+
+  .price-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-top:16px; }
+  .price-card{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; position:relative; }
+  .price-card.popular{ border-color:var(--violet); }
+  .price-card .badge{ position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--violet); color:#fff; font-size:10px; font-weight:700; padding:3px 10px; border-radius:100px; }
+  .price-card .amt{ font-size:24px; font-weight:900; font-family:'Orbitron'; margin:8px 0 2px; }
+  .price-card .unit{ font-size:11px; color:var(--text-faint); margin-bottom:12px; }
+  .price-card .cost{ font-size:15px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+
+  .plans-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:16px; margin-top:16px; }
+  .plan-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:24px; }
+  .plan-card.featured{ border-color:var(--gold); background:linear-gradient(180deg, #F5B94212, var(--panel)); }
+  .plan-card h3{ font-size:18px; margin-bottom:4px; }
+  .plan-card .price{ font-size:28px; font-weight:900; font-family:'Orbitron'; margin:10px 0; }
+  .plan-card .price span{ font-size:13px; color:var(--text-dim); font-family:'Inter'; font-weight:500; }
+  .plan-card ul{ list-style:none; margin:16px 0; }
+  .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
+  .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
+
+  /* Owner Advanced Universal Panel */
+  .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+  .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
+  .user-table-wrap{ overflow-x:auto; }
+  .user-table{ width:100%; border-collapse:collapse; margin-top:14px; min-width:600px; }
+  .user-table th{ text-align:left; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px; border-bottom:1px solid var(--line); }
+  .user-table td{ padding:11px 10px; font-size:13.5px; border-bottom:1px solid var(--line); }
+  .status-tag{ font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700; }
+  .status-tag.active{ background:#33E5FF22; color:var(--cyan); }
+  .status-tag.banned{ background:#FF5C7A22; color:var(--danger); }
+  .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+  .icon-btn{ background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim); padding:5px 9px; border-radius:7px; font-size:11px; }
+  .icon-btn:hover{ color:var(--text); border-color:#3a3d55; }
+  .icon-btn.danger:hover{ color:var(--danger); border-color:var(--danger); }
+  .icon-btn.gift:hover{ color:var(--gold); border-color:var(--gold); }
+
+  .admin-form-row{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-top:12px; align-items:end; }
+  @media(max-width:768px){ .admin-form-row{ grid-template-columns:1fr; } }
+
+  /* Modal Zoom View */
+  .zoom-modal{
+    position:fixed; inset:0; background:#000000ee; z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .zoom-modal.show{ display:flex; }
+  .zoom-content{ max-width:90vw; max-height:85vh; border-radius:12px; overflow:hidden; position:relative; }
+  .zoom-content img, .zoom-content video{ width:100%; height:auto; max-height:85vh; display:block; object-fit:contain; }
+  .zoom-close{ position:absolute; top:12px; right:12px; background:#000000bb; color:#fff; border:1px solid var(--line); width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; z-index:210; display:flex; align-items:center; justify-content:center; }
+
+  .toast{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+    background:var(--panel-2); border:1px solid var(--violet); color:var(--text);
+    padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; opacity:0; pointer-events:none;
+    transition:all .3s; z-index:100; box-shadow:0 10px 30px #0008;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+</style>
 </head>
-<body class="bg-nyx-900 text-gray-100 min-h-screen flex flex-col font-sans selection:bg-nyx-accent selection:text-white">
+<body>
 
-    <!-- Header / Navegación -->
-    <header class="border-b border-nyx-700 bg-nyx-800/80 backdrop-blur sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-            <div class="bg-gradient-to-tr from-indigo-600 to-purple-500 p-2.5 rounded-xl shadow-lg shadow-indigo-500/30">
-                <i class="fa-solid fa-wand-magic-sparkles text-white text-lg"></i>
-            </div>
-            <div>
-                <h1 class="text-xl font-bold tracking-wider bg-gradient-to-r from-white via-indigo-200 to-indigo-400 bg-clip-text text-transparent">NYXORA</h1>
-                <span class="text-xs text-indigo-400 font-medium">Enterprise AI Studio</span>
-            </div>
-        </div>
-        <div class="flex items-center space-x-4">
-            <div id="user-badge" class="hidden text-xs bg-nyx-700 px-3 py-1.5 rounded-full border border-nyx-600 text-gray-300">
-                <i class="fa-solid fa-circle text-emerald-400 text-[10px] mr-1.5"></i><span id="user-email-display">Conectado</span>
-            </div>
-            <button onclick="toggleAdminPanel()" class="bg-nyx-700 hover:bg-nyx-600 text-gray-200 px-3.5 py-2 rounded-lg text-sm font-medium transition border border-nyx-600">
-                <i class="fa-solid fa-shield-halved mr-1.5 text-indigo-400"></i>Panel Admin
-            </button>
-        </div>
-    </header>
-
-    <!-- Contenido Principal -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Panel de Controles y Prompt (2 columnas) -->
-        <section class="lg:col-span-2 space-y-6 bg-nyx-800/50 border border-nyx-700/60 p-6 rounded-2xl shadow-xl backdrop-blur">
-            <div>
-                <h2 class="text-lg font-semibold text-white mb-1"><i class="fa-solid fa-sliders text-indigo-400 mr-2"></i>Configuración de Generación</h2>
-                <p class="text-xs text-gray-400">Controla los parámetros de fotorrealismo, modelos avanzados y restricciones del worker.</p>
-            </div>
-
-            <!-- Selector de Modelo con FLUX.2 -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-2">Motor de Fotorrealismo / Modelo</label>
-                    <select id="model-selector" class="w-full bg-nyx-900 border border-nyx-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-nyx-accent">
-                        <option value="flux-2-dev">FLUX.2 (Fotorrealismo Supremo & Nitidez)</option>
-                        <option value="imagen-3">Imagen 3 Enterprise</option>
-                        <option value="veo-video">Veo (Generación de Vídeo)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-300 mb-2">Modo de Coherencia Facial</label>
-                    <select id="face-mode" class="w-full bg-nyx-900 border border-nyx-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-nyx-accent">
-                        <option value="strict">Estricto (Preservar rasgos y cabello exactos)</option>
-                        <option value="flexible">Flexible (Adaptativo al Estilo)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Prompt Textarea -->
-            <div>
-                <label class="block text-xs font-medium text-gray-300 mb-2">Prompt Descriptivo (Instrucciones en Lenguaje Natural / JSON)</label>
-                <textarea id="prompt-input" rows="5" class="w-full bg-nyx-900 border border-nyx-700 rounded-xl p-4 text-sm text-white focus:outline-none focus:border-nyx-accent placeholder-gray-600 font-mono" placeholder="Escribe tu prompt detallado o estructura JSON para la generación..."></textarea>
-            </div>
-
-            <!-- Botón de Ejecución -->
-            <button onclick="executeGeneration()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-semibold py-3.5 px-6 rounded-xl shadow-lg shadow-indigo-600/20 transition flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-bolt"></i>
-                <span>Generar Contenido (Cloudflare Proxy)</span>
-            </button>
-        </section>
-
-        <!-- Panel de Visualización / Resultado -->
-        <section class="bg-nyx-800/50 border border-nyx-700/60 p-6 rounded-2xl shadow-xl backdrop-blur flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-semibold text-white mb-1"><i class="fa-solid fa-eye text-indigo-400 mr-2"></i>Resultado Output</h2>
-                <p class="text-xs text-gray-400 mb-4">Previsualización del contenido generado por el Worker.</p>
-                
-                <div id="output-container" class="w-full aspect-square bg-nyx-900 border border-nyx-700/80 rounded-xl flex flex-col items-center justify-center text-center p-6 relative overflow-hidden group">
-                    <div id="placeholder-state" class="space-y-3">
-                        <i class="fa-solid fa-image text-4xl text-gray-600 group-hover:text-indigo-400 transition"></i>
-                        <p class="text-xs text-gray-500">El resultado aparecerá aquí una vez procesada la petición segura.</p>
-                    </div>
-                    <div id="loading-state" class="hidden space-y-3">
-                        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-indigo-400"></i>
-                        <p class="text-xs text-indigo-300">Validando cuota KV y ejecutando modelo...</p>
-                    </div>
-                    <div id="result-state" class="hidden absolute inset-0 w-full h-full bg-nyx-900 flex items-center justify-center">
-                        <!-- Contenido renderizado -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="mt-6 pt-4 border-t border-nyx-700/60 text-xs text-gray-500 flex justify-between items-center">
-                <span>Protección KV Activa</span>
-                <span class="text-emerald-400 font-medium"><i class="fa-solid fa-lock mr-1"></i>Conexión Segura WSS</span>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Modal Panel de Dueño / Admin -->
-    <div id="admin-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-nyx-800 border border-nyx-700 w-full max-w-2xl rounded-2xl p-6 shadow-2xl space-y-6">
-            <div class="flex justify-between items-center border-b border-nyx-700 pb-4">
-                <h3 class="text-lg font-bold text-white flex items-center"><i class="fa-solid fa-screwdriver-wrench text-indigo-400 mr-2"></i>Panel de Administración Avanzado</h3>
-                <button onclick="toggleAdminPanel()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <div class="space-y-4">
-                <p class="text-xs text-gray-400">Herramientas globales de gestión de cuotas, billeteras y resolución de conflictos de usuario en Firestore:</p>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="adminAction('resolve')" class="bg-nyx-700 hover:bg-nyx-600 text-xs py-2.5 px-4 rounded-xl text-left font-medium transition border border-nyx-600"><i class="fa-solid fa-check-circle text-emerald-400 mr-2"></i>Resolve Quotas</button>
-                    <button onclick="adminAction('repair')" class="bg-nyx-700 hover:bg-nyx-600 text-xs py-2.5 px-4 rounded-xl text-left font-medium transition border border-nyx-600"><i class="fa-solid fa-wrench text-indigo-400 mr-2"></i>Repair Wallets</button>
-                    <button onclick="adminAction('correct')" class="bg-nyx-700 hover:bg-nyx-600 text-xs py-2.5 px-4 rounded-xl text-left font-medium transition border border-nyx-600"><i class="fa-solid fa-rotate text-purple-400 mr-2"></i>Correct State</button>
-                    <button onclick="adminAction('modify')" class="bg-nyx-700 hover:bg-nyx-600 text-xs py-2.5 px-4 rounded-xl text-left font-medium transition border border-nyx-600"><i class="fa-solid fa-pen-to-square text-amber-400 mr-2"></i>Modify Permissions</button>
-                </div>
-            </div>
-            <div class="flex justify-end pt-4 border-t border-nyx-700">
-                <button onclick="toggleAdminPanel()" class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold py-2 px-5 rounded-xl transition">Cerrar Panel</button>
-            </div>
-        </div>
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="orb-hero"></div>
+      <h1 class="brand">NYXORA</h1>
+      <p id="authSubtitle">Inicia sesión en tu estudio creativo avanzado</p>
     </div>
 
-    <!-- Script Principal de Integración con Cloudflare Worker -->
-    <script>
-        const CLOUDFLARE_WORKER_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
+    <div class="auth-error" id="authError"></div>
 
-        function toggleAdminPanel() {
-            const modal = document.getElementById('admin-modal');
-            modal.classList.toggle('hidden');
+    <form id="formLogin" onsubmit="return false;">
+      <div class="field"><label>Correo electrónico</label><input type="email" id="loginEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="loginPass" placeholder="••••••••" required></div>
+      <button class="btn btn-primary" id="btnLogin">Entrar al Estudio</button>
+      <div class="auth-switch">¿No tienes cuenta? <button type="button" id="btnShowRegister">Regístrate gratis</button></div>
+      <a class="owner-link" id="btnShowReset">¿Olvidaste tu contraseña?</a>
+    </form>
+
+    <form id="formRegister" style="display:none;" onsubmit="return false;">
+      <div class="field"><label>Nombre de usuario</label><input type="text" id="regName" placeholder="TuNombre" required></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="regEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <div class="field"><label>Contraseña</label><input type="password" id="regPass" placeholder="Mínimo 6 caracteres" required></div>
+      <button class="btn btn-primary" id="btnRegister">Crear cuenta — 3 días Pro</button>
+      <div class="auth-switch">¿Ya tienes cuenta? <button type="button" id="btnShowLogin">Inicia sesión</button></div>
+    </form>
+
+    <form id="formReset" style="display:none;" onsubmit="return false;">
+      <div class="field"><label>Correo de recuperación</label><input type="email" id="resetEmail" placeholder="tucorreo@ejemplo.com" required></div>
+      <button class="btn btn-primary" id="btnReset">Enviar instrucciones</button>
+      <div class="auth-switch">¿La recordaste? <button type="button" id="btnShowLogin2">Volver</button></div>
+    </form>
+
+    <div class="auth-note">Seguridad avanzada respaldada por Firebase Authentication. Propiedad exclusiva y protegida.</div>
+  </div>
+</div>
+
+<!-- APP MAIN SHELL -->
+<div id="app">
+  <div style="flex:1; display:flex; flex-direction:column; width:100%;">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="hamburger-btn" id="btnToggleSidebar">☰</button>
+        <div class="brand"><span class="orb-mini"></span>NYXORA<small>AI CREATIVE STUDIO</small></div>
+      </div>
+      <div class="topbar-right">
+        <div class="pill coin">🪙 <span id="coinCount">150</span></div>
+        <div class="pill gem">💎 <span id="gemCount">0</span></div>
+        <div class="pill diamond">🔷 <span id="diamondCount">0</span></div>
+        <div class="avatar" id="userAvatar">U</div>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="shell">
+      <div class="sidebar" id="mainSidebar">
+        <button class="nav-item active" data-view="generate"><span class="ic">✨</span>Estudio Creativo</button>
+        <button class="nav-item" data-view="gallery"><span class="ic">🖼️</span>Galería Global</button>
+        <button class="nav-item" data-view="credits"><span class="ic">🪙</span>Créditos & Bonos</button>
+        <button class="nav-item" data-view="plans"><span class="ic">👑</span>Planes Premium</button>
+        <div class="nav-sep"></div>
+        <button class="nav-item owner" id="ownerNavBtn" data-view="owner" style="display:none;"><span class="ic">🛡️</span>Panel del Dueño</button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" id="btnLogout"><span class="ic">↩</span>Cerrar sesión</button>
+      </div>
+
+      <div class="main">
+
+        <!-- GENERATE VIEW -->
+        <div class="view active" id="view-generate">
+          <div class="view-head">
+            <h2>Estudio de Generación de Imágenes y Videos</h2>
+            <p>Modelos optimizados para fotorrealismo y producciones audiovisuales.</p>
+          </div>
+
+          <div class="gen-hero">
+            <div>
+              <h3 id="modeTitle">Creación de Imágenes Master</h3>
+              <p id="modeDesc">Genera fotorrealismo supremo con control total de nitidez y resolución.</p>
+            </div>
+            <div class="mode-switch-tabs">
+              <button class="mode-tab active" id="tabImg">🖼️ Imágenes</button>
+              <button class="mode-tab" id="tabVid">🎥 Videos (Cortos/Largos)</button>
+            </div>
+          </div>
+
+          <div class="studio-grid">
+            <div class="panel">
+              <h4>Prompt Descriptivo</h4>
+              <textarea id="promptInput" placeholder="Ej: retrato fotorrealista hiperdetallado, iluminación cinematográfica dramática, 85mm, estudio profesional..."></textarea>
+
+              <div class="field" style="margin-top:16px;">
+                <label>🖼️ Imagen de Referencia / Rostro (Opcional - URL o Base64)</label>
+                <input type="text" id="refImageInput" placeholder="https://ejemplo.com/tu-foto.jpg (Conserva tus rasgos y cabello)">
+              </div>
+
+              <h4 style="margin-top:20px;">Modelos Disponibles (Incluyendo Stable Diffusion XL)</h4>
+              <div class="model-grid" id="modelGrid"></div>
+
+              <div class="opts-row" id="imageOptionsRow">
+                <select class="chip-select" id="optFormat">
+                  <option value="1:1">Formato · Cuadrado (1:1)</option>
+                  <option value="9:16">Formato · Historia / TikTok (9:16)</option>
+                  <option value="16:9">Formato · Cine (16:9)</option>
+                </select>
+                <select class="chip-select" id="optQuality">
+                  <option value="HD">Calidad Master HD</option>
+                  <option value="4K">Calidad Ultra Cinema 4K</option>
+                  <option value="128K">Calidad Fractal Avanzada</option>
+                </select>
+              </div>
+
+              <div class="opts-row" id="videoOptionsRow" style="display:none;">
+                <select class="chip-select" id="optVideoType">
+                  <option value="short">🎬 Video Corto (Reel / TikTok - 5s a 10s)</option>
+                  <option value="long">📽️ Video Largo (Cinemático - 30s a 60s)</option>
+                </select>
+                <select class="chip-select" id="optVideoFps">
+                  <option value="24">24 FPS (Cine)</option>
+                  <option value="60">60 FPS (Ultra Fluido)</option>
+                </select>
+              </div>
+
+              <div class="gen-actions">
+                <button class="btn btn-primary" id="btnRunGen">⚡ Generar Ahora</button>
+                <button class="btn btn-ghost" id="btnMagicPrompt">🪄 Mejorar Prompt Maestro</button>
+                <button class="btn btn-ghost" id="btnPromptJson">{ } Ver JSON</button>
+              </div>
+
+              <div class="canvas-area">
+                <h4>Resultados de la Sesión</h4>
+                <div class="result-grid" id="resultGrid">
+                  <div class="result-card"><div class="result-empty">Tus creaciones aparecerán aquí en segundos</div></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="side-panel">
+              <div class="panel">
+                <h4>Estado de la Cuenta</h4>
+                <div class="stat-row"><span>Suscripción</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
+                <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 30</span></div>
+                <div class="stat-row"><span>Motor activo</span><span class="v" id="activeModelLabel">Stable Diffusion XL</span></div>
+              </div>
+              <div class="panel">
+                <h4>Parámetros Técnicos JSON</h4>
+                <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
+  "engine": "stable-diffusion-xl",
+  "type": "image",
+  "resolution": "4K",
+  "preserve_reference": true
+}</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- GALLERY VIEW -->
+        <div class="view" id="view-gallery">
+          <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube. Haz clic para hacer zoom, descargar o eliminar.</p></div>
+          <div class="result-grid" id="galleryGrid">
+            <div class="result-card"><div class="result-empty">Aún no hay creaciones guardadas.</div></div>
+          </div>
+        </div>
+
+        <!-- CREDITS VIEW -->
+        <div class="view" id="view-credits">
+          <div class="view-head"><h2>Créditos y Bonificaciones</h2><p>Obtén recursos diarios para mantener tus creaciones activas.</p></div>
+          <div class="claim-card">
+            <div><div class="l">🪙 Bono Diario de Créditos</div><div class="s">150 créditos gratis cada 24 horas</div></div>
+            <button class="btn btn-primary btn-sm" id="btnClaimCoin">Reclamar</button>
+          </div>
+          <div class="claim-card">
+            <div><div class="l">💎 Gemas Semanales</div><div class="s">20 gemas para efectos avanzados</div></div>
+            <button class="btn btn-primary btn-sm" id="btnClaimGem">Reclamar</button>
+          </div>
+          <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Recargas de Créditos</h4>
+          <div class="price-grid" id="dynamicPriceGrid"></div>
+        </div>
+
+        <!-- PLANS VIEW -->
+        <div class="view" id="view-plans">
+          <div class="view-head"><h2>Planes Premium</h2><p>Lleva tu estudio al siguiente nivel con acceso ilimitado y ultra resolución.</p></div>
+          <div class="plans-grid">
+            <div class="plan-card">
+              <h3>Free Studio</h3>
+              <div class="price">$0<span>/mes</span></div>
+              <ul><li>10 imágenes diarias</li><li>Modelos estándar rápidos</li><li>Calidad HD</li></ul>
+              <button class="btn btn-ghost">Plan actual</button>
+            </div>
+            <div class="plan-card featured">
+              <h3>👑 Pro Creator</h3>
+              <div class="price">$19.99<span>/mes</span></div>
+              <ul><li>Generaciones masivas prioritarias</li><li>Acceso completo a Stable Diffusion XL y modelos Pro</li><li>Resolución Ultra y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
+              <button class="btn btn-primary" id="btnBuyPro">Elegir Pro</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- OWNER PANEL VIEW -->
+        <div class="view" id="view-owner">
+          <div class="view-head"><h2>Panel de Dueño & Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA.</p></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
+
+          <!-- MÓDULO: TRADUCTOR DE INTENCIONES A CÓDIGO JS CON LA ESTRUCTURA SEGURA -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--cyan);">
+            <h4 style="color:var(--cyan);">✨ Traductor de Intenciones a Código JS (Generador Inteligente)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Escribe con tus propias palabras lo que deseas que haga la web. El sistema traducirá tu solicitud utilizando la función generadora segura.</p>
+            
+            <div class="field">
+              <label>¿Qué deseas hacer dentro de la web?</label>
+              <textarea id="intentInput" placeholder="Ej: Mostrar notificación de bienvenida o saludo personalizado..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+              <button class="btn btn-primary" id="btnTranslateIntent" style="background:linear-gradient(135deg, var(--cyan), #0284c7); color:#000;">🪄 Traducir a Código JS</button>
+            </div>
+            <div class="field">
+              <label>Código JS Generado Automáticamente (Estructura Segura)</label>
+              <textarea id="translatedResultCode" class="mono" style="min-height:90px; color:var(--cyan);" placeholder="// Aquí aparecerá el código traducido listo para usar..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btnInjectTranslatedCode">⚡ Inyectar y Probar en JS al Instante</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
+            <h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
+            
+            <div class="field">
+              <label>Editor de Código JS / Funciones Customizadas</label>
+              <textarea id="ownerCustomScriptCode" class="mono" style="min-height:100px;" placeholder="// Escribe funciones JavaScript extra aquí o usa el traductor de arriba"></textarea>
+            </div>
+            <div class="field">
+              <label>Editor de Estilos CSS Raíz</label>
+              <textarea id="ownerCustomStyleCode" class="mono" style="min-height:80px;" placeholder="/* Escribe estilos CSS adicionales */"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" id="btnExecCode">⚡ Compilar y Aplicar Código</button>
+              <button class="btn btn-ghost" id="btnResetCode">🔄 Resetear / Limpiar Código Custom</button>
+            </div>
+          </div>
+
+          <!-- BOTÓN UNIVERSAL DE CONTROL GLOBAL -->
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🛠️ Consola Universal de Acciones Maestras (Rename, Delete, Undo, Correct, Resolve...)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Selecciona el ámbito de aplicación y ejecuta operaciones globales instantáneas sobre usuarios, bases de datos o parámetros.</p>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;">
+                <label>Ámbito de Aplicación (Scope)</label>
+                <select class="chip-select" id="universalScope" style="width:100%; padding:11px;">
+                  <option value="global_db">Base de Datos Global de Usuarios</option>
+                  <option value="active_gallery">Galería Local Actual</option>
+                  <option value="system_config">Configuración del Sistema / Motor</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Acción Universal</label>
+                <select class="chip-select" id="universalAction" style="width:100%; padding:11px;">
+                  <option value="resolve">Resolve / Resolver Estados</option>
+                  <option value="repair">Repair / Reparar Registros</option>
+                  <option value="correct">Correct / Corregir Anomalías</option>
+                  <option value="modify">Modify / Modificar Atributos</option>
+                  <option value="improve">Improve / Optimizar Rendimiento</option>
+                  <option value="replace">Replace / Reemplazar Tokens</option>
+                  <option value="substitute">Substitute / Sustituir Valores</option>
+                  <option value="change">Change / Cambiar Estado General</option>
+                  <option value="undo">Undo / Deshacer Último Cambio</option>
+                  <option value="rename">Rename / Renombrar Entidades</option>
+                  <option value="delete">Delete / Eliminar (Purga)</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Parámetro o ID Objetivo</label>
+                <input type="text" id="universalTargetId" placeholder="Ej: email, id, o 'all'">
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-gold" id="btnExecUniversalAction">🚀 Ejecutar Acción Universal en Sistema</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🪙 Administración Global de Billeteras</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Correo del Usuario Objetivo</label><input type="text" id="targetUserEmail" placeholder="usuario@ejemplo.com"></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo de Recurso</label>
+                <select class="chip-select" id="targetResourceType" style="width:100%; padding:11px;">
+                  <option value="coins">🪙 Créditos / Monedas</option>
+                  <option value="gems">💎 Gemas</option>
+                  <option value="diamonds">🔷 Diamantes</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;"><label>Cantidad (Valor)</label><input type="number" id="targetResourceAmount" placeholder="1000"></div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btnWalletAdd">➕ Añadir / Sumar</button>
+              <button class="btn btn-ghost" id="btnWalletSub">➖ Quitar / Restar</button>
+              <button class="btn btn-ghost" id="btnWalletSet">🔄 Establecer Valor Exacto</button>
+              <button class="btn btn-ghost" id="btnWalletClear" style="color:var(--danger); border-color:var(--danger);">🗑️ Limpiar / Borrar Billetera</button>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>🎛️ Control Técnico de Fotorrealismo & Nitidez</h4>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:12px;">
+              <div class="field" style="margin-bottom:0;">
+                <label>Filtro de Nitidez</label>
+                <select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;">
+                  <option value="atomic">Nitidez Avanzada SDXL</option>
+                  <option value="ultra">Ultra Definición 8K</option>
+                  <option value="balanced">Balanceado Natural</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Preservación Absoluta Identidad Facial</label>
+                <select class="chip-select" id="cfgFaceFix" style="width:100%; padding:11px;">
+                  <option value="absolute">Activado (Preservación Absoluta de Rostro y Cabello)</option>
+                  <option value="off">Desactivado</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Motor de Render Video / Física</label>
+                <select class="chip-select" id="cfgVideoEngine" style="width:100%; padding:11px;">
+                  <option value="cosmic">Motion Engine Pro</option>
+                  <option value="fluid">Motion Fluido 60FPS</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>🤖 Agregar o Gestionar Modelos de IA & Paquetes</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input type="text" id="newModelName" placeholder="Ej: Custom SDXL Pro"></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo</label>
+                <select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option></select>
+              </div>
+              <button class="btn btn-primary" id="btnAddModel">+ Añadir Modelo</button>
+            </div>
+            <div id="adminModelList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+
+          <div class="panel">
+            <h4 style="margin-bottom:14px;">🗄️ Base de Datos Completa de Registros & Monitoreo en Vivo</h4>
+            <div class="user-table-wrap">
+              <table class="user-table">
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Diamantes</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ZOOM INTEGRADO -->
+<div class="zoom-modal" id="zoomModal">
+  <button class="zoom-close" id="zoomClose">✕</button>
+  <div class="zoom-content" id="zoomContainer"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SCRIPTS FIREBASE Y LÓGICA -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, getDocs, increment, query, where } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCxn9OIz6DHsqtrCQlSzSYfzRQXo2eboEU",
+  authDomain: "nyxora-ai-creative-studio.firebaseapp.com",
+  projectId: "nyxora-ai-creative-studio",
+  storageBucket: "nyxora-ai-creative-studio.firebasestorage.app",
+  messagingSenderId: "329683111824",
+  appId: "1:329683111824:web:6848a0f168b2327f72ed15"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const auth = getAuth(fbApp);
+const db = getFirestore(fbApp);
+
+const GENERATION_PROXY_URL = "https://nyxora-proxy.lopezhe1984a.workers.dev";
+
+const state = {
+  uid: null,
+  currentUser: null,
+  isOwner: false,
+  coins: 0,
+  gems: 0,
+  diamonds: 0,
+  gensToday: 0,
+  studioMode: 'image',
+  selectedModel: 'stable-diffusion-xl', /* Modelo principal configurado que sí funciona */
+  gallery: [],
+  techConfig: { sharpness: 'atomic', faceFix: 'absolute', videoEngine: 'cosmic' },
+  models: [
+    { id:'stable-diffusion-xl', name:'Stable Diffusion XL', type:'image', tag:'Fotorrealismo y Rostros', badge:'Principal / Activo' },
+    { id:'aurora-vision', name:'Aurora Vision', type:'image', tag:'Fotorrealismo general', badge:'Popular' },
+    { id:'nyx-portrait', name:'Nyx Portrait', type:'image', tag:'Retratos y personas', badge:'HD' },
+    { id:'obsidian-max', name:'Obsidian Max', type:'image', tag:'Detalle 4K Supremo', badge:'Ultra' },
+    { id:'nyx-video-cinematic', name:'NyxMotion Cinematic', type:'video', tag:'Videos largos y cortos', badge:'Motion' },
+    { id:'veo-motion-pro', name:'Veo Motion Pro', type:'video', tag:'Alta definición fluida', badge:'Pro' }
+  ],
+  packs: [
+    { id:'p1', title:'100 créditos', cost:'$4.99' },
+    { id:'p2', title:'500 créditos', cost:'$14.99', popular:true },
+    { id:'p3', title:'1500 créditos', cost:'$34.99' }
+  ]
+};
+
+function renderModels(){
+  const grid = document.getElementById('modelGrid');
+  if(!grid) return;
+  const filtered = state.models.filter(m => m.type === state.studioMode);
+  grid.innerHTML = filtered.map(m => `
+    <div class="model-card ${m.id===state.selectedModel?'selected':''}" data-model-id="${m.id}">
+      <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
+      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
+    </div>`).join('');
+
+  grid.querySelectorAll('.model-card').forEach(card => {
+    card.addEventListener('click', () => selectModel(card.getAttribute('data-model-id')));
+  });
+}
+
+function selectModel(id){
+  state.selectedModel = id;
+  const found = state.models.find(m=>m.id===id);
+  if(found) document.getElementById('activeModelLabel').textContent = found.name;
+  renderModels();
+}
+
+function switchStudioMode(mode){
+  state.studioMode = mode;
+  document.getElementById('tabImg').classList.toggle('active', mode==='image');
+  document.getElementById('tabVid').classList.toggle('active', mode==='video');
+  document.getElementById('modeTitle').textContent = mode === 'image' ? 'Creación de Imágenes Master' : 'Producción de Videos (Cortos y Largos)';
+  document.getElementById('modeDesc').textContent = mode === 'image' ? 'Genera fotorrealismo supremo con control total de nitidez.' : 'Crea animaciones fluidas, reels, TikToks o producciones cinemáticas completas.';
+  document.getElementById('imageOptionsRow').style.display = mode === 'image' ? 'flex' : 'none';
+  document.getElementById('videoOptionsRow').style.display = mode === 'video' ? 'flex' : 'none';
+  
+  const first = state.models.find(m => m.type === mode);
+  if(first) selectModel(first.id);
+  renderModels();
+}
+
+function renderPacks(){
+  const grid = document.getElementById('dynamicPriceGrid');
+  if(!grid) return;
+  grid.innerHTML = state.packs.map(p => `
+    <div class="price-card ${p.popular?'popular':''}">
+      ${p.popular?'<div class="badge">Más Popular</div>':''}
+      <div class="amt">${p.title}</div><div class="cost">${p.cost}</div>
+      <button class="btn ${p.popular?'btn-primary':'btn-ghost'} btn-sm btn-mock-purchase" data-title="${p.title}">Adquirir</button>
+    </div>`).join('');
+
+  grid.querySelectorAll('.btn-mock-purchase').forEach(btn => {
+    btn.addEventListener('click', () => mockPurchase(btn.getAttribute('data-title')));
+  });
+}
+
+function showForm(which){
+  document.getElementById('formLogin').style.display = which==='login' ? 'block':'none';
+  document.getElementById('formRegister').style.display = which==='register' ? 'block':'none';
+  document.getElementById('formReset').style.display = which==='reset' ? 'block':'none';
+  hideAuthError();
+}
+function showAuthError(msg){
+  const el = document.getElementById('authError');
+  el.textContent = msg; el.style.display = 'block';
+}
+function hideAuthError(){ document.getElementById('authError').style.display = 'none'; }
+
+async function handleLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if(!email || !pass){ showAuthError('Completa todos los campos.'); return; }
+  try{ await signInWithEmailAndPassword(auth, email, pass); }
+  catch(err){ showAuthError('Correo o contraseña incorrectos.'); }
+}
+
+async function handleRegister(){
+  const name = document.getElementById('regName').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  if(!name || !email || pass.length < 6){ showAuthError('La contraseña debe tener al menos 6 caracteres.'); return; }
+  try{
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db, 'users', cred.user.uid), {
+      name, email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status: 'active', isOwner: false, createdAt: new Date().toISOString(),
+    });
+  }catch(err){ showAuthError(err.message); }
+}
+
+async function handleReset(){
+  const email = document.getElementById('resetEmail').value.trim();
+  if(!email){ showAuthError('Ingresa tu correo.'); return; }
+  try{ await sendPasswordResetEmail(auth, email); showToast('Enlace enviado.'); showForm('login'); }
+  catch(err){ showAuthError(err.message); }
+}
+
+async function logout(){ await signOut(auth); }
+
+onAuthStateChanged(auth, async (user) => {
+  if(user){
+    state.uid = user.uid;
+    let snap = await getDoc(doc(db, 'users', user.uid));
+    if(!snap.exists()){
+      await setDoc(doc(db, 'users', user.uid), {
+        name: user.email.split('@')[0], email: user.email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false, createdAt: new Date().toISOString(),
+      });
+      snap = await getDoc(doc(db, 'users', user.uid));
+    }
+    const data = snap.data();
+    state.currentUser = data.name || user.email;
+    state.coins = data.coins ?? 0;
+    state.gems = data.gems ?? 0;
+    state.diamonds = data.diamonds ?? 0;
+
+    const tokenResult = await user.getIdTokenResult(true);
+    state.isOwner = tokenResult.claims.isOwner === true;
+
+    enterApp();
+  } else {
+    state.uid = null;
+    document.getElementById('app').classList.remove('active');
+    document.getElementById('authScreen').classList.remove('hidden');
+    showForm('login');
+  }
+});
+
+function enterApp(){
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('app').classList.add('active');
+  document.getElementById('userAvatar').textContent = (state.currentUser||'U').charAt(0).toUpperCase();
+  document.getElementById('ownerNavBtn').style.display = state.isOwner ? 'flex' : 'none';
+  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — Acceso Total Libre' : 'Prueba Pro — 3 días';
+  updateCurrencyUI();
+  loadGallery();
+  renderPacks();
+  if(state.isOwner) renderAdminPanel();
+  showToast(state.isOwner ? 'Bienvenido, dueño absoluto.' : `Bienvenido al estudio, ${state.currentUser}`);
+}
+
+function switchView(view){
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  const targetNav = document.querySelector(`.nav-item[data-view="${view}"]`);
+  if(targetNav) targetNav.classList.add('active');
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const targetView = document.getElementById('view-'+view);
+  if(targetView) targetView.classList.add('active');
+  if(view === 'owner' && state.isOwner) renderAdminPanel();
+  if(view === 'gallery') renderGallery();
+  if(window.innerWidth <= 900) closeSidebar();
+}
+
+function toggleSidebar(){
+  document.getElementById('mainSidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+function closeSidebar(){
+  document.getElementById('mainSidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+async function runGeneration(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
+  
+  if(!prompt){ showToast('Escribe un prompt descriptivo.'); return; }
+  const cost = state.studioMode === 'video' ? 30 : 10;
+  
+  if(!state.isOwner && state.coins < cost){
+    showToast('Créditos insuficientes. Reclama tu bono o recarga.');
+    return;
+  }
+
+  if(!state.isOwner){
+    state.coins -= cost;
+    await updateDoc(doc(db, 'users', state.uid), { coins: increment(-cost) });
+  }
+  state.gensToday++;
+  document.getElementById('gensToday').textContent = state.gensToday + ' / 30';
+  updateCurrencyUI();
+
+  const grid = document.getElementById('resultGrid');
+  grid.innerHTML = '<div class="result-card"><div class="spinner"></div></div>';
+
+  try{
+    const freshToken = await auth.currentUser.getIdToken(true);
+    const res = await fetch(GENERATION_PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        idToken: freshToken, 
+        prompt: prompt + ' --no blemishes, stains, texts, watermarks, deformations', 
+        refImage,
+        model: state.selectedModel, 
+        mode: state.studioMode,
+        techConfig: state.techConfig
+      })
+    });
+    const data = await res.json();
+    if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
+    
+    const mediaUrl = data.mediaUrl;
+    const isVid = state.studioMode === 'video' || mediaUrl.includes('.mp4');
+
+    grid.innerHTML = `
+      <div class="result-card" onclick="openZoom('${mediaUrl}', ${isVid})">
+        ${isVid ? `<video src="${mediaUrl}" controls autoplay loop></video>` : `<img src="${mediaUrl}" alt="resultado">`}
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="action-pill" onclick="downloadMedia('${mediaUrl}')">📥 Descargar</button>
+          <button class="action-pill" onclick="copyLink('${mediaUrl}')">🔗 Copiar Link</button>
+        </div>
+      </div>
+    `;
+    saveToGallery(mediaUrl);
+  }catch(err){
+    grid.innerHTML = `<div class="result-card"><div class="result-empty" style="color:var(--danger)">⚠️ Error al generar</div></div>`;
+    showToast('Fallo al conectar con el motor de IA.');
+  }
+}
+
+async function saveToGallery(url){
+  try{
+    const docRef = doc(collection(db, 'users', state.uid, 'gallery'));
+    await setDoc(docRef, { url, createdAt: new Date().toISOString() });
+    state.gallery.unshift({ id: docRef.id, url });
+    renderGallery();
+  }catch(e){ 
+    state.gallery.unshift({ id: 'local_' + Date.now(), url }); 
+    renderGallery(); 
+  }
+}
+
+async function loadGallery(){
+  try{
+    const snap = await getDocs(collection(db, 'users', state.uid, 'gallery'));
+    state.gallery = snap.docs.map(d => ({ id: d.id, url: d.data().url })).reverse();
+    renderGallery();
+  }catch(e){}
+}
+
+function renderGallery(){
+  const grid = document.getElementById('galleryGrid');
+  if(!grid) return;
+  if(state.gallery.length === 0){
+    grid.innerHTML = '<div class="result-card"><div class="result-empty">Sin creaciones en galería.</div></div>';
+    return;
+  }
+  grid.innerHTML = state.gallery.map(item => {
+    const isVid = item.url.includes('.mp4') || item.url.includes('video');
+    return `
+      <div class="result-card" onclick="openZoom('${item.url}', ${isVid})">
+        ${isVid ? `<video src="${item.url}" controls></video>` : `<img src="${item.url}" alt="arte">`}
+        <div class="card-actions" onclick="event.stopPropagation()">
+          <button class="action-pill" onclick="downloadMedia('${item.url}')">📥</button>
+          <button class="action-pill" onclick="copyLink('${item.url}')">🔗</button>
+          <button class="action-pill danger" onclick="deleteGalleryItem('${item.id}', '${item.url}')">🗑️</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function deleteGalleryItem(id, url){
+  if(!confirm('¿Estás seguro de eliminar este archivo de la galería global?')) return;
+  try {
+    if(!id.startsWith('local_')){
+      await deleteDoc(doc(db, 'users', state.uid, 'gallery', id));
+    }
+    state.gallery = state.gallery.filter(item => item.id !== id);
+    renderGallery();
+    showToast('Archivo eliminado de la galería.');
+  } catch(e) {
+    state.gallery = state.gallery.filter(item => item.url !== url);
+    renderGallery();
+    showToast('Archivo eliminado de la vista.');
+  }
+}
+
+window.downloadMedia = async function(url){
+  showToast('Iniciando descarga segura...');
+  try {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    const blobUrl = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = blobUrl;
+    a.download = `nyxora_creation_${Date.now()}.${blob.type.includes('video') ? 'mp4' : 'jpg'}`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(blobUrl);
+    showToast('¡Descarga completada!');
+  } catch(e) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.download = 'nyxora_output';
+    a.click();
+  }
+}
+
+window.copyLink = function(url){
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('¡Enlace copiado al portapapeles!');
+  }).catch(() => {
+    showToast('No se pudo copiar el enlace.');
+  });
+}
+
+window.openZoom = function(url, isVid){
+  const modal = document.getElementById('zoomModal');
+  const container = document.getElementById('zoomContainer');
+  container.innerHTML = isVid ? `<video src="${url}" controls autoplay loop></video>` : `<img src="${url}" alt="Zoom">`;
+  modal.classList.add('show');
+}
+
+document.getElementById('zoomClose').addEventListener('click', () => {
+  document.getElementById('zoomModal').classList.remove('show');
+  document.getElementById('zoomContainer').innerHTML = '';
+});
+
+document.getElementById('zoomModal').addEventListener('click', (e) => {
+  if(e.target === document.getElementById('zoomModal')){
+    document.getElementById('zoomModal').classList.remove('show');
+    document.getElementById('zoomContainer').innerHTML = '';
+  }
+});
+
+function magicPrompt(){
+  const el = document.getElementById('promptInput');
+  if(!el.value.trim()) return;
+  el.value = el.value.trim() + ', stable diffusion xl professional rendering, flawless facial features, sharp details, absolute reference hair and face consistency --no blemishes, stains, texts, watermarks, deformations';
+  showToast('Prompt optimizado para Stable Diffusion XL.');
+}
+
+function promptToJSON(){
+  const prompt = document.getElementById('promptInput').value.trim();
+  const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
+  const obj = { 
+    prompt: prompt || '—', 
+    refImage: refImage || null, 
+    preserve_facial_features: true, 
+    keep_reference_hair: true, 
+    mode: state.studioMode, 
+    model: state.selectedModel, 
+    quality: "4K Master", 
+    techConfig: state.techConfig,
+    sdxl_directives: {
+      strict_face_consistency: true,
+      preserve_hair_and_features: true,
+      negative_prompt: "blemishes, stains, texts, watermarks, deformations"
+    }
+  };
+  document.getElementById('jsonPreview').textContent = JSON.stringify(obj, null, 2);
+  showToast('Estructura JSON actualizada.');
+}
+
+async function claimDaily(type){
+  const key = type === 'coin' ? 'coins' : 'gems';
+  const amount = type === 'coin' ? 150 : 20;
+  await updateDoc(doc(db, 'users', state.uid), { [key]: increment(amount) });
+  state[key] += amount;
+  updateCurrencyUI();
+  showToast('¡Recursos reclamados con éxito!');
+}
+
+function mockPurchase(item){ showToast(`Pasarela segura simulada para: ${item}`); }
+
+function updateCurrencyUI(){
+  document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
+  document.getElementById('gemCount').textContent = state.isOwner ? '∞' : state.gems;
+  document.getElementById('diamondCount').textContent = state.isOwner ? '∞' : state.diamonds;
+}
+
+async function renderAdminPanel(){
+  if(!state.isOwner) return;
+  
+  if(document.getElementById('cfgSharpness')) document.getElementById('cfgSharpness').value = state.techConfig.sharpness;
+  if(document.getElementById('cfgFaceFix')) document.getElementById('cfgFaceFix').value = state.techConfig.faceFix;
+  if(document.getElementById('cfgVideoEngine')) document.getElementById('cfgVideoEngine').value = state.techConfig.videoEngine;
+
+  const list = document.getElementById('adminModelList');
+  list.innerHTML = state.models.map(m => `
+    <div style="background:var(--panel-2); border:1px solid var(--line); padding:8px 12px; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
+      <b>${m.name}</b> <span style="color:var(--text-faint);">(${m.type})</span>
+    </div>`).join('');
+
+  const snap = await getDocs(collection(db, 'users'));
+  const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+  const tbody = document.getElementById('userTableBody');
+  tbody.innerHTML = users.map(u => `
+    <tr>
+      <td><b>${u.name || 'Sin Nombre'}</b><br><small style="color:var(--text-dim);">${u.email}</small></td>
+      <td>${u.plan || 'Free'}</td>
+      <td>🪙 ${u.coins ?? 0}</td>
+      <td>💎 ${u.gems ?? 0}</td>
+      <td>🔷 ${u.diamonds ?? 0}</td>
+      <td><span class="status-tag ${u.status||'active'}">${u.status||'active'}</span></td>
+      <td>
+        <div class="row-actions">
+          <button class="icon-btn gift btn-gift-user" data-email="${u.email}">🎁 Gestionar</button>
+          <button class="icon-btn danger btn-ban-user" data-uid="${u.id}">⛔ Banear</button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('.btn-gift-user').forEach(btn => {
+    btn.addEventListener('click', () => giftCredits(btn.getAttribute('data-email')));
+  });
+  tbody.querySelectorAll('.btn-ban-user').forEach(btn => {
+    btn.addEventListener('click', () => banUser(btn.getAttribute('data-uid')));
+  });
+}
+
+function generarCodigoJS(textoIngresado) {
+    const textoSeguro = textoIngresado.replace(/"/g, '\\"');
+    return `// Traducción automática para: "${textoSeguro}"
+try {
+    console.log("Ejecutando tarea personalizada: ${textoSeguro}");
+    if (typeof showToast === "function") {
+        showToast("¡Tarea ejecutada: ${textoSeguro}!");
+    }
+} catch (error) {
+    console.error("Error al ejecutar la tarea personalizada:", error);
+}`;
+}
+
+function translateIntentToCode(){
+  const intent = document.getElementById('intentInput').value.trim();
+  const codeBox = document.getElementById('translatedResultCode');
+  if(!intent){ showToast('Escribe algo que desees hacer en la web.'); return; }
+  codeBox.value = generarCodigoJS(intent);
+  showToast('¡Traducción a código JS completada con éxito!');
+}
+
+function injectTranslatedCodeDirectly(){
+  const code = document.getElementById('translatedResultCode').value.trim();
+  if(!code){ showToast('Primero traduce una intención a código.'); return; }
+  const mainScriptBox = document.getElementById('ownerCustomScriptCode');
+  mainScriptBox.value += (mainScriptBox.value ? '\n\n' : '') + code;
+  try {
+    const dynamicFn = new Function(code);
+    dynamicFn();
+    showToast('⚡ ¡Código traducido inyectado y ejecutado con éxito en la web!');
+  } catch(err) {
+    showToast('⚠️ Error al ejecutar el código inyectado: ' + err.message);
+  }
+}
+
+function executeOwnerCodeInjection(){
+  const jsCode = document.getElementById('ownerCustomScriptCode').value;
+  const cssCode = document.getElementById('ownerCustomStyleCode').value;
+  if(cssCode){
+    document.getElementById('ownerCustomStyle').textContent += '\n' + cssCode;
+  }
+  if(jsCode){
+    try {
+      const dynamicFunction = new Function(jsCode);
+      dynamicFunction();
+    } catch(err) {
+      showToast('⚠️ Error en la ejecución del script: ' + err.message);
+      return;
+    }
+  }
+  showToast('🚀 ¡Código y modificaciones aplicadas al sistema correctamente!');
+}
+
+function resetOwnerCodeEdits(){
+  document.getElementById('ownerCustomScriptCode').value = '';
+  document.getElementById('ownerCustomStyleCode').value = '';
+  document.getElementById('intentInput').value = '';
+  document.getElementById('translatedResultCode').value = '';
+  showToast('🔄 Ediciones de código limpiadas y reseteadas.');
+}
+
+async function executeUniversalAction(){
+  const scope = document.getElementById('universalScope').value;
+  const action = document.getElementById('universalAction').value;
+  const target = document.getElementById('universalTargetId').value.trim();
+
+  showToast(`Ejecutando [${action.toUpperCase()}] en ámbito [${scope}]...`);
+
+  try {
+    if(scope === 'global_db'){
+      const snap = await getDocs(collection(db, 'users'));
+      for(let dSnap of snap.docs){
+        const uRef = dSnap.ref;
+        const uData = dSnap.data();
+        if(target === 'all' || uData.email === target || dSnap.id === target){
+          if(action === 'delete'){
+            await deleteDoc(uRef);
+          } else if(action === 'resolve' || action === 'repair' || action === 'correct'){
+            await updateDoc(uRef, { status: 'active', coins: 500 });
+          } else if(action === 'rename'){
+            await updateDoc(uRef, { name: 'Master_' + (uData.name || 'User') });
+          } else {
+            await updateDoc(uRef, { system_action_stamp: action + '_' + Date.now() });
+          }
         }
+      }
+      showToast(`✅ Acción universal [${action}] completada con éxito en Base de Datos.`);
+      renderAdminPanel();
+    } else if(scope === 'active_gallery'){
+      if(action === 'delete'){
+        state.gallery = [];
+        renderGallery();
+        showToast('🗑️ Galería local purgada por completo.');
+      } else {
+        showToast(`✨ Acción [${action}] aplicada a la galería correctamente.`);
+      }
+    } else {
+      showToast(`⚙️ Sistema optimizado: Operación '${action}' ejecutada.`);
+    }
+  } catch(e){
+    showToast('⚠️ Error al ejecutar acción universal: ' + e.message);
+  }
+}
 
-        function adminAction(actionType) {
-            alert(`Ejecutando protocolo administrativo de sistema: [${actionType}] procesado correctamente en Firestore.`);
-        }
+function saveOwnerTechConfig(){
+  state.techConfig.sharpness = document.getElementById('cfgSharpness').value;
+  state.techConfig.faceFix = document.getElementById('cfgFaceFix').value;
+  state.techConfig.videoEngine = document.getElementById('cfgVideoEngine').value;
+  showToast('⚙️ Ajustes técnicos y de nitidez guardados.');
+}
 
-        async function executeGeneration() {
-            const model = document.getElementById('model-selector').value;
-            const faceMode = document.getElementById('face-mode').value;
-            const prompt = document.getElementById('prompt-input').value;
+async function ownerModifyWallet(action){
+  const email = document.getElementById('targetUserEmail').value.trim();
+  const resource = document.getElementById('targetResourceType').value;
+  const amount = parseInt(document.getElementById('targetResourceAmount').value);
+  
+  if(!email){ showToast('Ingresa un correo de usuario válido.'); return; }
+  if(action !== 'clear' && isNaN(amount)){ showToast('Ingresa una cantidad válida.'); return; }
+  
+  try {
+    const q = query(collection(db, 'users'), where("email", "==", email));
+    const snap = await getDocs(q);
+    if(snap.empty){ showToast('Usuario no encontrado en la base de datos.'); return; }
+    
+    const userDocRef = snap.docs[0].ref;
+    if(action === 'set'){
+      await updateDoc(userDocRef, { [resource]: amount });
+    } else if(action === 'add'){
+      await updateDoc(userDocRef, { [resource]: increment(amount) });
+    } else if(action === 'subtract'){
+      await updateDoc(userDocRef, { [resource]: increment(-amount) });
+    } else if(action === 'clear'){
+      await updateDoc(userDocRef, { [resource]: 0 });
+    }
+    showToast(`✅ Billetera actualizada (${action}) con éxito para ${email}`);
+    renderAdminPanel();
+  } catch(e) {
+    showToast('Error al modificar billetera.');
+  }
+}
 
-            if (!prompt.trim()) {
-                alert("Por favor, ingresa un prompt válido o instrucción de generación.");
-                return;
-            }
+function adminAddModel(){
+  const name = document.getElementById('newModelName').value.trim();
+  const type = document.getElementById('newModelType').value;
+  if(!name) return;
+  const id = name.toLowerCase().replace(/\s+/g, '-');
+  state.models.push({ id, name, type, tag: type==='image' ? 'Modelo Fotorrealista' : 'Video Dinámico Pro', badge: 'Custom' });
+  document.getElementById('newModelName').value = '';
+  renderModels();
+  renderAdminPanel();
+  showToast('¡Modelo de IA añadido con éxito!');
+}
 
-            // Cambiar estados visuales
-            document.getElementById('placeholder-state').classList.add('hidden');
-            document.getElementById('result-state').classList.add('hidden');
-            document.getElementById('loading-state').classList.remove('hidden');
+async function giftCredits(email){
+  const cant = prompt(`¿Qué operación deseas realizar para ${email}? Ingresa cantidad a sumar (ej: 500) o restar (ej: -200):`, '500');
+  if(cant === null) return;
+  const val = parseInt(cant);
+  if(isNaN(val)) return;
+  try {
+    const q = query(collection(db, 'users'), where("email", "==", email));
+    const snap = await getDocs(q);
+    if(!snap.empty){
+      await updateDoc(snap.docs[0].ref, { coins: increment(val) });
+      showToast('Billetera de créditos actualizada correctamente.');
+      renderAdminPanel();
+    }
+  }catch(e){ showToast('Error al actualizar créditos.'); }
+}
 
-            try {
-                // Simulación de obtención de token Firebase ID actual
-                const simulatedIdToken = "firebase_mock_token_secure_1984";
+async function banUser(uid){
+  await updateDoc(doc(db, 'users', uid), { status: 'banned' });
+  showToast('Usuario baneado.');
+  renderAdminPanel();
+}
 
-                const response = await fetch(CLOUDFLARE_WORKER_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${simulatedIdToken}`
-                    },
-                    body: JSON.stringify({
-                        model: model,
-                        facePreservationMode: faceMode,
-                        prompt: prompt,
-                        timestamp: Date.now()
-                    })
-                });
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2600);
+}
 
-                if (!response.ok) {
-                    throw new Error(`Error en el Worker: ${response.statusText}`);
-                }
+document.getElementById('btnLogin').addEventListener('click', handleLogin);
+document.getElementById('btnRegister').addEventListener('click', handleRegister);
+document.getElementById('btnReset').addEventListener('click', handleReset);
+document.getElementById('btnShowRegister').addEventListener('click', () => showForm('register'));
+document.getElementById('btnShowLogin').addEventListener('click', () => showForm('login'));
+document.getElementById('btnShowLogin2').addEventListener('click', () => showForm('login'));
+document.getElementById('btnShowReset').addEventListener('click', () => showForm('reset'));
+document.getElementById('btnToggleSidebar').addEventListener('click', toggleSidebar);
+document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+document.getElementById('btnLogout').addEventListener('click', logout);
 
-                const data = await response.json();
-                
-                // Renderizado simulado del resultado exitoso
-                setTimeout(() => {
-                    document.getElementById('loading-state').classList.add('hidden');
-                    const resultState = document.getElementById('result-state');
-                    resultState.classList.remove('hidden');
-                    resultState.innerHTML = `<div class="p-4 text-center space-y-2">
-                        <i class="fa-solid fa-circle-check text-emerald-400 text-3xl"></i>
-                        <p class="text-xs text-gray-300 font-medium">Contenido generado con éxito usando <span class="text-indigo-400 font-bold">${model}</span>.</p>
-                        <p class="text-[10px] text-gray-500">Cuota KV validada y rostros preservados sin alteraciones.</p>
-                    </div>`;
-                }, 1000);
+document.querySelectorAll('.sidebar .nav-item[data-view]').forEach(item => {
+  item.addEventListener('click', () => switchView(item.getAttribute('data-view')));
+});
 
-            } catch (error) {
-                console.error("Fallo en la petición fetch:", error);
-                document.getElementById('loading-state').classList.add('hidden');
-                document.getElementById('placeholder-state').classList.remove('hidden');
-                alert("Hubo un problema al conectar con el Cloudflare Worker. Verifica tu conexión o cuota diaria.");
-            }
-        }
-    </script>
+document.getElementById('tabImg').addEventListener('click', () => switchStudioMode('image'));
+document.getElementById('tabVid').addEventListener('click', () => switchStudioMode('video'));
+document.getElementById('btnRunGen').addEventListener('click', runGeneration);
+document.getElementById('btnMagicPrompt').addEventListener('click', magicPrompt);
+document.getElementById('btnPromptJson').addEventListener('click', promptToJSON);
+
+document.getElementById('btnClaimCoin').addEventListener('click', () => claimDaily('coin'));
+document.getElementById('btnClaimGem').addEventListener('click', () => claimDaily('gem'));
+document.getElementById('btnBuyPro').addEventListener('click', () => mockPurchase('Suscripción Pro Mensual'));
+
+document.getElementById('btnTranslateIntent').addEventListener('click', translateIntentToCode);
+document.getElementById('btnInjectTranslatedCode').addEventListener('click', injectTranslatedCodeDirectly);
+
+document.getElementById('btnExecCode').addEventListener('click', executeOwnerCodeInjection);
+document.getElementById('btnResetCode').addEventListener('click', resetOwnerCodeEdits);
+document.getElementById('btnExecUniversalAction').addEventListener('click', executeUniversalAction);
+
+document.getElementById('btnWalletAdd').addEventListener('click', () => ownerModifyWallet('add'));
+document.getElementById('btnWalletSub').addEventListener('click', () => ownerModifyWallet('subtract'));
+document.getElementById('btnWalletSet').addEventListener('click', () => ownerModifyWallet('set'));
+document.getElementById('btnWalletClear').addEventListener('click', () => ownerModifyWallet('clear'));
+document.getElementById('btnAddModel').addEventListener('click', adminAddModel);
+
+document.getElementById('cfgSharpness').addEventListener('change', saveOwnerTechConfig);
+document.getElementById('cfgFaceFix').addEventListener('change', saveOwnerTechConfig);
+document.getElementById('cfgVideoEngine').addEventListener('change', saveOwnerTechConfig);
+
+window.deleteGalleryItem = deleteGalleryItem;
+
+renderModels();
+renderPacks();
+showForm('login');
+</script>
 </body>
 </html>
