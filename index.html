@@ -1,653 +1,620 @@
 <!DOCTYPE html>
-
-<html lang="es"><head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>NYXORA — AI Creative Studio &amp; Production Hub</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&amp;family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<style id="ownerCustomStyle">
-  :root{
-    --bg-0:#07070C;
-    --bg-1:#0D0E17;
-    --bg-2:#141623;
-    --panel:#12131E;
-    --panel-2:#1A1C2B;
-    --line:#252838;
-    --violet:#8B5CF6;
-    --violet-soft:#8B5CF622;
-    --cyan:#33E5FF;
-    --gold:#F5B942;
-    --pink:#EC4899;
-    --pink-soft:#EC489922;
-    --text:#EDEEF5;
-    --text-dim:#9297AC;
-    --text-faint:#5A5E72;
-    --danger:#FF5C7A;
-    --radius:16px;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  html,body{height:100%;}
-  body{
-    background:
-      radial-gradient(circle at 20% -10%, #8B5CF61a, transparent 45%),
-      radial-gradient(circle at 90% 10%, #33E5FF14, transparent 40%),
-      var(--bg-0);
-    color:var(--text);
-    font-family:'Inter', sans-serif;
-    min-height:100vh;
-    overflow-x:hidden;
-  }
-  h1,h2,h3,.brand{ font-family:'Orbitron', sans-serif; letter-spacing:0.02em; }
-  .mono{ font-family:'JetBrains Mono', monospace; }
-  a{ color:inherit; text-decoration:none; }
-  button{ font-family:inherit; cursor:pointer; border:none; }
-  ::selection{ background:var(--violet); color:#fff; }
-
-  /* Layout shell */
-  #app{ display:none; min-height:100vh; }
-  #app.active{ display:flex; }
-  #authScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
-  #authScreen.hidden{ display:none; }
-
-  .topbar{
-    position:sticky; top:0; z-index:40;
-    display:flex; align-items:center; justify-content:space-between;
-    padding:16px 24px;
-    background:linear-gradient(180deg, #07070Cee, #07070Cbb 80%, transparent);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
-  }
-  .brand{ font-size:20px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:10px; }
-  .brand .orb-mini{
-    width:22px; height:22px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #3d1a8a 100%);
-    box-shadow:0 0 14px 2px #8B5CF688;
-  }
-  .brand small{ color:var(--violet); font-family:'Inter'; font-weight:600; font-size:10px; letter-spacing:.14em; display:block; margin-top:-2px;}
-
-  .topbar-right{ display:flex; align-items:center; gap:12px; }
-  .pill{
-    display:flex; align-items:center; gap:6px;
-    background:var(--panel-2); border:1px solid var(--line);
-    padding:7px 12px; border-radius:100px; font-size:13px; font-weight:600;
-  }
-  .pill.coin{ color:var(--gold); }
-  .pill.gem{ color:var(--cyan); }
-  .pill.diamond{ color:#C9B8FF; }
-  .avatar{
-    width:34px; height:34px; border-radius:50%;
-    background:linear-gradient(135deg, var(--violet), var(--cyan));
-    display:flex; align-items:center; justify-content:center;
-    font-weight:800; font-size:13px; color:#0A0A12;
-  }
-
-  .shell{ display:flex; flex:1; width:100%; }
-  .sidebar{
-    width:230px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--line);
-    display:flex; flex-direction:column; gap:4px; min-height:calc(100vh - 68px);
-  }
-  .nav-item{
-    display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px;
-    color:var(--text-dim); font-weight:600; font-size:14px; background:transparent; width:100%; text-align:left;
-  }
-  .nav-item .ic{ width:18px; text-align:center; }
-  .nav-item:hover{ background:var(--panel-2); color:var(--text); }
-  .nav-item.active{ background:var(--violet-soft); color:var(--violet); }
-  .nav-item.owner{ color:var(--gold); }
-  .nav-sep{ height:1px; background:var(--line); margin:10px 6px; }
-
-  .main{ flex:1; padding:28px 32px 60px; max-width:1180px; }
-  .view{ display:none; animation:fadeIn .35s ease; }
-  .view.active{ display:block; }
-  @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
-
-  .hamburger-btn{
-    display:none; background:var(--panel-2); border:1px solid var(--line);
-    color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
-    align-items:center; justify-content:center;
-  }
-  .sidebar-overlay{ display:none; position:fixed; inset:0; background:#000000aa; z-index:55; }
-  .sidebar-overlay.show{ display:block; }
-
-  /* Auth screen */
-  .auth-card{
-    width:100%; max-width:400px; background:var(--panel);
-    border:1px solid var(--line); border-radius:20px; padding:36px 30px;
-    box-shadow:0 20px 60px #00000080;
-    position:relative; overflow:hidden;
-  }
-  .auth-card::before{
-    content:''; position:absolute; top:-60px; right:-60px; width:180px; height:180px;
-    background:radial-gradient(circle, #8B5CF640, transparent 70%); pointer-events:none;
-  }
-  .auth-head{ text-align:center; margin-bottom:26px; }
-  .orb-hero{
-    width:64px; height:64px; margin:0 auto 14px; border-radius:50%;
-    background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #2b1466 100%);
-    box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633;
-    animation:pulseOrb 3.2s ease-in-out infinite;
-  }
-  @keyframes pulseOrb{ 0%,100%{ box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633; } 50%{ box-shadow:0 0 58px 12px #8B5CF699, 0 0 0 1px #8B5CF655; } }
-  .auth-head h1{ font-size:22px; margin-bottom:6px; }
-  .auth-head p{ color:var(--text-dim); font-size:13px; }
-  .field{ margin-bottom:14px; }
-  .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
-  .field input, .field select, .field textarea{
-    width:100%; padding:12px 14px; background:var(--bg-1); border:1px solid var(--line);
-    border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s; font-family:inherit;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--violet); }
-  .btn{
-    width:100%; padding:13px; border-radius:10px; font-weight:700; font-size:14px; text-align:center;
-    transition:transform .12s, opacity .12s;
-  }
-  .btn:active{ transform:scale(.98); }
-  .btn-primary{ background:linear-gradient(135deg, var(--violet), #6D28D9); color:#fff; }
-  .btn-primary:hover{ opacity:.92; }
-  .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
-  .btn-ghost:hover{ border-color:var(--violet); }
-  .btn-gold{ background:linear-gradient(135deg, var(--gold), #D97706); color:#000; }
-  .btn-pink{ background:linear-gradient(135deg, var(--pink), #BE185D); color:#fff; }
-  .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
-  .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
-  .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
-  .auth-note{ text-align:center; font-size:11px; color:var(--text-faint); margin-top:18px; line-height:1.5; }
-  .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); cursor:pointer; }
-  .owner-link:hover{ color:var(--gold); }
-
-  /* Studio Dashboard */
-  .view-head{ margin-bottom:22px; }
-  .view-head h2{ font-size:24px; margin-bottom:4px; }
-  .view-head p{ color:var(--text-dim); font-size:13.5px; }
-
-  .gen-hero{
-    position:relative; border-radius:20px; padding:30px 24px; margin-bottom:24px;
-    background:radial-gradient(ellipse at 30% 20%, #8B5CF622, transparent 60%), var(--panel);
-    border:1px solid var(--line); overflow:hidden; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
-  }
-  .mode-switch-tabs{ display:flex; gap:8px; background:var(--bg-1); padding:4px; border-radius:12px; border:1px solid var(--line); }
-  .mode-tab{ padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; background:transparent; color:var(--text-dim); }
-  .mode-tab.active{ background:var(--violet); color:#fff; }
-
-  .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
-  @media (max-width:900px){
-    .studio-grid{ grid-template-columns:1fr; }
-    .main{ padding:18px 16px 60px; }
-    .hamburger-btn{ display:flex; }
-    .sidebar{
-      position:fixed; top:0; left:0; height:100vh; width:230px; z-index:60;
-      background:var(--bg-1); transform:translateX(-100%);
-      transition:transform .25s ease; box-shadow:0 0 40px #000000cc;
+<html lang="es">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>NYXORA — AI Creative Studio & Production Hub</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style id="ownerCustomStyle">
+    :root{
+      --bg-0:#07070C;
+      --bg-1:#0D0E17;
+      --bg-2:#141623;
+      --panel:#12131E;
+      --panel-2:#1A1C2B;
+      --line:#252838;
+      --violet:#8B5CF6;
+      --violet-soft:#8B5CF622;
+      --cyan:#33E5FF;
+      --gold:#F5B942;
+      --pink:#EC4899;
+      --pink-soft:#EC489922;
+      --text:#EDEEF5;
+      --text-dim:#9297AC;
+      --text-faint:#5A5E72;
+      --danger:#FF5C7A;
+      --radius:16px;
     }
-    .sidebar.open{ transform:translateX(0); }
-  }
-
-  .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
-  .panel h4{ font-size:14px; margin-bottom:14px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
-
-  textarea{
-    width:100%; min-height:110px; background:var(--bg-1); border:1px solid var(--line); border-radius:12px;
-    color:var(--text); padding:14px; font-size:14px; resize:vertical; outline:none; font-family:inherit;
-  }
-  textarea:focus{ border-color:var(--violet); }
-
-  .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; margin-top:14px; }
-  .model-card{
-    background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;
-    cursor:pointer; transition:border-color .15s, transform .1s; position:relative;
-  }
-  .model-card:hover{ border-color:#3a3d55; }
-  .model-card.selected{ border-color:var(--violet); background:var(--violet-soft); }
-  .model-card.locked{ opacity:0.6; cursor:not-allowed; }
-  .model-card.locked:hover{ border-color:var(--line); }
-  .model-card .m-name{ font-weight:700; font-size:13px; margin-bottom:2px; }
-  .model-card .m-tag{ font-size:10.5px; color:var(--text-faint); }
-  .model-card .m-badge{ display:inline-block; margin-top:6px; font-size:9.5px; padding:2px 6px; border-radius:6px; background:#8B5CF633; color:#C9B8FF; font-weight:700; }
-  .model-card .m-badge.adult{ background:var(--pink-soft); color:var(--pink); }
-  .model-card .m-lock{ position:absolute; top:12px; right:12px; font-size:14px; }
-
-  .opts-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
-  .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; outline:none; }
-
-  .gen-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
-  .gen-actions .btn{ width:auto; padding:12px 22px; }
-
-  .canvas-area{ margin-top:24px; }
-  .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
-  .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; }
-  .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
-  
-  .card-actions{
-    position:absolute; bottom:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
-  }
-  .result-card:hover .card-actions{ opacity:1; }
-  .action-pill{
-    background:#000000dd; backdrop-filter:blur(4px); border:1px solid var(--line); color:#fff;
-    padding:5px 8px; border-radius:6px; font-size:10.5px; font-weight:700; display:flex; align-items:center; gap:3px;
-  }
-  .action-pill:hover{ background:var(--violet); border-color:var(--violet); }
-  .action-pill.danger:hover{ background:var(--danger); border-color:var(--danger); }
-
-  .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
-  .spinner{ width:36px; height:36px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
-  @keyframes spin{ to{ transform:rotate(360deg);} }
-
-  .side-panel{ display:flex; flex-direction:column; gap:18px; }
-  .stat-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
-  .stat-row:last-child{ border-bottom:none; }
-  .stat-row .v{ font-weight:700; }
-
-  /* Plans & Credits */
-  .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
-  .claim-card .l{ font-weight:700; font-size:14px; }
-  .claim-card .s{ font-size:12px; color:var(--text-dim); }
-  .btn-sm{ padding:9px 16px; font-size:12.5px; border-radius:9px; width:auto; }
-
-  .price-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-top:16px; }
-  .price-card{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; position:relative; }
-  .price-card.popular{ border-color:var(--violet); }
-  .price-card .badge{ position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--violet); color:#fff; font-size:10px; font-weight:700; padding:3px 10px; border-radius:100px; }
-  .price-card .amt{ font-size:24px; font-weight:900; font-family:'Orbitron'; margin:8px 0 2px; }
-  .price-card .unit{ font-size:11px; color:var(--text-faint); margin-bottom:12px; }
-  .price-card .cost{ font-size:15px; font-weight:700; color:var(--gold); margin-bottom:12px; }
-
-  .plans-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:16px; margin-top:16px; }
-  .plan-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:24px; }
-  .plan-card.featured{ border-color:var(--gold); background:linear-gradient(180deg, #F5B94212, var(--panel)); }
-  .plan-card.adult{ border-color:var(--pink); background:linear-gradient(180deg, var(--pink-soft), var(--panel)); }
-  .plan-card h3{ font-size:18px; margin-bottom:4px; }
-  .plan-card .price{ font-size:28px; font-weight:900; font-family:'Orbitron'; margin:10px 0; }
-  .plan-card .price span{ font-size:13px; color:var(--text-dim); font-family:'Inter'; font-weight:500; }
-  .plan-card ul{ list-style:none; margin:16px 0; }
-  .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
-  .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
-  .plan-card.adult li::before{ color:var(--pink); }
-
-  /* Owner Advanced Universal Panel */
-  .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
-  .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
-  .user-table-wrap{ overflow-x:auto; }
-  .user-table{ width:100%; border-collapse:collapse; margin-top:14px; min-width:600px; }
-  .user-table th{ text-align:left; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px; border-bottom:1px solid var(--line); }
-  .user-table td{ padding:11px 10px; font-size:13.5px; border-bottom:1px solid var(--line); }
-  .status-tag{ font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700; }
-  .status-tag.active{ background:#33E5FF22; color:var(--cyan); }
-  .status-tag.banned{ background:#FF5C7A22; color:var(--danger); }
-  .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
-  .icon-btn{ background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim); padding:5px 9px; border-radius:7px; font-size:11px; }
-  .icon-btn:hover{ color:var(--text); border-color:#3a3d55; }
-  .icon-btn.danger:hover{ color:var(--danger); border-color:var(--danger); }
-  .icon-btn.gift:hover{ color:var(--gold); border-color:var(--gold); }
-
-  .admin-form-row{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-top:12px; align-items:end; }
-  @media(max-width:768px){ .admin-form-row{ grid-template-columns:1fr; } }
-
-  /* Modal Zoom View */
-  .zoom-modal{
-    position:fixed; inset:0; background:#000000ee; z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
-  }
-  .zoom-modal.show{ display:flex; }
-  .zoom-content{ max-width:90vw; max-height:85vh; border-radius:12px; overflow:hidden; position:relative; }
-  .zoom-content img, .zoom-content video{ width:100%; height:auto; max-height:85vh; display:block; object-fit:contain; }
-  .zoom-close{ position:absolute; top:12px; right:12px; background:#000000bb; color:#fff; border:1px solid var(--line); width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; z-index:210; display:flex; align-items:center; justify-content:center; }
-
-  .toast{
-    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
-    background:var(--panel-2); border:1px solid var(--violet); color:var(--text);
-    padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; opacity:0; pointer-events:none;
-    transition:all .3s; z-index:100; box-shadow:0 10px 30px #0008;
-  }
-  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
-</style>
+    *{box-sizing:border-box; margin:0; padding:0;}
+    html,body{height:100%;}
+    body{
+      background:
+        radial-gradient(circle at 20% -10%, #8B5CF61a, transparent 45%),
+        radial-gradient(circle at 90% 10%, #33E5FF14, transparent 40%),
+        var(--bg-0);
+      color:var(--text);
+      font-family:'Inter', sans-serif;
+      min-height:100vh;
+      overflow-x:hidden;
+    }
+    h1,h2,h3,.brand{ font-family:'Orbitron', sans-serif; letter-spacing:0.02em; }
+    .mono{ font-family:'JetBrains Mono', monospace; }
+    a{ color:inherit; text-decoration:none; }
+    button{ font-family:inherit; cursor:pointer; border:none; }
+    ::selection{ background:var(--violet); color:#fff; }
+    #app{ display:none; min-height:100vh; }
+    #app.active{ display:flex; }
+    #authScreen{ min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px; }
+    #authScreen.hidden{ display:none; }
+    .topbar{
+      position:sticky; top:0; z-index:40;
+      display:flex; align-items:center; justify-content:space-between;
+      padding:16px 24px;
+      background:linear-gradient(180deg, #07070Cee, #07070Cbb 80%, transparent);
+      backdrop-filter:blur(10px);
+      border-bottom:1px solid var(--line);
+    }
+    .brand{ font-size:20px; font-weight:900; color:var(--text); display:flex; align-items:center; gap:10px; }
+    .brand .orb-mini{
+      width:22px; height:22px; border-radius:50%;
+      background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #3d1a8a 100%);
+      box-shadow:0 0 14px 2px #8B5CF688;
+    }
+    .brand small{ color:var(--violet); font-family:'Inter'; font-weight:600; font-size:10px; letter-spacing:.14em; display:block; margin-top:-2px;}
+    .topbar-right{ display:flex; align-items:center; gap:12px; }
+    .pill{
+      display:flex; align-items:center; gap:6px;
+      background:var(--panel-2); border:1px solid var(--line);
+      padding:7px 12px; border-radius:100px; font-size:13px; font-weight:600;
+    }
+    .pill.coin{ color:var(--gold); }
+    .pill.gem{ color:var(--cyan); }
+    .pill.diamond{ color:#C9B8FF; }
+    .avatar{
+      width:34px; height:34px; border-radius:50%;
+      background:linear-gradient(135deg, var(--violet), var(--cyan));
+      display:flex; align-items:center; justify-content:center;
+      font-weight:800; font-size:13px; color:#0A0A12;
+    }
+    .shell{ display:flex; flex:1; width:100%; }
+    .sidebar{
+      width:230px; flex-shrink:0; padding:20px 12px; border-right:1px solid var(--line);
+      display:flex; flex-direction:column; gap:4px; min-height:calc(100vh - 68px);
+    }
+    .nav-item{
+      display:flex; align-items:center; gap:12px; padding:11px 14px; border-radius:10px;
+      color:var(--text-dim); font-weight:600; font-size:14px; background:transparent; width:100%; text-align:left;
+    }
+    .nav-item .ic{ width:18px; text-align:center; }
+    .nav-item:hover{ background:var(--panel-2); color:var(--text); }
+    .nav-item.active{ background:var(--violet-soft); color:var(--violet); }
+    .nav-item.owner{ color:var(--gold); }
+    .nav-sep{ height:1px; background:var(--line); margin:10px 6px; }
+    .main{ flex:1; padding:28px 32px 60px; max-width:1180px; }
+    .view{ display:none; animation:fadeIn .35s ease; }
+    .view.active{ display:block; }
+    @keyframes fadeIn{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+    .hamburger-btn{
+      display:none; background:var(--panel-2); border:1px solid var(--line);
+      color:var(--text); width:36px; height:36px; border-radius:9px; font-size:16px;
+      align-items:center; justify-content:center;
+    }
+    .sidebar-overlay{ display:none; position:fixed; inset:0; background:#000000aa; z-index:55; }
+    .sidebar-overlay.show{ display:block; }
+    .auth-card{
+      width:100%; max-width:400px; background:var(--panel);
+      border:1px solid var(--line); border-radius:20px; padding:36px 30px;
+      box-shadow:0 20px 60px #00000080;
+      position:relative; overflow:hidden;
+    }
+    .auth-card::before{
+      content:''; position:absolute; top:-60px; right:-60px; width:180px; height:180px;
+      background:radial-gradient(circle, #8B5CF640, transparent 70%); pointer-events:none;
+    }
+    .auth-head{ text-align:center; margin-bottom:26px; }
+    .orb-hero{
+      width:64px; height:64px; margin:0 auto 14px; border-radius:50%;
+      background:radial-gradient(circle at 35% 30%, #fff, var(--violet) 40%, #2b1466 100%);
+      box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633;
+      animation:pulseOrb 3.2s ease-in-out infinite;
+    }
+    @keyframes pulseOrb{ 0%,100%{ box-shadow:0 0 40px 6px #8B5CF666, 0 0 0 1px #8B5CF633; } 50%{ box-shadow:0 0 58px 12px #8B5CF699, 0 0 0 1px #8B5CF655; } }
+    .auth-head h1{ font-size:22px; margin-bottom:6px; }
+    .auth-head p{ color:var(--text-dim); font-size:13px; }
+    .field{ margin-bottom:14px; }
+    .field label{ display:block; font-size:12px; color:var(--text-dim); margin-bottom:6px; font-weight:600; }
+    .field input, .field select, .field textarea{
+      width:100%; padding:12px 14px; background:var(--bg-1); border:1px solid var(--line);
+      border-radius:10px; color:var(--text); font-size:14px; outline:none; transition:border-color .15s; font-family:inherit;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--violet); }
+    .btn{
+      width:100%; padding:13px; border-radius:10px; font-weight:700; font-size:14px; text-align:center;
+      transition:transform .12s, opacity .12s;
+    }
+    .btn:active{ transform:scale(.98); }
+    .btn-primary{ background:linear-gradient(135deg, var(--violet), #6D28D9); color:#fff; }
+    .btn-primary:hover{ opacity:.92; }
+    .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
+    .btn-ghost:hover{ border-color:var(--violet); }
+    .btn-gold{ background:linear-gradient(135deg, var(--gold), #D97706); color:#000; }
+    .btn-pink{ background:linear-gradient(135deg, var(--pink), #BE185D); color:#fff; }
+    .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
+    .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
+    .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
+    .auth-note{ text-align:center; font-size:11px; color:var(--text-faint); margin-top:18px; line-height:1.5; }
+    .owner-link{ display:block; text-align:center; margin-top:10px; font-size:11px; color:var(--text-faint); cursor:pointer; }
+    .owner-link:hover{ color:var(--gold); }
+    .view-head{ margin-bottom:22px; }
+    .view-head h2{ font-size:24px; margin-bottom:4px; }
+    .view-head p{ color:var(--text-dim); font-size:13.5px; }
+    .gen-hero{
+      position:relative; border-radius:20px; padding:30px 24px; margin-bottom:24px;
+      background:radial-gradient(ellipse at 30% 20%, #8B5CF622, transparent 60%), var(--panel);
+      border:1px solid var(--line); overflow:hidden; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+    }
+    .mode-switch-tabs{ display:flex; gap:8px; background:var(--bg-1); padding:4px; border-radius:12px; border:1px solid var(--line); }
+    .mode-tab{ padding:8px 16px; border-radius:9px; font-weight:700; font-size:13px; background:transparent; color:var(--text-dim); }
+    .mode-tab.active{ background:var(--violet); color:#fff; }
+    .studio-grid{ display:grid; grid-template-columns:1fr 340px; gap:22px; }
+    @media (max-width:900px){
+      .studio-grid{ grid-template-columns:1fr; }
+      .main{ padding:18px 16px 60px; }
+      .hamburger-btn{ display:flex; }
+      .sidebar{
+        position:fixed; top:0; left:0; height:100vh; width:230px; z-index:60;
+        background:var(--bg-1); transform:translateX(-100%);
+        transition:transform .25s ease; box-shadow:0 0 40px #000000cc;
+      }
+      .sidebar.open{ transform:translateX(0); }
+    }
+    .panel{ background:var(--panel); border:1px solid var(--line); border-radius:var(--radius); padding:22px; }
+    .panel h4{ font-size:14px; margin-bottom:14px; color:var(--text-dim); text-transform:uppercase; letter-spacing:.08em; font-weight:700; }
+    textarea{
+      width:100%; min-height:110px; background:var(--bg-1); border:1px solid var(--line); border-radius:12px;
+      color:var(--text); padding:14px; font-size:14px; resize:vertical; outline:none; font-family:inherit;
+    }
+    textarea:focus{ border-color:var(--violet); }
+    .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; margin-top:14px; }
+    .model-card{
+      background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;
+      cursor:pointer; transition:border-color .15s, transform .1s; position:relative;
+    }
+    .model-card:hover{ border-color:#3a3d55; }
+    .model-card.selected{ border-color:var(--violet); background:var(--violet-soft); }
+    .model-card.locked{ opacity:0.6; cursor:not-allowed; }
+    .model-card.locked:hover{ border-color:var(--line); }
+    .model-card .m-name{ font-weight:700; font-size:13px; margin-bottom:2px; }
+    .model-card .m-tag{ font-size:10.5px; color:var(--text-faint); }
+    .model-card .m-badge{ display:inline-block; margin-top:6px; font-size:9.5px; padding:2px 6px; border-radius:6px; background:#8B5CF633; color:#C9B8FF; font-weight:700; }
+    .model-card .m-badge.adult{ background:var(--pink-soft); color:var(--pink); }
+    .model-card .m-lock{ position:absolute; top:12px; right:12px; font-size:14px; }
+    .opts-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+    .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; outline:none; }
+    .gen-actions{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+    .gen-actions .btn{ width:auto; padding:12px 22px; }
+    .canvas-area{ margin-top:24px; }
+    .result-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(180px,1fr)); gap:14px; margin-top:14px; }
+    .result-card{ border-radius:14px; overflow:hidden; border:1px solid var(--line); background:var(--panel-2); aspect-ratio:1; display:flex; align-items:center; justify-content:center; position:relative; cursor:pointer; }
+    .result-card img, .result-card video{ width:100%; height:100%; object-fit:cover; }
+    .card-actions{
+      position:absolute; bottom:8px; right:8px; display:flex; gap:4px; opacity:0; transition:opacity .2s; z-index:10;
+    }
+    .result-card:hover .card-actions{ opacity:1; }
+    .action-pill{
+      background:#000000dd; backdrop-filter:blur(4px); border:1px solid var(--line); color:#fff;
+      padding:5px 8px; border-radius:6px; font-size:10.5px; font-weight:700; display:flex; align-items:center; gap:3px;
+    }
+    .action-pill:hover{ background:var(--violet); border-color:var(--violet); }
+    .action-pill.danger:hover{ background:var(--danger); border-color:var(--danger); }
+    .result-empty{ color:var(--text-faint); font-size:12px; text-align:center; padding:20px; }
+    .spinner{ width:36px; height:36px; border-radius:50%; border:3px solid #8B5CF633; border-top-color:var(--violet); animation:spin .8s linear infinite; }
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+    .side-panel{ display:flex; flex-direction:column; gap:18px; }
+    .stat-row{ display:flex; justify-content:space-between; align-items:center; padding:9px 0; border-bottom:1px solid var(--line); font-size:13px; }
+    .stat-row:last-child{ border-bottom:none; }
+    .stat-row .v{ font-weight:700; }
+    .claim-card{ display:flex; justify-content:space-between; align-items:center; background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:16px 18px; margin-bottom:12px; }
+    .claim-card .l{ font-weight:700; font-size:14px; }
+    .claim-card .s{ font-size:12px; color:var(--text-dim); }
+    .btn-sm{ padding:9px 16px; font-size:12.5px; border-radius:9px; width:auto; }
+    .price-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px,1fr)); gap:14px; margin-top:16px; }
+    .price-card{ background:var(--panel-2); border:1px solid var(--line); border-radius:14px; padding:18px; text-align:center; position:relative; }
+    .price-card.popular{ border-color:var(--violet); }
+    .price-card .badge{ position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--violet); color:#fff; font-size:10px; font-weight:700; padding:3px 10px; border-radius:100px; }
+    .price-card .amt{ font-size:24px; font-weight:900; font-family:'Orbitron'; margin:8px 0 2px; }
+    .price-card .unit{ font-size:11px; color:var(--text-faint); margin-bottom:12px; }
+    .price-card .cost{ font-size:15px; font-weight:700; color:var(--gold); margin-bottom:12px; }
+    .plans-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:16px; margin-top:16px; }
+    .plan-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:24px; }
+    .plan-card.featured{ border-color:var(--gold); background:linear-gradient(180deg, #F5B94212, var(--panel)); }
+    .plan-card.adult{ border-color:var(--pink); background:linear-gradient(180deg, var(--pink-soft), var(--panel)); }
+    .plan-card h3{ font-size:18px; margin-bottom:4px; }
+    .plan-card .price{ font-size:28px; font-weight:900; font-family:'Orbitron'; margin:10px 0; }
+    .plan-card .price span{ font-size:13px; color:var(--text-dim); font-family:'Inter'; font-weight:500; }
+    .plan-card ul{ list-style:none; margin:16px 0; }
+    .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
+    .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
+    .plan-card.adult li::before{ color:var(--pink); }
+    .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
+    .owner-banner .dot{ width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--gold); }
+    .user-table-wrap{ overflow-x:auto; }
+    .user-table{ width:100%; border-collapse:collapse; margin-top:14px; min-width:600px; }
+    .user-table th{ text-align:left; font-size:11px; color:var(--text-faint); text-transform:uppercase; letter-spacing:.06em; padding:8px 10px; border-bottom:1px solid var(--line); }
+    .user-table td{ padding:11px 10px; font-size:13.5px; border-bottom:1px solid var(--line); }
+    .status-tag{ font-size:10.5px; padding:3px 8px; border-radius:6px; font-weight:700; }
+    .status-tag.active{ background:#33E5FF22; color:var(--cyan); }
+    .status-tag.banned{ background:#FF5C7A22; color:var(--danger); }
+    .row-actions{ display:flex; gap:6px; flex-wrap:wrap; }
+    .icon-btn{ background:var(--panel-2); border:1px solid var(--line); color:var(--text-dim); padding:5px 9px; border-radius:7px; font-size:11px; }
+    .icon-btn:hover{ color:var(--text); border-color:#3a3d55; }
+    .icon-btn.danger:hover{ color:var(--danger); border-color:var(--danger); }
+    .icon-btn.gift:hover{ color:var(--gold); border-color:var(--gold); }
+    .admin-form-row{ display:grid; grid-template-columns:1fr 1fr auto; gap:10px; margin-top:12px; align-items:end; }
+    @media(max-width:768px){ .admin-form-row{ grid-template-columns:1fr; } }
+    .zoom-modal{
+      position:fixed; inset:0; background:#000000ee; z-index:200; display:none; align-items:center; justify-content:center; padding:20px;
+    }
+    .zoom-modal.show{ display:flex; }
+    .zoom-content{ max-width:90vw; max-height:85vh; border-radius:12px; overflow:hidden; position:relative; }
+    .zoom-content img, .zoom-content video{ width:100%; height:auto; max-height:85vh; display:block; object-fit:contain; }
+    .zoom-close{ position:absolute; top:12px; right:12px; background:#000000bb; color:#fff; border:1px solid var(--line); width:36px; height:36px; border-radius:50%; font-size:16px; font-weight:bold; cursor:pointer; z-index:210; display:flex; align-items:center; justify-content:center; }
+    .toast{
+      position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px);
+      background:var(--panel-2); border:1px solid var(--violet); color:var(--text);
+      padding:12px 20px; border-radius:12px; font-size:13px; font-weight:600; opacity:0; pointer-events:none;
+      transition:all .3s; z-index:100; box-shadow:0 10px 30px #0008;
+    }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
 </head>
 <body>
 <!-- AUTH SCREEN -->
 <div id="authScreen">
-<div class="auth-card">
-<div class="auth-head">
-<div class="orb-hero"></div>
-<h1 class="brand">NYXORA</h1>
-<p id="authSubtitle">Inicia sesión en tu estudio creativo avanzado</p>
-</div>
-<div class="auth-error" id="authError"></div>
-<form id="formLogin" onsubmit="return false;">
-<div class="field"><label>Correo electrónico</label><input id="loginEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
-<div class="field"><label>Contraseña</label><input id="loginPass" placeholder="••••••••" required="" type="password"/></div>
-<button class="btn btn-primary" id="btnLogin">Entrar al Estudio</button>
-<div class="auth-switch">¿No tienes cuenta? <button id="btnShowRegister" type="button">Regístrate gratis</button></div>
-<a class="owner-link" id="btnShowReset">¿Olvidaste tu contraseña?</a>
-</form>
-<form id="formRegister" onsubmit="return false;" style="display:none;">
-<div class="field"><label>Nombre de usuario</label><input id="regName" placeholder="TuNombre" required="" type="text"/></div>
-<div class="field"><label>Correo electrónico</label><input id="regEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
-<div class="field"><label>Contraseña</label><input id="regPass" placeholder="Mínimo 6 caracteres" required="" type="password"/></div>
-<button class="btn btn-primary" id="btnRegister">Crear cuenta — 3 días Pro</button>
-<div class="auth-switch">¿Ya tienes cuenta? <button id="btnShowLogin" type="button">Inicia sesión</button></div>
-</form>
-<form id="formReset" onsubmit="return false;" style="display:none;">
-<div class="field"><label>Correo de recuperación</label><input id="resetEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
-<button class="btn btn-primary" id="btnReset">Enviar instrucciones</button>
-<div class="auth-switch">¿La recordaste? <button id="btnShowLogin2" type="button">Volver</button></div>
-</form>
-<div class="auth-note">Seguridad avanzada respaldada por Firebase Authentication. Propiedad exclusiva y protegida.</div>
-</div>
+  <div class="auth-card">
+    <div class="auth-head">
+      <div class="orb-hero"></div>
+      <h1 class="brand">NYXORA</h1>
+      <p id="authSubtitle">Inicia sesión en tu estudio creativo avanzado</p>
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <form id="formLogin" onsubmit="return false;">
+      <div class="field"><label>Correo electrónico</label><input id="loginEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
+      <div class="field"><label>Contraseña</label><input id="loginPass" placeholder="••••••••" required="" type="password"/></div>
+      <button class="btn btn-primary" id="btnLogin">Entrar al Estudio</button>
+      <div class="auth-switch">¿No tienes cuenta? <button id="btnShowRegister" type="button">Regístrate gratis</button></div>
+      <a class="owner-link" id="btnShowReset">¿Olvidaste tu contraseña?</a>
+    </form>
+    <form id="formRegister" onsubmit="return false;" style="display:none;">
+      <div class="field"><label>Nombre de usuario</label><input id="regName" placeholder="TuNombre" required="" type="text"/></div>
+      <div class="field"><label>Correo electrónico</label><input id="regEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
+      <div class="field"><label>Contraseña</label><input id="regPass" placeholder="Mínimo 6 caracteres" required="" type="password"/></div>
+      <button class="btn btn-primary" id="btnRegister">Crear cuenta — 3 días Pro</button>
+      <div class="auth-switch">¿Ya tienes cuenta? <button id="btnShowLogin" type="button">Inicia sesión</button></div>
+    </form>
+    <form id="formReset" onsubmit="return false;" style="display:none;">
+      <div class="field"><label>Correo de recuperación</label><input id="resetEmail" placeholder="tucorreo@ejemplo.com" required="" type="email"/></div>
+      <button class="btn btn-primary" id="btnReset">Enviar instrucciones</button>
+      <div class="auth-switch">¿La recordaste? <button id="btnShowLogin2" type="button">Volver</button></div>
+    </form>
+    <div class="auth-note">Seguridad avanzada respaldada por Firebase Authentication. Propiedad exclusiva y protegida.</div>
+  </div>
 </div>
 <!-- APP MAIN SHELL -->
 <div id="app">
-<div style="flex:1; display:flex; flex-direction:column; width:100%;">
-<div class="topbar">
-<div style="display:flex; align-items:center; gap:12px;">
-<button class="hamburger-btn" id="btnToggleSidebar">☰</button>
-<div class="brand"><span class="orb-mini"></span>NYXORA<small>AI CREATIVE STUDIO</small></div>
-</div>
-<div class="topbar-right">
-<div class="pill coin">🪙 <span id="coinCount">150</span></div>
-<div class="pill gem">💎 <span id="gemCount">0</span></div>
-<div class="pill diamond">🔷 <span id="diamondCount">0</span></div>
-<div class="avatar" id="userAvatar">U</div>
-</div>
-</div>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
-<div class="shell">
-<div class="sidebar" id="mainSidebar">
-<button class="nav-item active" data-view="generate"><span class="ic">✨</span>Estudio Creativo</button>
-<button class="nav-item" data-view="gallery"><span class="ic">🖼️</span>Galería Global</button>
-<button class="nav-item" data-view="credits"><span class="ic">🪙</span>Créditos &amp; Bonos</button>
-<button class="nav-item" data-view="plans"><span class="ic">👑</span>Planes Premium</button>
-<div class="nav-sep"></div>
-<button class="nav-item owner" data-view="owner" id="ownerNavBtn" style="display:none;"><span class="ic">🛡️</span>Panel del Dueño</button>
-<div class="nav-sep"></div>
-<button class="nav-item" id="btnLogout"><span class="ic">↩</span>Cerrar sesión</button>
-</div>
-<div class="main">
-<!-- GENERATE VIEW -->
-<div class="view active" id="view-generate">
-<div class="view-head">
-<h2>Estudio de Generación de Imágenes y Videos</h2>
-<p>Modelos optimizados para fotorrealismo y producciones audiovisuales.</p>
-</div>
-<div class="gen-hero">
-<div>
-<h3 id="modeTitle">Creación de Imágenes Master</h3>
-<p id="modeDesc">Genera fotorrealismo supremo con control total de nitidez y resolución.</p>
-</div>
-<div class="mode-switch-tabs">
-<button class="mode-tab active" id="tabImg">🖼️ Imágenes</button>
-<button class="mode-tab" id="tabVid">🎥 Videos (Cortos/Largos)</button>
-</div>
-</div>
-<div class="studio-grid">
-<div class="panel">
-<h4>Prompt Descriptivo</h4>
-<textarea id="promptInput" placeholder="Ej: retrato fotorrealista hiperdetallado, iluminación cinematográfica dramática, 85mm, estudio profesional..."></textarea>
-<div class="field" style="margin-top:16px;">
-<label>🖼️ Imagen de Referencia / Rostro (Opcional - URL o Base64)</label>
-<input id="refImageInput" placeholder="https://ejemplo.com/tu-foto.jpg (Conserva tus rasgos y cabello)" type="text"/>
-</div>
-<h4 style="margin-top:20px;">Modelos Disponibles (Incluyendo Stable Diffusion XL)</h4>
-<div class="model-grid" id="modelGrid"></div>
-<div class="opts-row" id="imageOptionsRow">
-<select class="chip-select" id="optFormat">
-<option value="1:1">Formato · Cuadrado (1:1)</option>
-<option value="9:16">Formato · Historia / TikTok (9:16)</option>
-<option value="16:9">Formato · Cine (16:9)</option>
-</select>
-<select class="chip-select" id="optQuality">
-<option value="HD">Calidad Master HD</option>
-<option value="4K">Calidad Ultra Cinema 4K</option>
-<option value="128K">Calidad Fractal Avanzada</option>
-</select>
-</div>
-<div class="opts-row" id="videoOptionsRow" style="display:none;">
-<select class="chip-select" id="optVideoType">
-<option value="short">🎬 Video Corto (Reel / TikTok - 5s a 10s)</option>
-<option value="long">📽️ Video Largo (Cinemático - 30s a 60s)</option>
-</select>
-<select class="chip-select" id="optVideoFps">
-<option value="24">24 FPS (Cine)</option>
-<option value="60">60 FPS (Ultra Fluido)</option>
-</select>
-</div>
-<div class="gen-actions">
-<button class="btn btn-primary" id="btnRunGen">⚡ Generar Ahora</button>
-<button class="btn btn-ghost" id="btnMagicPrompt">🪄 Mejorar Prompt Maestro</button>
-<button class="btn btn-ghost" id="btnPromptJson">{ } Ver JSON</button>
-</div>
-<div class="canvas-area">
-<h4>Resultados de la Sesión</h4>
-<div class="result-grid" id="resultGrid">
-<div class="result-card"><div class="result-empty">Tus creaciones aparecerán aquí en segundos</div></div>
-</div>
-</div>
-</div>
-<div class="side-panel">
-<div class="panel">
-<h4>Estado de la Cuenta</h4>
-<div class="stat-row"><span>Suscripción</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
-<div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 30</span></div>
-<div class="stat-row"><span>Motor activo</span><span class="v" id="activeModelLabel">Stable Diffusion XL</span></div>
-</div>
-<div class="panel">
-<h4>Parámetros Técnicos JSON</h4>
-<pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
+  <div style="flex:1; display:flex; flex-direction:column; width:100%;">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <button class="hamburger-btn" id="btnToggleSidebar">☰</button>
+        <div class="brand"><span class="orb-mini"></span>NYXORA<small>AI CREATIVE STUDIO</small></div>
+      </div>
+      <div class="topbar-right">
+        <div class="pill coin">🪙 <span id="coinCount">150</span></div>
+        <div class="pill gem">💎 <span id="gemCount">0</span></div>
+        <div class="pill diamond">🔷 <span id="diamondCount">0</span></div>
+        <div class="avatar" id="userAvatar">U</div>
+      </div>
+    </div>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <div class="shell">
+      <div class="sidebar" id="mainSidebar">
+        <button class="nav-item active" data-view="generate"><span class="ic">✨</span>Estudio Creativo</button>
+        <button class="nav-item" data-view="gallery"><span class="ic">🖼️</span>Galería Global</button>
+        <button class="nav-item" data-view="credits"><span class="ic">🪙</span>Créditos &amp; Bonos</button>
+        <button class="nav-item" data-view="plans"><span class="ic">👑</span>Planes Premium</button>
+        <div class="nav-sep"></div>
+        <button class="nav-item owner" data-view="owner" id="ownerNavBtn" style="display:none;"><span class="ic">🛡️</span>Panel del Dueño</button>
+        <div class="nav-sep"></div>
+        <button class="nav-item" id="btnLogout"><span class="ic">↩</span>Cerrar sesión</button>
+      </div>
+      <div class="main">
+        <!-- GENERATE VIEW -->
+        <div class="view active" id="view-generate">
+          <div class="view-head">
+            <h2>Estudio de Generación de Imágenes y Videos</h2>
+            <p>Modelos optimizados para fotorrealismo y producciones audiovisuales.</p>
+          </div>
+          <div class="gen-hero">
+            <div>
+              <h3 id="modeTitle">Creación de Imágenes Master</h3>
+              <p id="modeDesc">Genera fotorrealismo supremo con control total de nitidez y resolución.</p>
+            </div>
+            <div class="mode-switch-tabs">
+              <button class="mode-tab active" id="tabImg">🖼️ Imágenes</button>
+              <button class="mode-tab" id="tabVid">🎥 Videos (Cortos/Largos)</button>
+            </div>
+          </div>
+          <div class="studio-grid">
+            <div class="panel">
+              <h4>Prompt Descriptivo</h4>
+              <textarea id="promptInput" placeholder="Ej: retrato fotorrealista hiperdetallado, iluminación cinematográfica dramática, 85mm, estudio profesional..."></textarea>
+              <div class="field" style="margin-top:16px;">
+                <label>🖼️ Imagen de Referencia / Rostro (Opcional - URL o Base64)</label>
+                <input id="refImageInput" placeholder="https://ejemplo.com/tu-foto.jpg (Conserva tus rasgos y cabello)" type="text"/>
+              </div>
+              <h4 style="margin-top:20px;">Modelos Disponibles (Incluyendo Stable Diffusion XL)</h4>
+              <div class="model-grid" id="modelGrid"></div>
+              <div class="opts-row" id="imageOptionsRow">
+                <select class="chip-select" id="optFormat">
+                  <option value="1:1">Formato · Cuadrado (1:1)</option>
+                  <option value="9:16">Formato · Historia / TikTok (9:16)</option>
+                  <option value="16:9">Formato · Cine (16:9)</option>
+                </select>
+                <select class="chip-select" id="optQuality">
+                  <option value="HD">Calidad Master HD</option>
+                  <option value="4K">Calidad Ultra Cinema 4K</option>
+                  <option value="128K">Calidad Fractal Avanzada</option>
+                </select>
+              </div>
+              <div class="opts-row" id="videoOptionsRow" style="display:none;">
+                <select class="chip-select" id="optVideoType">
+                  <option value="short">🎬 Video Corto (Reel / TikTok - 5s a 10s)</option>
+                  <option value="long">📽️ Video Largo (Cinemático - 30s a 60s)</option>
+                </select>
+                <select class="chip-select" id="optVideoFps">
+                  <option value="24">24 FPS (Cine)</option>
+                  <option value="60">60 FPS (Ultra Fluido)</option>
+                </select>
+              </div>
+              <div class="gen-actions">
+                <button class="btn btn-primary" id="btnRunGen">⚡ Generar Ahora</button>
+                <button class="btn btn-ghost" id="btnMagicPrompt">🪄 Mejorar Prompt Maestro</button>
+                <button class="btn btn-ghost" id="btnPromptJson">{ } Ver JSON</button>
+              </div>
+              <div class="canvas-area">
+                <h4>Resultados de la Sesión</h4>
+                <div class="result-grid" id="resultGrid">
+                  <div class="result-card"><div class="result-empty">Tus creaciones aparecerán aquí en segundos</div></div>
+                </div>
+              </div>
+            </div>
+            <div class="side-panel">
+              <div class="panel">
+                <h4>Estado de la Cuenta</h4>
+                <div class="stat-row"><span>Suscripción</span><span class="v" id="planStatus">Prueba Pro — 3 días</span></div>
+                <div class="stat-row"><span>Generaciones hoy</span><span class="v" id="gensToday">0 / 30</span></div>
+                <div class="stat-row"><span>Motor activo</span><span class="v" id="activeModelLabel">Stable Diffusion XL</span></div>
+              </div>
+              <div class="panel">
+                <h4>Parámetros Técnicos JSON</h4>
+                <pre class="mono" id="jsonPreview" style="font-size:11px; color:var(--text-dim); white-space:pre-wrap; line-height:1.6;">{
   "engine": "stable-diffusion-xl",
   "type": "image",
   "resolution": "4K",
   "preserve_reference": true
 }</pre>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- GALLERY VIEW -->
+        <div class="view" id="view-gallery">
+          <div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube. Haz clic para hacer zoom, descargar o eliminar.</p></div>
+          <div class="result-grid" id="galleryGrid">
+            <div class="result-card"><div class="result-empty">Aún no hay creaciones guardadas.</div></div>
+          </div>
+        </div>
+        <!-- CREDITS VIEW -->
+        <div class="view" id="view-credits">
+          <div class="view-head"><h2>Créditos y Bonificaciones</h2><p>Obtén recursos diarios para mantener tus creaciones activas.</p></div>
+          <div class="claim-card">
+            <div><div class="l">🪙 Bono Diario de Créditos</div><div class="s">150 créditos gratis cada 24 horas</div></div>
+            <button class="btn btn-primary btn-sm" id="btnClaimCoin">Reclamar</button>
+          </div>
+          <div class="claim-card">
+            <div><div class="l">💎 Gemas Semanales</div><div class="s">20 gemas para efectos avanzados</div></div>
+            <button class="btn btn-primary btn-sm" id="btnClaimGem">Reclamar</button>
+          </div>
+          <h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Recargas de Créditos</h4>
+          <div class="price-grid" id="dynamicPriceGrid"></div>
+        </div>
+        <!-- PLANS VIEW -->
+        <div class="view" id="view-plans">
+          <div class="view-head"><h2>Planes Premium</h2><p>Lleva tu estudio al siguiente nivel con acceso ilimitado y ultra resolución.</p></div>
+          <div class="plans-grid">
+            <div class="plan-card">
+              <h3>Free Studio</h3>
+              <div class="price">$0<span>/mes</span></div>
+              <ul><li>10 imágenes diarias</li><li>Modelos estándar rápidos</li><li>Calidad HD</li></ul>
+              <button class="btn btn-ghost">Plan actual</button>
+            </div>
+            <div class="plan-card featured">
+              <h3>👑 Pro Creator</h3>
+              <div class="price">$19.99<span>/mes</span></div>
+              <ul><li>Generaciones masivas prioritarias</li><li>Acceso completo a Stable Diffusion XL y modelos Pro</li><li>Resolución Ultra y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
+              <button class="btn btn-primary" id="btnBuyPro">Elegir Pro</button>
+            </div>
+            <div class="plan-card adult" style="background: linear-gradient(180deg, #F5B94218, #8B5CF612, var(--panel)); border: 1px solid #F5B942; box-shadow: 0 0 20px #F5B94233; position: relative;"><div class="badge" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #F5B942, #8B5CF6); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 100px; white-space: nowrap;">MODELOS X EXCLUSIVOS</div><h3>👑 Adult Master Premium</h3><div class="price">$29.99<span>/mes</span></div><ul><li>Acceso total a modelos Nyxora-X &amp; Obsidian-X</li><li>Generación de contenido adulto sin restricciones</li><li>Máxima nitidez atómica 8K</li><li>Soporte prioritario 24/7</li></ul><button class="btn" id="btnBuyAdult" style="background: linear-gradient(135deg, #F5B942, #D97706); color: #000; font-weight: 900;">Desbloquear Adult</button></div>
+          </div>
+        </div>
+        <!-- OWNER PANEL VIEW -->
+        <div class="view" id="view-owner">
+          <div class="view-head"><h2>Panel de Dueño &amp; Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA.</p></div>
+          <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
+          <div class="panel" style="margin-bottom:20px; border-color:var(--pink);">
+            <h4 style="color:var(--pink);">🔞 Módulo de Contenido para Adultos</h4>
+            <div class="field" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+              <label style="margin:0; font-size:14px; color:var(--text);">Habilitar modelos para adultos globalmente</label>
+              <input checked="" id="toggleAdultContent" style="width:auto;" type="checkbox"/>
+            </div>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Nombre del Pack Premium</label><input id="newAdultPackName" placeholder="Ej: Elite X-Pack" type="text"/></div>
+              <div class="field" style="margin-bottom:0;"><label>Precio ($)</label><input id="newAdultPackPrice" placeholder="49.99" type="number"/></div>
+              <button class="btn btn-pink" id="btnAddAdultPack">+ Añadir Pack Adulto</button>
+            </div>
+            <div id="adminAdultPackList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+          <div class="panel" style="margin-bottom:20px; border-color:var(--cyan);">
+            <h4 style="color:var(--cyan);">✨ Traductor de Intenciones a Código JS (Generador Inteligente)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Escribe con tus propias palabras lo que deseas que haga la web. El sistema traducirá tu solicitud utilizando la función generadora segura.</p>
+            <div class="field">
+              <label>¿Qué deseas hacer dentro de la web?</label>
+              <textarea id="intentInput" placeholder="Ej: Mostrar notificación de bienvenida o saludo personalizado..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+              <button class="btn btn-primary" id="btnTranslateIntent" style="background:linear-gradient(135deg, var(--cyan), #0284c7); color:#000;">🪄 Traducir a Código JS</button>
+            </div>
+            <div class="field">
+              <label>Código JS Generado Automáticamente (Estructura Segura)</label>
+              <textarea class="mono" id="translatedResultCode" placeholder="// Aquí aparecerá el código traducido listo para usar..." style="min-height:90px; color:var(--cyan);"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btnInjectTranslatedCode">⚡ Inyectar y Probar en JS al Instante</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
+            <h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
+            <div class="field">
+              <label>Editor de Código JS / Funciones Customizadas</label>
+              <textarea class="mono" id="ownerCustomScriptCode" placeholder="// Escribe funciones JavaScript extra aquí o usa el traductor de arriba" style="min-height:100px;"></textarea>
+            </div>
+            <div class="field">
+              <label>Editor de Estilos CSS Raíz</label>
+              <textarea class="mono" id="ownerCustomStyleCode" placeholder="/* Escribe estilos CSS adicionales */" style="min-height:80px;"></textarea>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" id="btnExecCode">⚡ Compilar y Aplicar Código</button>
+              <button class="btn btn-ghost" id="btnResetCode">🔄 Resetear / Limpiar Código Custom</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🛠️ Consola Universal de Acciones Maestras (Rename, Delete, Undo, Correct, Resolve...)</h4>
+            <p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Selecciona el ámbito de aplicación y ejecuta operaciones globales instantáneas sobre usuarios, bases de datos o parámetros.</p>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;">
+                <label>Ámbito de Aplicación (Scope)</label>
+                <select class="chip-select" id="universalScope" style="width:100%; padding:11px;">
+                  <option value="global_db">Base de Datos Global de Usuarios</option>
+                  <option value="active_gallery">Galería Local Actual</option>
+                  <option value="system_config">Configuración del Sistema / Motor</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Acción Universal</label>
+                <select class="chip-select" id="universalAction" style="width:100%; padding:11px;">
+                  <option value="resolve">Resolve / Resolver Estados</option>
+                  <option value="repair">Repair / Reparar Registros</option>
+                  <option value="correct">Correct / Corregir Anomalías</option>
+                  <option value="modify">Modify / Modificar Atributos</option>
+                  <option value="improve">Improve / Optimizar Rendimiento</option>
+                  <option value="replace">Replace / Reemplazar Tokens</option>
+                  <option value="substitute">Substitute / Sustituir Valores</option>
+                  <option value="change">Change / Cambiar Estado General</option>
+                  <option value="undo">Undo / Deshacer Último Cambio</option>
+                  <option value="rename">Rename / Renombrar Entidades</option>
+                  <option value="delete">Delete / Eliminar (Purga)</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Parámetro o ID Objetivo</label>
+                <input id="universalTargetId" placeholder="Ej: email, id, o 'all'" type="text"/>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn btn-gold" id="btnExecUniversalAction">🚀 Ejecutar Acción Universal en Sistema</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
+            <h4 style="color:var(--gold);">🪙 Administración Global de Billeteras</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Correo del Usuario Objetivo</label><input id="targetUserEmail" placeholder="usuario@ejemplo.com" type="text"/></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo de Recurso</label>
+                <select class="chip-select" id="targetResourceType" style="width:100%; padding:11px;">
+                  <option value="coins">🪙 Créditos / Monedas</option>
+                  <option value="gems">💎 Gemas</option>
+                  <option value="diamonds">🔷 Diamantes</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;"><label>Cantidad (Valor)</label><input id="targetResourceAmount" placeholder="1000" type="number"/></div>
+            </div>
+            <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-gold" id="btnWalletAdd">➕ Añadir / Sumar</button>
+              <button class="btn btn-ghost" id="btnWalletSub">➖ Quitar / Restar</button>
+              <button class="btn btn-ghost" id="btnWalletSet">🔄 Establecer Valor Exacto</button>
+              <button class="btn btn-ghost" id="btnWalletClear" style="color:var(--danger); border-color:var(--danger);">🗑️ Limpiar / Borrar Billetera</button>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>🎛️ Control Técnico de Fotorrealismo &amp; Nitidez</h4>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:12px;">
+              <div class="field" style="margin-bottom:0;">
+                <label>Filtro de Nitidez</label>
+                <select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;">
+                  <option value="atomic">Nitidez Avanzada SDXL</option>
+                  <option value="ultra">Ultra Definición 8K</option>
+                  <option value="balanced">Balanceado Natural</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Preservación Absoluta Identidad Facial</label>
+                <select class="chip-select" id="cfgFaceFix" style="width:100%; padding:11px;">
+                  <option value="absolute">Activado (Preservación Absoluta de Rostro y Cabello)</option>
+                  <option value="off">Desactivado</option>
+                </select>
+              </div>
+              <div class="field" style="margin-bottom:0;">
+                <label>Motor de Render Video / Física</label>
+                <select class="chip-select" id="cfgVideoEngine" style="width:100%; padding:11px;">
+                  <option value="cosmic">Motion Engine Pro</option>
+                  <option value="fluid">Motion Fluido 60FPS</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="panel" style="margin-bottom:20px;">
+            <h4>🤖 Agregar o Gestionar Modelos de IA &amp; Paquetes</h4>
+            <div class="admin-form-row">
+              <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input id="newModelName" placeholder="Ej: Custom SDXL Pro" type="text"/></div>
+              <div class="field" style="margin-bottom:0;"><label>Tipo</label>
+                <select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option><option value="adult">Adult</option></select>
+              </div>
+              <button class="btn btn-primary" id="btnAddModel">+ Añadir Modelo</button>
+            </div>
+            <div id="adminModelList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+          </div>
+          <div class="panel">
+            <h4 style="margin-bottom:14px;">🗄️ Base de Datos Completa de Registros &amp; Monitoreo en Vivo</h4>
+            <div class="user-table-wrap">
+              <table class="user-table">
+                <thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Diamantes</th><th>Estado</th><th>Acciones</th></tr></thead>
+                <tbody id="userTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-</div>
-</div>
-</div>
-<!-- GALLERY VIEW -->
-<div class="view" id="view-gallery">
-<div class="view-head"><h2>Galería Global</h2><p>Tus obras maestras almacenadas de forma segura en la nube. Haz clic para hacer zoom, descargar o eliminar.</p></div>
-<div class="result-grid" id="galleryGrid">
-<div class="result-card"><div class="result-empty">Aún no hay creaciones guardadas.</div></div>
-</div>
-</div>
-<!-- CREDITS VIEW -->
-<div class="view" id="view-credits">
-<div class="view-head"><h2>Créditos y Bonificaciones</h2><p>Obtén recursos diarios para mantener tus creaciones activas.</p></div>
-<div class="claim-card">
-<div><div class="l">🪙 Bono Diario de Créditos</div><div class="s">150 créditos gratis cada 24 horas</div></div>
-<button class="btn btn-primary btn-sm" id="btnClaimCoin">Reclamar</button>
-</div>
-<div class="claim-card">
-<div><div class="l">💎 Gemas Semanales</div><div class="s">20 gemas para efectos avanzados</div></div>
-<button class="btn btn-primary btn-sm" id="btnClaimGem">Reclamar</button>
-</div>
-<h4 style="margin-top:26px; color:var(--text-dim); font-size:13px; text-transform:uppercase; letter-spacing:.08em;">Recargas de Créditos</h4>
-<div class="price-grid" id="dynamicPriceGrid"></div>
-</div>
-<!-- PLANS VIEW -->
-<div class="view" id="view-plans">
-<div class="view-head"><h2>Planes Premium</h2><p>Lleva tu estudio al siguiente nivel con acceso ilimitado y ultra resolución.</p></div>
-<div class="plans-grid">
-<div class="plan-card">
-<h3>Free Studio</h3>
-<div class="price">$0<span>/mes</span></div>
-<ul><li>10 imágenes diarias</li><li>Modelos estándar rápidos</li><li>Calidad HD</li></ul>
-<button class="btn btn-ghost">Plan actual</button>
-</div>
-<div class="plan-card featured">
-<h3>👑 Pro Creator</h3>
-<div class="price">$19.99<span>/mes</span></div>
-<ul><li>Generaciones masivas prioritarias</li><li>Acceso completo a Stable Diffusion XL y modelos Pro</li><li>Resolución Ultra y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
-<button class="btn btn-primary" id="btnBuyPro">Elegir Pro</button>
-</div>
-<div class="plan-card adult" style="background: linear-gradient(180deg, #F5B94218, #8B5CF612, var(--panel)); border: 1px solid #F5B942; box-shadow: 0 0 20px #F5B94233; position: relative;"><div class="badge" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #F5B942, #8B5CF6); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 100px; white-space: nowrap;">MODELOS X EXCLUSIVOS</div><h3>👑 Adult Master Premium</h3><div class="price">$29.99<span>/mes</span></div><ul><li>Acceso total a modelos Nyxora-X &amp; Obsidian-X</li><li>Generación de contenido adulto sin restricciones</li><li>Máxima nitidez atómica 8K</li><li>Soporte prioritario 24/7</li></ul><button class="btn" id="btnBuyAdult" style="background: linear-gradient(135deg, #F5B942, #D97706); color: #000; font-weight: 900;">Desbloquear Adult</button></div>
-</div>
-</div>
-<!-- OWNER PANEL VIEW -->
-<div class="view" id="view-owner">
-<div class="view-head"><h2>Panel de Dueño &amp; Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA.</p></div>
-<div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
-<div class="panel" style="margin-bottom:20px; border-color:var(--pink);">
-<h4 style="color:var(--pink);">🔞 Módulo de Contenido para Adultos</h4>
-<div class="field" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
-<label style="margin:0; font-size:14px; color:var(--text);">Habilitar modelos para adultos globalmente</label>
-<input checked="" id="toggleAdultContent" style="width:auto;" type="checkbox"/>
-</div>
-<div class="admin-form-row">
-<div class="field" style="margin-bottom:0;"><label>Nombre del Pack Premium</label><input id="newAdultPackName" placeholder="Ej: Elite X-Pack" type="text"/></div>
-<div class="field" style="margin-bottom:0;"><label>Precio ($)</label><input id="newAdultPackPrice" placeholder="49.99" type="number"/></div>
-<button class="btn btn-pink" id="btnAddAdultPack">+ Añadir Pack Adulto</button>
-</div>
-<div id="adminAdultPackList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
-</div>
-<!-- MÓDULO: TRADUCTOR DE INTENCIONES A CÓDIGO JS CON LA ESTRUCTURA SEGURA -->
-<div class="panel" style="margin-bottom:20px; border-color:var(--cyan);">
-<h4 style="color:var(--cyan);">✨ Traductor de Intenciones a Código JS (Generador Inteligente)</h4>
-<p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Escribe con tus propias palabras lo que deseas que haga la web. El sistema traducirá tu solicitud utilizando la función generadora segura.</p>
-<div class="field">
-<label>¿Qué deseas hacer dentro de la web?</label>
-<textarea id="intentInput" placeholder="Ej: Mostrar notificación de bienvenida o saludo personalizado..."></textarea>
-</div>
-<div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
-<button class="btn btn-primary" id="btnTranslateIntent" style="background:linear-gradient(135deg, var(--cyan), #0284c7); color:#000;">🪄 Traducir a Código JS</button>
-</div>
-<div class="field">
-<label>Código JS Generado Automáticamente (Estructura Segura)</label>
-<textarea class="mono" id="translatedResultCode" placeholder="// Aquí aparecerá el código traducido listo para usar..." style="min-height:90px; color:var(--cyan);"></textarea>
-</div>
-<div style="display:flex; gap:10px; flex-wrap:wrap;">
-<button class="btn btn-gold" id="btnInjectTranslatedCode">⚡ Inyectar y Probar en JS al Instante</button>
-</div>
-</div>
-<div class="panel" style="margin-bottom:20px; border-color:var(--violet);">
-<h4 style="color:var(--violet);">💻 Programación y Inyección de Código en Vivo (HTML / CSS / JS)</h4>
-<p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Inyecta código personalizado, añade nuevas funciones, modifica comportamientos o rediseña estructuras globales al instante.</p>
-<div class="field">
-<label>Editor de Código JS / Funciones Customizadas</label>
-<textarea class="mono" id="ownerCustomScriptCode" placeholder="// Escribe funciones JavaScript extra aquí o usa el traductor de arriba" style="min-height:100px;"></textarea>
-</div>
-<div class="field">
-<label>Editor de Estilos CSS Raíz</label>
-<textarea class="mono" id="ownerCustomStyleCode" placeholder="/* Escribe estilos CSS adicionales */" style="min-height:80px;"></textarea>
-</div>
-<div style="display:flex; gap:10px; flex-wrap:wrap;">
-<button class="btn btn-primary" id="btnExecCode">⚡ Compilar y Aplicar Código</button>
-<button class="btn btn-ghost" id="btnResetCode">🔄 Resetear / Limpiar Código Custom</button>
-</div>
-</div>
-<!-- BOTÓN UNIVERSAL DE CONTROL GLOBAL -->
-<div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
-<h4 style="color:var(--gold);">🛠️ Consola Universal de Acciones Maestras (Rename, Delete, Undo, Correct, Resolve...)</h4>
-<p style="font-size:12.5px; color:var(--text-dim); margin-bottom:14px;">Selecciona el ámbito de aplicación y ejecuta operaciones globales instantáneas sobre usuarios, bases de datos o parámetros.</p>
-<div class="admin-form-row">
-<div class="field" style="margin-bottom:0;">
-<label>Ámbito de Aplicación (Scope)</label>
-<select class="chip-select" id="universalScope" style="width:100%; padding:11px;">
-<option value="global_db">Base de Datos Global de Usuarios</option>
-<option value="active_gallery">Galería Local Actual</option>
-<option value="system_config">Configuración del Sistema / Motor</option>
-</select>
-</div>
-<div class="field" style="margin-bottom:0;">
-<label>Acción Universal</label>
-<select class="chip-select" id="universalAction" style="width:100%; padding:11px;">
-<option value="resolve">Resolve / Resolver Estados</option>
-<option value="repair">Repair / Reparar Registros</option>
-<option value="correct">Correct / Corregir Anomalías</option>
-<option value="modify">Modify / Modificar Atributos</option>
-<option value="improve">Improve / Optimizar Rendimiento</option>
-<option value="replace">Replace / Reemplazar Tokens</option>
-<option value="substitute">Substitute / Sustituir Valores</option>
-<option value="change">Change / Cambiar Estado General</option>
-<option value="undo">Undo / Deshacer Último Cambio</option>
-<option value="rename">Rename / Renombrar Entidades</option>
-<option value="delete">Delete / Eliminar (Purga)</option>
-</select>
-</div>
-<div class="field" style="margin-bottom:0;">
-<label>Parámetro o ID Objetivo</label>
-<input id="universalTargetId" placeholder="Ej: email, id, o 'all'" type="text"/>
-</div>
-</div>
-<div style="margin-top:12px;">
-<button class="btn btn-gold" id="btnExecUniversalAction">🚀 Ejecutar Acción Universal en Sistema</button>
-</div>
-</div>
-<div class="panel" style="margin-bottom:20px; border-color:var(--gold);">
-<h4 style="color:var(--gold);">🪙 Administración Global de Billeteras</h4>
-<div class="admin-form-row">
-<div class="field" style="margin-bottom:0;"><label>Correo del Usuario Objetivo</label><input id="targetUserEmail" placeholder="usuario@ejemplo.com" type="text"/></div>
-<div class="field" style="margin-bottom:0;"><label>Tipo de Recurso</label>
-<select class="chip-select" id="targetResourceType" style="width:100%; padding:11px;">
-<option value="coins">🪙 Créditos / Monedas</option>
-<option value="gems">💎 Gemas</option>
-<option value="diamonds">🔷 Diamantes</option>
-</select>
-</div>
-<div class="field" style="margin-bottom:0;"><label>Cantidad (Valor)</label><input id="targetResourceAmount" placeholder="1000" type="number"/></div>
-</div>
-<div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-<button class="btn btn-gold" id="btnWalletAdd">➕ Añadir / Sumar</button>
-<button class="btn btn-ghost" id="btnWalletSub">➖ Quitar / Restar</button>
-<button class="btn btn-ghost" id="btnWalletSet">🔄 Establecer Valor Exacto</button>
-<button class="btn btn-ghost" id="btnWalletClear" style="color:var(--danger); border-color:var(--danger);">🗑️ Limpiar / Borrar Billetera</button>
-</div>
-</div>
-<div class="panel" style="margin-bottom:20px;">
-<h4>🎛️ Control Técnico de Fotorrealismo &amp; Nitidez</h4>
-<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:14px; margin-top:12px;">
-<div class="field" style="margin-bottom:0;">
-<label>Filtro de Nitidez</label>
-<select class="chip-select" id="cfgSharpness" style="width:100%; padding:11px;">
-<option value="atomic">Nitidez Avanzada SDXL</option>
-<option value="ultra">Ultra Definición 8K</option>
-<option value="balanced">Balanceado Natural</option>
-</select>
-</div>
-<div class="field" style="margin-bottom:0;">
-<label>Preservación Absoluta Identidad Facial</label>
-<select class="chip-select" id="cfgFaceFix" style="width:100%; padding:11px;">
-<option value="absolute">Activado (Preservación Absoluta de Rostro y Cabello)</option>
-<option value="off">Desactivado</option>
-</select>
-</div>
-<div class="field" style="margin-bottom:0;">
-<label>Motor de Render Video / Física</label>
-<select class="chip-select" id="cfgVideoEngine" style="width:100%; padding:11px;">
-<option value="cosmic">Motion Engine Pro</option>
-<option value="fluid">Motion Fluido 60FPS</option>
-</select>
-</div>
-</div>
-</div>
-<div class="panel" style="margin-bottom:20px;">
-<h4>🤖 Agregar o Gestionar Modelos de IA &amp; Paquetes</h4>
-<div class="admin-form-row">
-<div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input id="newModelName" placeholder="Ej: Custom SDXL Pro" type="text"/></div>
-<div class="field" style="margin-bottom:0;"><label>Tipo</label>
-<select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option><option value="adult">Adult</option></select>
-</div>
-<button class="btn btn-primary" id="btnAddModel">+ Añadir Modelo</button>
-</div>
-<div id="adminModelList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
-</div>
-<div class="panel">
-<h4 style="margin-bottom:14px;">🗄️ Base de Datos Completa de Registros &amp; Monitoreo en Vivo</h4>
-<div class="user-table-wrap">
-<table class="user-table">
-<thead><tr><th>Usuario / Correo</th><th>Plan Actual</th><th>Créditos</th><th>Gemas</th><th>Diamantes</th><th>Estado</th><th>Acciones</th></tr></thead>
-<tbody id="userTableBody"></tbody>
-</table>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- MODAL ZOOM INTEGRADO -->
+<!-- MODAL ZOOM -->
 <div class="zoom-modal" id="zoomModal">
-<button class="zoom-close" id="zoomClose">✕</button>
-<div class="zoom-content" id="zoomContainer"></div>
+  <button class="zoom-close" id="zoomClose">✕</button>
+  <div class="zoom-content" id="zoomContainer"></div>
 </div>
 <div class="toast" id="toast"></div>
+
 <!-- SCRIPTS FIREBASE Y LÓGICA -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
@@ -680,7 +647,7 @@ const state = {
   diamonds: 0,
   gensToday: 0,
   studioMode: 'image',
-  selectedModel: 'stable-diffusion-xl', /* Modelo principal configurado que sí funciona */
+  selectedModel: 'stable-diffusion-xl',
   gallery: [],
   techConfig: { sharpness: 'atomic', faceFix: 'absolute', videoEngine: 'cosmic' },
   models: [
@@ -878,6 +845,7 @@ function closeSidebar(){
   document.getElementById('sidebarOverlay').classList.remove('show');
 }
 
+// --- FUNCIÓN DE GENERACIÓN MEJORADA ---
 async function runGeneration(){
   const prompt = document.getElementById('promptInput').value.trim();
   const refImage = document.getElementById('refImageInput') ? document.getElementById('refImageInput').value.trim() : '';
@@ -919,6 +887,10 @@ async function runGeneration(){
     }
     enhancedPrompt += ' --no blemishes, stains, texts, watermarks, deformations';
 
+    // Obtener formato y calidad
+    const format = document.getElementById('optFormat').value;
+    const quality = document.getElementById('optQuality').value;
+
     const res = await fetch(GENERATION_PROXY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -928,6 +900,8 @@ async function runGeneration(){
         refImage,
         model: state.selectedModel, 
         mode: state.studioMode,
+        format: format,
+        quality: quality,
         techConfig: {
           sharpness: state.techConfig.sharpness,
           faceFix: state.techConfig.faceFix,
@@ -939,6 +913,8 @@ async function runGeneration(){
     if(!res.ok || data.error) throw new Error(data.error || 'Error en servidor de IA');
     
     const mediaUrl = data.mediaUrl;
+    if(!mediaUrl) throw new Error('No se recibió URL de la imagen/video');
+    
     const isVid = state.studioMode === 'video' || mediaUrl.includes('.mp4');
 
     grid.innerHTML = `
@@ -951,9 +927,11 @@ async function runGeneration(){
       </div>
     `;
     saveToGallery(mediaUrl);
+    showToast('¡Generación completada con éxito!');
   }catch(err){
-    grid.innerHTML = `<div class="result-card"><div class="result-empty" style="color:var(--danger)">⚠️ Error al generar</div></div>`;
-    showToast('Fallo al conectar con el motor de IA.');
+    console.error('Error en generación:', err);
+    grid.innerHTML = `<div class="result-card"><div class="result-empty" style="color:var(--danger)">⚠️ Error: ${err.message}</div></div>`;
+    showToast('Fallo: ' + err.message);
   }
 }
 
@@ -1416,4 +1394,5 @@ renderModels();
 renderPacks();
 showForm('login');
 </script>
-</body></html>
+</body>
+</html>
