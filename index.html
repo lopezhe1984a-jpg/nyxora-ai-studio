@@ -18,6 +18,8 @@
     --violet-soft:#8B5CF622;
     --cyan:#33E5FF;
     --gold:#F5B942;
+    --pink:#EC4899;
+    --pink-soft:#EC489922;
     --text:#EDEEF5;
     --text-dim:#9297AC;
     --text-faint:#5A5E72;
@@ -146,6 +148,7 @@
   .btn-ghost{ background:transparent; border:1px solid var(--line); color:var(--text); }
   .btn-ghost:hover{ border-color:var(--violet); }
   .btn-gold{ background:linear-gradient(135deg, var(--gold), #D97706); color:#000; }
+  .btn-pink{ background:linear-gradient(135deg, var(--pink), #BE185D); color:#fff; }
   .auth-switch{ text-align:center; margin-top:16px; font-size:13px; color:var(--text-dim); }
   .auth-switch button{ background:none; color:var(--violet); font-weight:700; }
   .auth-error{ background:#FF5C7A18; border:1px solid #FF5C7A44; color:var(--danger); font-size:12.5px; padding:9px 12px; border-radius:8px; margin-bottom:14px; display:none; }
@@ -192,13 +195,17 @@
   .model-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(140px,1fr)); gap:10px; margin-top:14px; }
   .model-card{
     background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:12px;
-    cursor:pointer; transition:border-color .15s, transform .1s;
+    cursor:pointer; transition:border-color .15s, transform .1s; position:relative;
   }
   .model-card:hover{ border-color:#3a3d55; }
   .model-card.selected{ border-color:var(--violet); background:var(--violet-soft); }
+  .model-card.locked{ opacity:0.6; cursor:not-allowed; }
+  .model-card.locked:hover{ border-color:var(--line); }
   .model-card .m-name{ font-weight:700; font-size:13px; margin-bottom:2px; }
   .model-card .m-tag{ font-size:10.5px; color:var(--text-faint); }
   .model-card .m-badge{ display:inline-block; margin-top:6px; font-size:9.5px; padding:2px 6px; border-radius:6px; background:#8B5CF633; color:#C9B8FF; font-weight:700; }
+  .model-card .m-badge.adult{ background:var(--pink-soft); color:var(--pink); }
+  .model-card .m-lock{ position:absolute; top:12px; right:12px; font-size:14px; }
 
   .opts-row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
   .chip-select{ background:var(--bg-1); border:1px solid var(--line); color:var(--text); padding:8px 12px; border-radius:9px; font-size:12.5px; outline:none; }
@@ -248,12 +255,14 @@
   .plans-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(230px,1fr)); gap:16px; margin-top:16px; }
   .plan-card{ background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:24px; }
   .plan-card.featured{ border-color:var(--gold); background:linear-gradient(180deg, #F5B94212, var(--panel)); }
+  .plan-card.adult{ border-color:var(--pink); background:linear-gradient(180deg, var(--pink-soft), var(--panel)); }
   .plan-card h3{ font-size:18px; margin-bottom:4px; }
   .plan-card .price{ font-size:28px; font-weight:900; font-family:'Orbitron'; margin:10px 0; }
   .plan-card .price span{ font-size:13px; color:var(--text-dim); font-family:'Inter'; font-weight:500; }
   .plan-card ul{ list-style:none; margin:16px 0; }
   .plan-card li{ font-size:13px; color:var(--text-dim); padding:6px 0; display:flex; gap:8px; align-items:flex-start; }
   .plan-card li::before{ content:'✓'; color:var(--violet); font-weight:800; }
+  .plan-card.adult li::before{ color:var(--pink); }
 
   /* Owner Advanced Universal Panel */
   .owner-banner{ background:linear-gradient(135deg, #F5B94222, #8B5CF622); border:1px solid var(--gold); border-radius:14px; padding:14px 18px; margin-bottom:20px; display:flex; align-items:center; gap:12px; }
@@ -468,12 +477,26 @@
 <ul><li>Generaciones masivas prioritarias</li><li>Acceso completo a Stable Diffusion XL y modelos Pro</li><li>Resolución Ultra y Videos Largos</li><li>150 créditos diarios automáticos</li></ul>
 <button class="btn btn-primary" id="btnBuyPro">Elegir Pro</button>
 </div>
+<div class="plan-card adult" style="background: linear-gradient(180deg, #F5B94218, #8B5CF612, var(--panel)); border: 1px solid #F5B942; box-shadow: 0 0 20px #F5B94233; position: relative;"><div class="badge" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #F5B942, #8B5CF6); color: #fff; font-size: 10px; font-weight: 700; padding: 3px 12px; border-radius: 100px; white-space: nowrap;">MODELOS X EXCLUSIVOS</div><h3>👑 Adult Master Premium</h3><div class="price">$29.99<span>/mes</span></div><ul><li>Acceso total a modelos Nyxora-X &amp; Obsidian-X</li><li>Generación de contenido adulto sin restricciones</li><li>Máxima nitidez atómica 8K</li><li>Soporte prioritario 24/7</li></ul><button class="btn" id="btnBuyAdult" style="background: linear-gradient(135deg, #F5B942, #D97706); color: #000; font-weight: 900;">Desbloquear Adult</button></div>
 </div>
 </div>
 <!-- OWNER PANEL VIEW -->
 <div class="view" id="view-owner">
 <div class="view-head"><h2>Panel de Dueño &amp; Administración Universal</h2><p>Control total avanzado: Modifica código HTML/JS/CSS en vivo, gestiona base de datos global, billeteras con opción de sumar, restar, modificar o eliminar recursos, y modelos de IA.</p></div>
 <div class="owner-banner"><span class="dot"></span><span style="font-size:13.5px; font-weight:600;">Modo Dueño Maestro activado. Tienes acceso absoluto a la programación y control global de toda la plataforma.</span></div>
+<div class="panel" style="margin-bottom:20px; border-color:var(--pink);">
+<h4 style="color:var(--pink);">🔞 Módulo de Contenido para Adultos</h4>
+<div class="field" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+<label style="margin:0; font-size:14px; color:var(--text);">Habilitar modelos para adultos globalmente</label>
+<input checked="" id="toggleAdultContent" style="width:auto;" type="checkbox"/>
+</div>
+<div class="admin-form-row">
+<div class="field" style="margin-bottom:0;"><label>Nombre del Pack Premium</label><input id="newAdultPackName" placeholder="Ej: Elite X-Pack" type="text"/></div>
+<div class="field" style="margin-bottom:0;"><label>Precio ($)</label><input id="newAdultPackPrice" placeholder="49.99" type="number"/></div>
+<button class="btn btn-pink" id="btnAddAdultPack">+ Añadir Pack Adulto</button>
+</div>
+<div id="adminAdultPackList" style="margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;"></div>
+</div>
 <!-- MÓDULO: TRADUCTOR DE INTENCIONES A CÓDIGO JS CON LA ESTRUCTURA SEGURA -->
 <div class="panel" style="margin-bottom:20px; border-color:var(--cyan);">
 <h4 style="color:var(--cyan);">✨ Traductor de Intenciones a Código JS (Generador Inteligente)</h4>
@@ -599,7 +622,7 @@
 <div class="admin-form-row">
 <div class="field" style="margin-bottom:0;"><label>Nombre del Modelo</label><input id="newModelName" placeholder="Ej: Custom SDXL Pro" type="text"/></div>
 <div class="field" style="margin-bottom:0;"><label>Tipo</label>
-<select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option></select>
+<select class="chip-select" id="newModelType" style="width:100%; padding:11px;"><option value="image">Imagen</option><option value="video">Video</option><option value="adult">Adult</option></select>
 </div>
 <button class="btn btn-primary" id="btnAddModel">+ Añadir Modelo</button>
 </div>
@@ -650,6 +673,8 @@ const state = {
   uid: null,
   currentUser: null,
   isOwner: false,
+  adultContentAccess: false,
+  adultContentGlobalEnabled: true,
   coins: 0,
   gems: 0,
   diamonds: 0,
@@ -663,29 +688,42 @@ const state = {
     { id:'aurora-vision', name:'Aurora Vision', type:'image', tag:'Fotorrealismo general', badge:'Popular' },
     { id:'nyx-portrait', name:'Nyx Portrait', type:'image', tag:'Retratos y personas', badge:'HD' },
     { id:'obsidian-max', name:'Obsidian Max', type:'image', tag:'Detalle 4K Supremo', badge:'Ultra' },
-    { id:'nyxora-ai-models', name:'NYXORA AI MODELS', type:'image', tag:'Resolución Cuántica 64K', badge:'MAESTRO' },
     { id:'nyx-video-cinematic', name:'NyxMotion Cinematic', type:'video', tag:'Videos largos y cortos', badge:'Motion' },
-    { id:'veo-motion-pro', name:'Veo Motion Pro', type:'video', tag:'Alta definición fluida', badge:'Pro' }
+    { id:'veo-motion-pro', name:'Veo Motion Pro', type:'video', tag:'Alta definición fluida', badge:'Pro' },
+    { id:'nyxora-x-realism', name:'Nyxora-X Realism', type:'image', tag:'NSFW Fotorrealismo', badge:'Adult', isAdult:true },
+    { id:'obsidian-x-video', name:'Obsidian-X Video', type:'video', tag:'NSFW Dinámico', badge:'Adult', isAdult:true }
   ],
   packs: [
     { id:'p1', title:'100 créditos', cost:'$4.99' },
     { id:'p2', title:'500 créditos', cost:'$14.99', popular:true },
     { id:'p3', title:'1500 créditos', cost:'$34.99' }
-  ]
+  ],
+  adultPacks: []
 };
 
 function renderModels(){
   const grid = document.getElementById('modelGrid');
   if(!grid) return;
-  const filtered = state.models.filter(m => m.type === state.studioMode);
-  grid.innerHTML = filtered.map(m => `
-    <div class="model-card ${m.id===state.selectedModel?'selected':''}" data-model-id="${m.id}">
+  const filtered = state.models.filter(m => m.type === state.studioMode && (!m.isAdult || state.adultContentGlobalEnabled));
+  grid.innerHTML = filtered.map(m => {
+    const isLocked = m.isAdult && !state.adultContentAccess && !state.isOwner;
+    return `
+    <div class="model-card ${m.id===state.selectedModel?'selected':''} ${isLocked?'locked':''}" data-model-id="${m.id}" data-locked="${isLocked}">
       <div class="m-name">${m.name}</div><div class="m-tag">${m.tag}</div>
-      ${m.badge?`<span class="m-badge">${m.badge}</span>`:''}
-    </div>`).join('');
+      ${m.badge?`<span class="m-badge ${m.isAdult?'adult':''}">${m.badge}</span>`:''}
+      ${isLocked?'<span class="m-lock">🔒</span>':''}
+    </div>`
+  }).join('');
 
   grid.querySelectorAll('.model-card').forEach(card => {
-    card.addEventListener('click', () => selectModel(card.getAttribute('data-model-id')));
+    card.addEventListener('click', () => {
+      if(card.getAttribute('data-locked') === 'true') {
+        showToast('Modelo bloqueado. Actualiza a Adult Premium para usarlo.');
+        switchView('plans');
+      } else {
+        selectModel(card.getAttribute('data-model-id'));
+      }
+    });
   });
 }
 
@@ -705,7 +743,7 @@ function switchStudioMode(mode){
   document.getElementById('imageOptionsRow').style.display = mode === 'image' ? 'flex' : 'none';
   document.getElementById('videoOptionsRow').style.display = mode === 'video' ? 'flex' : 'none';
   
-  const first = state.models.find(m => m.type === mode);
+  const first = state.models.find(m => m.type === mode && (!m.isAdult || state.adultContentAccess || state.isOwner));
   if(first) selectModel(first.id);
   renderModels();
 }
@@ -723,6 +761,15 @@ function renderPacks(){
   grid.querySelectorAll('.btn-mock-purchase').forEach(btn => {
     btn.addEventListener('click', () => mockPurchase(btn.getAttribute('data-title')));
   });
+}
+
+function renderAdultPacks(){
+  const grid = document.getElementById('adminAdultPackList');
+  if(!grid) return;
+  grid.innerHTML = state.adultPacks.map(p => `
+    <div style="background:var(--panel-2); border:1px solid var(--pink); padding:8px 12px; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
+      <b>${p.name}</b> <span style="color:var(--gold);">$${p.price}</span>
+    </div>`).join('');
 }
 
 function showForm(which){
@@ -753,7 +800,7 @@ async function handleRegister(){
   try{
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await setDoc(doc(db, 'users', cred.user.uid), {
-      name, email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status: 'active', isOwner: false, createdAt: new Date().toISOString(),
+      name, email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status: 'active', isOwner: false, adultContentAccess: false, createdAt: new Date().toISOString(),
     });
   }catch(err){ showAuthError(err.message); }
 }
@@ -773,7 +820,7 @@ onAuthStateChanged(auth, async (user) => {
     let snap = await getDoc(doc(db, 'users', user.uid));
     if(!snap.exists()){
       await setDoc(doc(db, 'users', user.uid), {
-        name: user.email.split('@')[0], email: user.email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false, createdAt: new Date().toISOString(),
+        name: user.email.split('@')[0], email: user.email, coins: 150, gems: 0, diamonds: 0, plan: 'Free Studio', status:'active', isOwner:false, adultContentAccess:false, createdAt: new Date().toISOString(),
       });
       snap = await getDoc(doc(db, 'users', user.uid));
     }
@@ -782,6 +829,7 @@ onAuthStateChanged(auth, async (user) => {
     state.coins = data.coins ?? 0;
     state.gems = data.gems ?? 0;
     state.diamonds = data.diamonds ?? 0;
+    state.adultContentAccess = data.adultContentAccess ?? false;
 
     const tokenResult = await user.getIdTokenResult(true);
     state.isOwner = tokenResult.claims.isOwner === true;
@@ -800,10 +848,11 @@ function enterApp(){
   document.getElementById('app').classList.add('active');
   document.getElementById('userAvatar').textContent = (state.currentUser||'U').charAt(0).toUpperCase();
   document.getElementById('ownerNavBtn').style.display = state.isOwner ? 'flex' : 'none';
-  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — Acceso Total Libre' : 'Prueba Pro — 3 días';
+  document.getElementById('planStatus').textContent = state.isOwner ? 'Propietario — Acceso Total Libre' : (state.adultContentAccess ? 'Adult Premium' : 'Prueba Pro — 3 días');
   updateCurrencyUI();
   loadGallery();
   renderPacks();
+  renderModels();
   if(state.isOwner) renderAdminPanel();
   showToast(state.isOwner ? 'Bienvenido, dueño absoluto.' : `Bienvenido al estudio, ${state.currentUser}`);
 }
@@ -836,6 +885,13 @@ async function runGeneration(){
   if(!prompt){ showToast('Escribe un prompt descriptivo.'); return; }
   const cost = state.studioMode === 'video' ? 30 : 10;
   
+  const selectedModelData = state.models.find(m => m.id === state.selectedModel);
+  if(selectedModelData && selectedModelData.isAdult && !state.adultContentAccess && !state.isOwner){
+      showToast('Modelo bloqueado. Actualiza a Adult Premium para usarlo.');
+      switchView('plans');
+      return;
+  }
+
   if(!state.isOwner && state.coins < cost){
     showToast('Créditos insuficientes. Reclama tu bono o recarga.');
     return;
@@ -856,9 +912,7 @@ async function runGeneration(){
     const freshToken = await auth.currentUser.getIdToken(true);
     
     let enhancedPrompt = prompt;
-    if (state.selectedModel === 'nyxora-ai-models') {
-      enhancedPrompt = '[SISTEMA DE RESOLUCIÓN Y CALIDAD]: INSANA RESOLUCIÓN HIPER-GIGAPIXEL 65536x36864 64K con CAPACIDAD DE ZOOM FRACTAL INFINITO, HIPER-NITIDEZ CUÁNTICO-SUBATÓMICA a nivel molecular y atómico, ENFOQUE PERFECTO INFINITO sin pérdida por difracción, MÁXIMA DEFINICIÓN 10000 PPI. ULTRA-HIPER-ULTRA-REALISMO con naturalismo crudo sin filtros, EXPLOSIÓN SUPREMA DE DETALLE INFINITO visible. [REQUISITOS DE CALIDAD SIN ERRORES] Fotografía fotorrealista al 100%, ultra detallada, sin deformaciones, sin distorsiones, sin borrosidad, sin rasgos artificiales. ' + enhancedPrompt;
-    } else if (state.studioMode === 'image') {
+    if (state.studioMode === 'image') {
       enhancedPrompt += ', photorealistic, 8k, highly detailed, masterwork, sharp focus, cinematic lighting';
     } else {
       enhancedPrompt += ', highly detailed, smooth motion, 8k resolution, cinematic masterpiece';
@@ -1051,6 +1105,15 @@ async function claimDaily(type){
 
 function mockPurchase(item){ showToast(`Pasarela segura simulada para: ${item}`); }
 
+async function buyAdultPremium(){
+  if(state.isOwner) { showToast('Ya eres propietario.'); return; }
+  await updateDoc(doc(db, 'users', state.uid), { adultContentAccess: true, plan: 'Adult Premium' });
+  state.adultContentAccess = true;
+  document.getElementById('planStatus').textContent = 'Adult Premium';
+  renderModels();
+  showToast('¡Adult Premium desbloqueado con éxito!');
+}
+
 function updateCurrencyUI(){
   document.getElementById('coinCount').textContent = state.isOwner ? '∞' : state.coins;
   document.getElementById('gemCount').textContent = state.isOwner ? '∞' : state.gems;
@@ -1067,8 +1130,10 @@ async function renderAdminPanel(){
   const list = document.getElementById('adminModelList');
   list.innerHTML = state.models.map(m => `
     <div style="background:var(--panel-2); border:1px solid var(--line); padding:8px 12px; border-radius:8px; font-size:12px; display:flex; align-items:center; gap:8px;">
-      <b>${m.name}</b> <span style="color:var(--text-faint);">(${m.type})</span>
+      <b>${m.name}</b> <span style="color:var(--text-faint);">(${m.type}${m.isAdult?' - Adult':''})</span>
     </div>`).join('');
+
+  renderAdultPacks();
 
   const snap = await getDocs(collection(db, 'users'));
   const users = snap.docs.map(d => ({ id:d.id, ...d.data() }));
@@ -1242,12 +1307,31 @@ function adminAddModel(){
   const name = document.getElementById('newModelName').value.trim();
   const type = document.getElementById('newModelType').value;
   if(!name) return;
+  const isAdult = type === 'adult';
+  const realType = isAdult ? 'image' : type;
   const id = name.toLowerCase().replace(/\s+/g, '-');
-  state.models.push({ id, name, type, tag: type==='image' ? 'Modelo Fotorrealista' : 'Video Dinámico Pro', badge: 'Custom' });
+  state.models.push({ id, name, type: realType, tag: realType==='image' ? 'Modelo Fotorrealista' : 'Video Dinámico Pro', badge: isAdult ? 'Adult' : 'Custom', isAdult });
   document.getElementById('newModelName').value = '';
   renderModels();
   renderAdminPanel();
   showToast('¡Modelo de IA añadido con éxito!');
+}
+
+function adminAddAdultPack(){
+  const name = document.getElementById('newAdultPackName').value.trim();
+  const price = document.getElementById('newAdultPackPrice').value;
+  if(!name || !price) return;
+  state.adultPacks.push({ name, price });
+  document.getElementById('newAdultPackName').value = '';
+  document.getElementById('newAdultPackPrice').value = '';
+  renderAdultPacks();
+  showToast('¡Pack Adulto añadido con éxito!');
+}
+
+function toggleAdultContentGlobally(e){
+  state.adultContentGlobalEnabled = e.target.checked;
+  renderModels();
+  showToast(state.adultContentGlobalEnabled ? 'Contenido adulto habilitado globalmente.' : 'Contenido adulto deshabilitado globalmente.');
 }
 
 async function giftCredits(email){
@@ -1304,6 +1388,7 @@ document.getElementById('btnPromptJson').addEventListener('click', promptToJSON)
 document.getElementById('btnClaimCoin').addEventListener('click', () => claimDaily('coin'));
 document.getElementById('btnClaimGem').addEventListener('click', () => claimDaily('gem'));
 document.getElementById('btnBuyPro').addEventListener('click', () => mockPurchase('Suscripción Pro Mensual'));
+document.getElementById('btnBuyAdult').addEventListener('click', buyAdultPremium);
 
 document.getElementById('btnTranslateIntent').addEventListener('click', translateIntentToCode);
 document.getElementById('btnInjectTranslatedCode').addEventListener('click', injectTranslatedCodeDirectly);
@@ -1321,6 +1406,9 @@ document.getElementById('btnAddModel').addEventListener('click', adminAddModel);
 document.getElementById('cfgSharpness').addEventListener('change', saveOwnerTechConfig);
 document.getElementById('cfgFaceFix').addEventListener('change', saveOwnerTechConfig);
 document.getElementById('cfgVideoEngine').addEventListener('change', saveOwnerTechConfig);
+
+document.getElementById('toggleAdultContent').addEventListener('change', toggleAdultContentGlobally);
+document.getElementById('btnAddAdultPack').addEventListener('click', adminAddAdultPack);
 
 window.deleteGalleryItem = deleteGalleryItem;
 
